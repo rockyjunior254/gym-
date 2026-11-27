@@ -1,0 +1,373 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Progress Studio{% endblock %}
+{% block page_subtitle %}Track body measurements, log personal records (1RM), and maintain private transformation photos{% endblock %}
+
+{% block topbar_actions %}
+  <button type="button" class="fp-btn-lime" onclick="openModal('logProgressModal')">
+    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+    Log Measurements
+  </button>
+  <button type="button" class="fp-btn-dark" onclick="openModal('addPrModal')">
+    <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
+    Record PR Lift
+  </button>
+  <button type="button" class="fp-btn-outline" onclick="openModal('addGoalModal')">
+    <i data-lucide="target" style="width: 16px; height: 16px;"></i>
+    Set Milestone
+  </button>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Personal Records & Goals Row -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <!-- Personal Records (PRs) Card -->
+    <div class="fp-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Personal Records (PRs)</h3>
+        <button type="button" class="fp-btn-lime" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openModal('addPrModal')">
+          + Record PR
+        </button>
+      </div>
+
+      {% if prs %}
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          {% for p in prs %}
+            <div style="padding: 12px 16px; border-radius: 12px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ p.exercise_name }}</span>
+                <div style="font-size: 0.72rem; color: var(--fp-muted); margin-top: 2px;">
+                  Achieved: {{ p.achieved_on }} &bull; {{ p.reps }} Reps
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 1.25rem; font-weight: 800; color: var(--fp-coral);">
+                  {{ p.weight_kg }} <span style="font-size: 0.75rem;">kg</span>
+                </div>
+                <div style="font-size: 0.7rem; color: var(--fp-muted);">Est 1RM: {{ p.estimated_one_rep_max or p.weight_kg }} kg</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+          No personal records logged yet. Record your benchmark lifts above!
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Active Milestones / Goals Card -->
+    <div class="fp-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Fitness Targets</h3>
+        <button type="button" class="fp-btn-dark" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openModal('addGoalModal')">
+          + Set Target
+        </button>
+      </div>
+
+      {% if goals %}
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          {% for g in goals %}
+            <div style="padding: 12px 14px; border-radius: 12px; border: 1px solid var(--fp-border); background: #FAFAFA;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.9rem; font-weight: 800; color: var(--fp-ink);">{{ g.title }}</span>
+                <span style="font-size: 0.78rem; font-weight: 700; color: var(--fp-muted);">
+                  {{ g.current_value }} / {{ g.target_value }} {{ g.unit }}
+                </span>
+              </div>
+              {% set pct = [((g.current_value / g.target_value) * 100)|round|int if g.target_value else 0, 100]|min %}
+              <div style="width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                <div style="width: {{ pct }}%; height: 100%; background: var(--fp-lime); border-radius: 4px;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; color: var(--fp-muted);">
+                <span>Target: {{ g.target_date or 'Ongoing' }}</span>
+                <form action="{{ url_for('member.delete_goal', goal_id=g.id) }}" method="POST" style="margin: 0;">
+                  <button type="submit" style="background: none; border: none; color: var(--fp-coral); cursor: pointer; font-size: 0.72rem;">Delete</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+          No fitness targets active. Establish a benchmark target to stay disciplined!
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Body Measurements History -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Biometric & Measurement History</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Logged weights and circumference progressions</p>
+      </div>
+      <button type="button" class="fp-btn-lime" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openModal('logProgressModal')">
+        Log Entry
+      </button>
+    </div>
+
+    {% if progress_records %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Body Weight</th>
+              <th style="padding: 10px 12px;">Body Fat %</th>
+              <th style="padding: 10px 12px;">Chest (cm)</th>
+              <th style="padding: 10px 12px;">Waist (cm)</th>
+              <th style="padding: 10px 12px;">Arms (cm)</th>
+              <th style="padding: 10px 12px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in progress_records %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; font-weight: 700;">{{ r.recorded_date or r.created_at[:10] }}</td>
+                <td style="padding: 12px; font-weight: 800; color: var(--fp-ink);">{{ r.weight }} kg</td>
+                <td style="padding: 12px;">{{ r.body_fat_percentage ~ '%' if r.body_fat_percentage else '—' }}</td>
+                <td style="padding: 12px;">{{ r.chest_cm or '—' }}</td>
+                <td style="padding: 12px;">{{ r.waist_cm or '—' }}</td>
+                <td style="padding: 12px;">{{ r.arms_cm or '—' }}</td>
+                <td style="padding: 12px; color: var(--fp-muted);">{{ r.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+        No biometric logs recorded yet. Begin logging measurements above!
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Private Transformation Photos -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Private Transformation Photos</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Visible only to you and your assigned coach</p>
+      </div>
+      <button type="button" class="fp-btn-dark" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openModal('addPhotoModal')">
+        + Add Progress Photo
+      </button>
+    </div>
+
+    {% if photos %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+        {% for photo in photos %}
+          <div style="border-radius: 12px; overflow: hidden; border: 1px solid var(--fp-border); background: #FAFAFA;">
+            <div style="height: 180px; overflow: hidden; background: #000;">
+              <img src="{{ photo.photo_url }}" alt="Progress" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+              <div>
+                <span style="font-weight: 700; text-transform: uppercase;">{{ photo.photo_tag }}</span>
+                <div style="color: var(--fp-muted);">{{ photo.taken_on }}</div>
+              </div>
+              <form action="{{ url_for('member.delete_photo', photo_id=photo.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" style="background: none; border: none; color: var(--fp-coral); cursor: pointer; font-size: 0.72rem;">Delete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+        No progress photos uploaded yet. Keep visual milestones of your transformation!
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Log Measurements Modal -->
+<div class="fp-modal-backdrop" id="logProgressModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Log Body Measurements</h3>
+      <button type="button" onclick="closeModal('logProgressModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.log_progress') }}" method="POST">
+      <div class="fp-modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Body Weight (kg)*</label>
+            <input type="number" step="0.1" name="weight" class="fp-form-control" placeholder="e.g. 78.5" required>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Body Fat % (Optional)</label>
+            <input type="number" step="0.1" name="body_fat_percentage" class="fp-form-control" placeholder="e.g. 15.2">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Chest (cm)</label>
+            <input type="number" step="0.5" name="chest_cm" class="fp-form-control">
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Waist (cm)</label>
+            <input type="number" step="0.5" name="waist_cm" class="fp-form-control">
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Arms (cm)</label>
+            <input type="number" step="0.5" name="arms_cm" class="fp-form-control">
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Notes / Conditioning Feedback</label>
+          <textarea name="notes" class="fp-form-control" rows="3" placeholder="Fasted morning weight, feeling energetic..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('logProgressModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Save Measurements</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add PR Lift Modal -->
+<div class="fp-modal-backdrop" id="addPrModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Record Personal Record Lift</h3>
+      <button type="button" onclick="closeModal('addPrModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.add_pr') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Exercise Name</label>
+          <input type="text" name="exercise_name" class="fp-form-control" placeholder="e.g. Barbell Deadlift, Barbell Squat, Flat Bench" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Weight Lifted (kg)</label>
+            <input type="number" step="0.5" name="weight_kg" class="fp-form-control" placeholder="140" required>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Repetitions Completed</label>
+            <input type="number" name="reps" class="fp-form-control" value="1" min="1" max="50" required>
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Lift Notes</label>
+          <textarea name="notes" class="fp-form-control" rows="2" placeholder="Form cues, beltless, clean lockout..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('addPrModal')">Cancel</button>
+        <button type="submit" class="fp-btn-dark">Record PR</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Set Goal Modal -->
+<div class="fp-modal-backdrop" id="addGoalModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Set Fitness Target</h3>
+      <button type="button" onclick="closeModal('addGoalModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.add_goal') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Target Title</label>
+          <input type="text" name="title" class="fp-form-control" placeholder="e.g. Reach 80kg Bodyweight or 100kg Bench Press" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Current Metric</label>
+            <input type="number" step="0.5" name="current_value" class="fp-form-control" placeholder="60">
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Target Metric</label>
+            <input type="number" step="0.5" name="target_value" class="fp-form-control" placeholder="100" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Unit of Measure</label>
+            <input type="text" name="unit" class="fp-form-control" value="kg">
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Target Deadline</label>
+            <input type="date" name="target_date" class="fp-form-control">
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('addGoalModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Set Target</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Photo Modal -->
+<div class="fp-modal-backdrop" id="addPhotoModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Add Private Progress Photo</h3>
+      <button type="button" onclick="closeModal('addPhotoModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.add_photo') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Photo Image URL</label>
+          <input type="url" name="photo_url" class="fp-form-control" placeholder="https://..." required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Angle / Pose</label>
+            <select name="photo_tag" class="fp-form-control">
+              <option value="front">Front Pose</option>
+              <option value="side">Side Profile</option>
+              <option value="back">Back Pose</option>
+              <option value="other">Other / Flex</option>
+            </select>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Weight at Photo (kg)</label>
+            <input type="number" step="0.1" name="recorded_weight" class="fp-form-control" placeholder="e.g. 78.5">
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Notes</label>
+          <textarea name="notes" class="fp-form-control" rows="2" placeholder="8 weeks into hypertrophy block..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('addPhotoModal')">Cancel</button>
+        <button type="submit" class="fp-btn-dark">Upload Progress Photo</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

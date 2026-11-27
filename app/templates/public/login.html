@@ -1,0 +1,50 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Login | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height: 80vh; display: flex; align-items: center;">
+  <div class="container" style="max-width: 480px;">
+    <div class="card card-elevated" style="padding: 2.5rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <img src="{{ url_for('static', filename='images/placeholders/gym-logo.svg') }}" alt="{{ gym_settings.gym_name }}" style="height: 48px; margin-bottom: 1rem;">
+        <h2>AUTHENTICATE</h2>
+        <p style="font-size: 0.9rem;">Sign in to access your portal.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('public.login') }}">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="athlete@strakly.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••••••" required>
+        </div>
+
+        <!-- Role Hint selector for evaluation testing when Supabase credentials pending -->
+        {% if not is_supabase_configured %}
+          <div class="form-group" style="background: rgba(245, 158, 11, 0.08); border: 1px dashed var(--color-warning); padding: 1rem; border-radius: var(--radius-sm); margin: 1.5rem 0;">
+            <label class="form-label" style="color: var(--color-warning);">PORTAL ROLE TESTING (SUPABASE PENDING)</label>
+            <select name="role_hint" class="form-control" style="background: var(--bg-card);">
+              <option value="admin">Administrator / Gym Owner Portal</option>
+              <option value="trainer">Trainer Portal (Coach Marcus)</option>
+              <option value="member">Member Portal (Coached & Self-Guided)</option>
+            </select>
+            <p style="font-size: 0.8rem; margin: 0.5rem 0 0; color: var(--text-muted);">
+              When Supabase credentials are configured in .env, authentication authenticates directly against auth.users.
+            </p>
+          </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;">LOG IN</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+        <p style="font-size: 0.9rem;">New athlete? <a href="{{ url_for('public.register') }}" class="text-lime" style="text-decoration: none; font-weight: bold;">Create Member Account</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

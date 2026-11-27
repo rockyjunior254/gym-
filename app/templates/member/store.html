@@ -1,0 +1,198 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Strakly Store{% endblock %}
+{% block page_subtitle %}Official gym apparel, competition lifting belts, shakers, and athletic gear{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Strict Cash Notice Banner -->
+  <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1A130E 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 20px 24px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(195, 231, 22, 0.2); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="banknote" style="width: 22px; height: 22px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 0.95rem; font-weight: 800; color: #FFFFFF;">STRICT CASH ON COLLECTION</div>
+        <div style="font-size: 0.78rem; color: #9CA3AF; margin-top: 2px;">
+          Reserve your size online. All orders are paid in physical cash at the Strakly Gym reception desk upon pickup.
+        </div>
+      </div>
+    </div>
+    <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink); padding: 4px 10px;">FRONT DESK PICKUP</span>
+  </div>
+
+  <!-- Store Products Grid -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Official Gym Merchandise</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">High performance training wear and equipment</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">{{ products|length }} ITEMS</span>
+    </div>
+
+    {% if products %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        {% for prod in products %}
+          <div style="border-radius: 14px; border: 1px solid var(--fp-border); overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="height: 180px; overflow: hidden; background: #FAFAFA; position: relative;">
+                {% if prod.image_url %}
+                  <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--fp-muted);">
+                    <i data-lucide="package" style="width: 48px; height: 48px; opacity: 0.3;"></i>
+                  </div>
+                {% endif %}
+                <span class="fp-brand-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(13, 7, 4, 0.85); color: #FFFFFF;">
+                  {{ prod.category|upper }}
+                </span>
+              </div>
+
+              <div style="padding: 18px 18px 10px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--fp-ink); margin: 0;">{{ prod.name }}</h4>
+                </div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-ink); margin-bottom: 8px;">
+                  KES {{ prod.price }}
+                </div>
+                <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 12px 0; line-height: 1.4;">
+                  {{ prod.description or 'Premium grade athletic merchandise from Strakly Fitness.' }}
+                </p>
+              </div>
+            </div>
+
+            <div style="padding: 0 18px 18px 18px;">
+              <button type="button" class="fp-btn-lime" style="width: 100%; justify-content: center;"
+                      data-id="{{ prod.id }}" data-name="{{ prod.name }}" data-price="{{ prod.price }}"
+                      onclick="selectProductForOrder(this)">
+                Reserve Item (Cash Pickup)
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <i data-lucide="shopping-bag" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">Merchandise Restocking</h3>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">New apparel and gym gear drops are arriving this week.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Member Order History -->
+  <div class="fp-card">
+    <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0 0 16px 0; color: var(--fp-ink);">My Store Reservations</h3>
+    
+    {% if orders %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Order #</th>
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Product</th>
+              <th style="padding: 10px 12px;">Quantity</th>
+              <th style="padding: 10px 12px;">Amount Due</th>
+              <th style="padding: 10px 12px;">Payment Method</th>
+              <th style="padding: 10px 12px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; font-weight: 800;">{{ o.order_number }}</td>
+                <td style="padding: 12px;">{{ o.created_at[:10] }}</td>
+                <td style="padding: 12px; font-weight: 700;">{{ o.product.name if o.product else 'Store Product' }}</td>
+                <td style="padding: 12px;">{{ o.quantity }} (Size: {{ o.selected_size or 'Standard' }})</td>
+                <td style="padding: 12px; font-weight: 800; color: var(--fp-ink);">KES {{ o.total_amount }}</td>
+                <td style="padding: 12px; color: var(--fp-muted);">Cash on Collection</td>
+                <td style="padding: 12px;">
+                  {% if o.status == 'ready_for_pickup' %}
+                    <span style="color: #10B981; font-weight: 700;">Ready at Desk</span>
+                  {% elif o.status == 'completed' %}
+                    <span style="color: var(--fp-muted); font-weight: 600;">Collected & Paid</span>
+                  {% else %}
+                    <span style="color: #F59E0B; font-weight: 700;">Pending Desk Pickup</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
+        No merchandise reservations logged yet.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Reserve Order Modal -->
+<div class="fp-modal-backdrop" id="orderProductModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3 id="orderModalTitle">Reserve Merchandise</h3>
+      <button type="button" onclick="closeModal('orderProductModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.place_order') }}" method="POST">
+      <input type="hidden" name="product_id" id="orderProductId">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Price per Unit</label>
+          <div id="orderProductPrice" style="font-size: 1.3rem; font-weight: 800; color: var(--fp-ink);">KES 0</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Select Size / Variant</label>
+            <select name="selected_size" class="fp-form-control">
+              <option value="S">Small (S)</option>
+              <option value="M" selected>Medium (M)</option>
+              <option value="L">Large (L)</option>
+              <option value="XL">Extra Large (XL)</option>
+              <option value="Standard">Standard / One Size</option>
+            </select>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Quantity</label>
+            <input type="number" name="quantity" class="fp-form-control" value="1" min="1" max="5" required>
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Pickup Notes</label>
+          <textarea name="pickup_notes" class="fp-form-control" rows="2" placeholder="Will collect after my evening workout..."></textarea>
+        </div>
+
+        <div style="background: #F8F8F9; padding: 12px; border-radius: 10px; font-size: 0.75rem; color: var(--fp-muted); border: 1px solid var(--fp-border);">
+          <strong>Payment Note:</strong> Strakly operates strictly on physical cash. Please hand cash to the front-desk attendant when collecting your items.
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('orderProductModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Confirm Cash Reservation</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function selectProductForOrder(btn) {
+    const prodId = btn.getAttribute('data-id');
+    const prodName = btn.getAttribute('data-name');
+    const prodPrice = btn.getAttribute('data-price');
+    document.getElementById('orderProductId').value = prodId;
+    document.getElementById('orderModalTitle').textContent = 'Reserve ' + prodName;
+    document.getElementById('orderProductPrice').textContent = 'KES ' + prodPrice;
+    openModal('orderProductModal');
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}My Coach Profile & Public Showcase | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      PUBLIC SHOWCASE & CREDENTIALS
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      MY COACH PROFILE
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Manage your professional coaching biography, certifications, and specialties. Changes submitted here are reviewed by Administration before publishing to the public homepage.
+    </p>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px;">
+    {% if coach.profile_status == 'approved' and coach.is_published %}
+      <span class="fp-badge-lime" style="padding: 6px 12px; font-size: 0.82rem;">LIVE ON HOMEPAGE</span>
+    {% elif coach.profile_status == 'pending_approval' %}
+      <span class="fp-badge-coral" style="padding: 6px 12px; font-size: 0.82rem;">PENDING ADMIN REVIEW</span>
+    {% elif coach.profile_status == 'rejected' %}
+      <span class="fp-badge-coral" style="padding: 6px 12px; font-size: 0.82rem;">REJECTED • REVISE AND RESUBMIT</span>
+    {% else %}
+      <span class="fp-badge-slate" style="padding: 6px 12px; font-size: 0.82rem;">DRAFT</span>
+    {% endif %}
+  </div>
+</div>
+
+{% if coach.rejection_reason %}
+  <div style="background: rgba(255, 94, 126, 0.1); border-left: 4px solid var(--fp-coral); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.85rem; color: var(--fp-ink);">
+    <strong style="color: var(--fp-coral); display: block; margin-bottom: 2px;">Admin Revision Request:</strong>
+    {{ coach.rejection_reason }}
+  </div>
+{% endif %}
+
+<!-- Split-Screen Editor & Live Homepage Card Preview -->
+<div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 28px; align-items: start;">
+  <!-- Profile Editor Form -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 12px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Edit Public Credentials</h3>
+      <span class="fp-badge-slate">Profile Editor</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('trainer.profile') }}">
+      <div class="form-group">
+        <label class="form-label" for="full_name">Coach Full Name *</label>
+        <input type="text" id="full_name" name="full_name" class="form-control" value="{{ coach.full_name }}" required oninput="updatePreview()">
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" class="form-control" value="{{ coach.phone or '' }}" placeholder="+254 700 000 000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="experience_years">Years of Experience</label>
+          <input type="number" id="experience_years" name="experience_years" class="form-control" value="{{ coach.experience_years or 3 }}" oninput="updatePreview()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="specialisations">Coaching Specialisations (Comma separated) *</label>
+        <input type="text" id="specialisations" name="specialisations" class="form-control" value="{{ coach.specialisations|join(', ') if coach.specialisations else 'Strength & Conditioning, Olympic Lifting' }}" required oninput="updatePreview()">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="certifications">Accreditations & Certifications</label>
+        <input type="text" id="certifications" name="certifications" class="form-control" value="{{ coach.certifications or 'CSCS Certified, Olympic Weightlifting Coach' }}" oninput="updatePreview()">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="bio">Professional Coach Bio *</label>
+        <textarea id="bio" name="bio" class="form-control" rows="3" required oninput="updatePreview()" placeholder="Explain your coaching philosophy and what athletes achieve under your supervision...">{{ coach.bio or '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="coaching_philosophy">Training Approach / Philosophy</label>
+        <textarea id="coaching_philosophy" name="coaching_philosophy" class="form-control" rows="2" placeholder="Evidence-based progressive overload, movement screening...">{{ coach.coaching_philosophy or '' }}</textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap;">
+        <button type="submit" name="action" value="save" class="fp-btn-outline">
+          Save Draft
+        </button>
+        <button type="submit" name="action" value="submit_approval" class="fp-btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Submit for Admin Approval
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Live Public Homepage Card Preview -->
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;">
+      LIVE HOMEPAGE CARD PREVIEW
+    </div>
+
+    <!-- Exact card design from homepage -->
+    <div class="fp-card" style="padding: 0; overflow: hidden; border-radius: 16px; background: #FFFFFF; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+      <div style="height: 280px; position: relative; overflow: hidden; background: #1E293B;">
+        <img id="previewAvatar" src="{{ coach.avatar_url or url_for('static', filename='images/trainers/trainer-1.jpg') }}" alt="Coach" style="width: 100%; height: 100%; object-fit: cover;">
+        <div style="position: absolute; bottom: 12px; left: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); color: #B8E92C; font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase;">
+          CERTIFIED COACH
+        </div>
+      </div>
+
+      <div style="padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div>
+            <h3 id="previewName" style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #0F172A;">{{ coach.full_name }}</h3>
+            <div id="previewSpecs" style="color: #2F6B4F; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-top: 2px;">
+              {{ coach.specialisations|join(' • ') if coach.specialisations else 'Strength & Conditioning' }}
+            </div>
+          </div>
+        </div>
+
+        <p id="previewBio" style="font-size: 0.85rem; color: #64748B; line-height: 1.5; margin: 10px 0 16px;">
+          {{ coach.bio or 'Specialises in progressive athletic conditioning and personal coaching.' }}
+        </p>
+
+        <div style="border-top: 1px solid #E2E8F0; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #94A3B8;">
+          <span id="previewExp">{{ coach.experience_years or 3 }} Years Experience</span>
+          <span style="color: #2F6B4F; font-weight: 700;">Verified Staff</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explanation Box -->
+    <div style="background: #FFFFFF; border: 1px solid var(--fp-border); border-radius: 12px; padding: 14px; margin-top: 20px; font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5;">
+      <strong style="color: var(--fp-ink); display: block; margin-bottom: 4px;">Public Display Protocol:</strong>
+      To protect facility standards, only active profiles approved by administration appear on the public Strakly homepage and <code>/trainers</code> directory. Submitting an update changes your status to <em>Pending Approval</em>.
+    </div>
+  </div>
+</div>
+
+<script>
+function updatePreview() {
+  const name = document.getElementById('full_name').value;
+  const specs = document.getElementById('specialisations').value;
+  const bio = document.getElementById('bio').value;
+  const exp = document.getElementById('experience_years').value;
+
+  if (name) document.getElementById('previewName').textContent = name;
+  if (specs) document.getElementById('previewSpecs').textContent = specs.split(',').join(' • ');
+  if (bio) document.getElementById('previewBio').textContent = bio;
+  if (exp) document.getElementById('previewExp').textContent = exp + ' Years Experience';
+}
+</script>
+{% endblock %}

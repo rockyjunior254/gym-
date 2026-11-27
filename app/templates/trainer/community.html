@@ -1,0 +1,80 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Community Hub | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      COMMUNITY ENGAGEMENT
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      COMMUNITY FEED & COACHING TIPS
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Engage with gym athletes, post technique tips, celebrate milestones, and foster a supportive fitness environment.
+    </p>
+  </div>
+
+  <div>
+    <a href="{{ url_for('community.index') }}" class="fp-btn-primary">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      Go to Full Community Feed
+    </a>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+  <!-- Community Posts List -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Recent Club Posts</h3>
+      <span class="fp-badge-lime">{{ posts|length }} Posts</span>
+    </div>
+
+    {% if posts %}
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for post in posts %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 12px; padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
+                {{ post.author.full_name[:2].upper() if post.author else 'ME' }}
+              </div>
+              <div>
+                <strong style="color: var(--fp-ink); font-size: 0.92rem; display: block;">{{ post.author.full_name if post.author else 'Member' }}</strong>
+                <span style="font-size: 0.75rem; color: var(--fp-muted);">{{ post.created_at[:16] if post.created_at else 'Recent' }}</span>
+              </div>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--fp-ink); line-height: 1.5; margin: 0 0 10px; white-space: pre-line;">
+              {{ post.content }}
+            </p>
+
+            <div style="display: flex; gap: 14px; font-size: 0.8rem; color: var(--fp-muted); border-top: 1px solid var(--fp-border-subtle); padding-top: 8px;">
+              <span>❤️ {{ post.likes_count or 0 }} Cheers</span>
+              <span>💬 {{ post.comments_count or 0 }} Comments</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0; text-align: center; padding: 32px 0;">No community posts yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Coaching Advice Sidebar -->
+  <div>
+    <div class="fp-card" style="margin-bottom: 20px;">
+      <h3 style="margin: 0 0 10px; font-size: 1rem; font-weight: 700; color: var(--fp-ink);">Coaching Community Conduct</h3>
+      <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 10px;">
+        As a Strakly Coach, your contributions uphold the training culture of the gym:
+      </p>
+      <ul style="padding-left: 16px; margin: 0; font-size: 0.8rem; color: var(--fp-muted); line-height: 1.6;">
+        <li>Share evidence-based training advice and recovery cues.</li>
+        <li>Encourage personal records and milestones.</li>
+        <li>Maintain athlete confidentiality — never post private biometrics.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

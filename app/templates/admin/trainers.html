@@ -1,0 +1,276 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Coaching Staff & Athlete Allocation | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Staff &amp; Operations
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Coaching Staff
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Supervise certified coaches, assign members to dedicated trainers, and monitor training rosters.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addTrainerModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="user-plus" style="width: 15px; height: 15px;"></i>
+        <span>Add Coach</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+    <!-- Assign Dedicated Coach Form -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Assign Dedicated Coach</h3>
+        <span class="badge badge-forest" style="font-size: 10.5px;">Allocation</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.trainers') }}">
+        <div class="form-group">
+          <label class="form-label" for="member_id">Select Member <span style="color: var(--accent-rose);">*</span></label>
+          <select id="member_id" name="member_id" class="form-control" required>
+            <option value="">-- Choose Member --</option>
+            {% for m in members %}
+              <option value="{{ m.id }}">{{ m.full_name }} ({{ m.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="trainer_id">Select Certified Coach <span style="color: var(--accent-rose);">*</span></label>
+          <select id="trainer_id" name="trainer_id" class="form-control" required>
+            <option value="">-- Choose Trainer --</option>
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }} ({{ t.trainer_details.specialisations|join(', ') if t.trainer_details and t.trainer_details.specialisations else 'Strength' }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="notes">Coaching Directives / Plan Notes</label>
+          <input type="text" id="notes" name="notes" class="form-control" placeholder="e.g. 12-week strength peaking program">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i data-lucide="check-circle" style="width: 15px; height: 15px;"></i>
+          <span>Confirm Coaching Allocation</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Coaches Cards Roster -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Certified Coaching Roster</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Facility coaches and assigned training specialisations</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">{{ trainers|length }} Coaches Active</span>
+      </div>
+
+      {% if trainers %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px;">
+          {% for t in trainers %}
+            <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                  <div style="width: 42px; height: 42px; border-radius: 10px; background: #FFFFFF; border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--primary-forest); overflow: hidden; flex-shrink: 0;">
+                    {% if t.avatar_url %}
+                      <img src="{{ t.avatar_url }}" alt="{{ t.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                      {{ t.full_name[:2].upper() if t.full_name else 'TR' }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-ink);">{{ t.full_name }}</h4>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">{{ t.email }}</div>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                  <span class="badge badge-neutral" style="font-size: 11px;">
+                    {{ t.trainer_details.specialisations|join(', ') if t.trainer_details and t.trainer_details.specialisations else 'General Fitness & Strength' }}
+                  </span>
+                </div>
+
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 14px; line-height: 1.45;">
+                  {{ t.trainer_details.bio if t.trainer_details and t.trainer_details.bio else 'Certified fitness specialist at Strakly Gym.' }}
+                </p>
+              </div>
+
+              <div style="border-top: 1px solid var(--border-line); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  {% if t.is_active %}
+                    <span class="badge badge-forest" style="font-size: 10.5px;">Active</span>
+                  {% else %}
+                    <span class="badge badge-rose" style="font-size: 10.5px;">Suspended</span>
+                  {% endif %}
+
+                  {% if t.trainer_details and t.trainer_details.profile_status == 'pending_approval' %}
+                    <span class="badge badge-amber" style="font-size: 10.5px;" title="Pending profile approval for website">Review Needed</span>
+                  {% elif t.trainer_details and t.trainer_details.profile_status == 'approved' and t.trainer_details.is_published %}
+                    <span class="badge badge-forest" style="font-size: 10.5px;" title="Published on public website">Published</span>
+                  {% endif %}
+                </div>
+                <div style="display: flex; gap: 4px;">
+                  {% if t.trainer_details and t.trainer_details.profile_status == 'pending_approval' %}
+                    <form method="POST" action="{{ url_for('admin.approve_trainer_profile', trainer_id=t.id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-primary" style="padding: 2px 6px; font-size: 11px;" title="Approve and publish profile">Approve</button>
+                    </form>
+                    <button type="button" class="btn btn-sm btn-outline-rose" style="padding: 2px 6px; font-size: 11px;" onclick="openRejectTrainerModal('{{ t.id }}', '{{ t.full_name }}')">Reject</button>
+                  {% endif %}
+                  <button type="button" class="btn btn-secondary btn-sm" style="padding: 2px 6px; font-size: 11px;"
+                          data-id="{{ t.id }}"
+                          data-name="{{ t.full_name }}"
+                          data-phone="{{ t.phone or '' }}"
+                          data-specs="{{ t.trainer_details.specialisations|join(', ') if t.trainer_details and t.trainer_details.specialisations else '' }}"
+                          data-bio="{{ t.trainer_details.bio if t.trainer_details and t.trainer_details.bio else '' }}"
+                          onclick="openEditTrainerModal(this)">Edit</button>
+                  <form method="POST" action="{{ url_for('admin.toggle_trainer_active', trainer_id=t.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm {% if t.is_active %}btn-outline{% else %}btn-primary{% endif %}" style="padding: 2px 6px; font-size: 11px;">
+                      {{ 'Suspend' if t.is_active else 'Activate' }}
+                    </button>
+                  </form>
+                  <form method="POST" action="{{ url_for('admin.archive_trainer', trainer_id=t.id) }}" onsubmit="return confirm('Archive coach {{ t.full_name }}? Assigned athletes will be freed.');" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline" style="padding: 2px 6px; font-size: 11px; color: var(--color-danger); border-color: var(--border-line);">Archive</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i data-lucide="users" style="width: 36px; height: 36px; opacity: 0.35; margin-bottom: 8px;"></i>
+          <h4 style="margin: 0 0 4px; color: var(--text-ink); font-size: 1rem;">No Trainers Registered</h4>
+          <p style="margin: 0 0 14px; font-size: 0.82rem; color: var(--text-muted);">Add certified coaching staff to assign athletes to personalized programs.</p>
+          <button class="btn btn-primary btn-sm" onclick="openModal('addTrainerModal')">Add First Coach</button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add Trainer -->
+<div id="addTrainerModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Register Coaching Staff</h3>
+        <p class="modal-subtitle">Create certified trainer profile and credentials</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addTrainerModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.trainers') }}">
+      <input type="hidden" name="action" value="create">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="t_full_name">Coach Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="t_full_name" name="full_name" class="form-control" placeholder="e.g. Daniel Brooks" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="t_email">Email Address <span style="color: var(--accent-rose);">*</span></label>
+          <input type="email" id="t_email" name="email" class="form-control" placeholder="trainer@strakly.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="t_phone">Phone Number</label>
+          <input type="tel" id="t_phone" name="phone" class="form-control" placeholder="+254 700 000 000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="t_specialisations">Specialisations (Comma separated)</label>
+          <input type="text" id="t_specialisations" name="specialisations" class="form-control" placeholder="Strength & Conditioning, Olympic Lifting, Hypertrophy">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="t_bio">Coach Bio & Accreditations</label>
+          <textarea id="t_bio" name="bio" class="form-control" rows="3" placeholder="Experience, certifications, and coaching philosophy..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addTrainerModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Coach Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Trainer -->
+<div id="editTrainerModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Coaching Staff</h3>
+        <p class="modal-subtitle">Update trainer details and specialisations</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editTrainerModal')">&times;</button>
+    </div>
+    <form id="editTrainerForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="edit_t_full_name">Coach Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="edit_t_full_name" name="full_name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_t_phone">Phone Number</label>
+          <input type="tel" id="edit_t_phone" name="phone" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_t_specialisations">Specialisations (Comma separated)</label>
+          <input type="text" id="edit_t_specialisations" name="specialisations" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_t_bio">Coach Bio & Accreditations</label>
+          <textarea id="edit_t_bio" name="bio" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editTrainerModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditTrainerModal(btn) {
+  const form = document.getElementById('editTrainerForm');
+  form.action = '/admin/trainers/edit/' + btn.dataset.id;
+  document.getElementById('edit_t_full_name').value = btn.dataset.name || '';
+  document.getElementById('edit_t_phone').value = btn.dataset.phone || '';
+  document.getElementById('edit_t_specialisations').value = btn.dataset.specs || '';
+  document.getElementById('edit_t_bio').value = btn.dataset.bio || '';
+  openModal('editTrainerModal');
+}
+
+function openRejectTrainerModal(trainerId, trainerName) {
+  const reason = prompt("Enter rejection reason or guidance for " + trainerName + ":", "Please clarify certifications and coaching philosophy.");
+  if (reason !== null && reason.trim() !== "") {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/trainers/reject/' + trainerId;
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'rejection_reason';
+    input.value = reason;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,452 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}{{ detail.profile.full_name }} — Athlete Profile | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div class="breadcrumb" style="margin-bottom: 1.5rem;">
+  <a href="{{ url_for('admin.dashboard') }}">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="{{ url_for('admin.members') }}">Members</a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">{{ detail.profile.full_name }}</span>
+</div>
+
+<!-- Header Card -->
+<div class="card card-elevated" style="margin-bottom: 2rem; position: relative; overflow: hidden;">
+  <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+    <div style="width: 90px; height: 90px; border-radius: 50%; background: var(--bg-surface); border: 2px solid var(--accent-neon); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; color: var(--accent-neon); overflow: hidden;">
+      {% if detail.profile.avatar_url %}
+        <img src="{{ detail.profile.avatar_url }}" alt="{{ detail.profile.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+      {% else %}
+        {{ detail.profile.full_name[:2].upper() if detail.profile.full_name else 'ME' }}
+      {% endif %}
+    </div>
+
+    <div style="flex: 1; min-width: 250px;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+        <h2 style="margin: 0; font-size: 2.2rem;">{{ detail.profile.full_name }}</h2>
+        <span class="badge badge-lime">{{ detail.member_details.member_number if detail.member_details else 'UNASSIGNED' }}</span>
+        {% if detail.profile.is_archived %}
+          <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger); border: 1px solid var(--color-danger);">ARCHIVED</span>
+        {% elif detail.profile.is_active %}
+          <span class="badge badge-lime">ACTIVE</span>
+        {% else %}
+          <span class="badge" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b;">INACTIVE</span>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; color: var(--text-secondary); font-size: 0.9rem;">
+        <span>✉️ {{ detail.profile.email }}</span>
+        <span>📞 {{ detail.profile.phone or 'No phone number' }}</span>
+        <span>📅 Member Since: {{ detail.profile.created_at[:10] if detail.profile.created_at else 'N/A' }}</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <a href="{{ url_for('admin.payments') }}?member_id={{ detail.profile.id }}" class="btn btn-primary btn-sm">💵 RECORD CASH PAYMENT</a>
+      {% if not detail.profile.is_archived %}
+        <button class="btn btn-outline btn-sm" onclick="openModal('archiveMemberModal')">ARCHIVE RECORD</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+  <button class="btn btn-sm btn-secondary active-tab" onclick="switchDetailTab('tab-overview', this)">Overview</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-profile', this)">Personal Info & Goals</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-subscriptions', this)">Subscriptions ({{ detail.subscriptions|length }})</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-payments', this)">Cash Payments ({{ detail.payments|length }})</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-attendance', this)">Attendance Logs ({{ detail.attendance|length }})</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-workouts', this)">Workouts & Coaching ({{ detail.workout_plans|length }})</button>
+  <button class="btn btn-sm btn-secondary" onclick="switchDetailTab('tab-progress', this)">Fitness Progress ({{ detail.progress_logs|length }})</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-overview" class="detail-tab-pane">
+  <div class="grid-3" style="margin-bottom: 2rem;">
+    <!-- Active Subscription -->
+    <div class="card">
+      <h4 style="margin-bottom: 1rem; color: var(--accent-neon);">CURRENT MEMBERSHIP</h4>
+      {% if detail.active_subscription %}
+        <div style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.4rem;">
+          {{ detail.active_subscription.membership_plans.name if detail.active_subscription.membership_plans else 'Active Plan' }}
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.8rem;">
+          Valid until: <strong>{{ detail.active_subscription.end_date }}</strong>
+        </p>
+        <span class="badge badge-lime">VALID & UNRESTRICTED</span>
+      {% else %}
+        <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+          <p style="color: var(--color-danger); margin: 0; font-size: 0.9rem; font-weight: 600;">No Active Subscription</p>
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.3rem 0 0 0;">Front-desk manual check-in is restricted until renewed.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Assigned Trainer -->
+    <div class="card">
+      <h4 style="margin-bottom: 1rem; color: var(--accent-neon);">COACHING RELATIONSHIP</h4>
+      {% if detail.trainer_assignment %}
+        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem;">
+          Coach {{ detail.trainer_assignment.trainer.full_name if detail.trainer_assignment.trainer else 'Assigned' }}
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">
+          Role: Coached Athlete
+        </p>
+        <span class="badge badge-cyan">DEDICATED TRAINER</span>
+      {% else %}
+        <div style="padding: 1rem; background: var(--bg-surface); border-radius: 6px;">
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Self-Guided Member</p>
+          <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0.3rem 0 0 0;">No personal coach assigned.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="card">
+      <h4 style="margin-bottom: 1rem; color: var(--accent-neon);">FINANCIAL OVERVIEW</h4>
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent-neon); margin-bottom: 0.3rem;">
+        KES {{ "{:,.0f}".format(detail.payments|sum(attribute='amount')) if detail.payments else 0 }}
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0;">Total Physical Cash Paid</p>
+      <span class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--color-success); margin-top: 0.6rem; display: inline-block;">
+        {{ detail.payments|length }} Verified Cash Receipts
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: PERSONAL INFO & EDIT -->
+<div id="tab-profile" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <h3 style="margin-bottom: 1.5rem;">ATHLETE PROFILE & ADMINISTRATIVE NOTES</h3>
+    <form method="POST" action="{{ url_for('admin.member_detail', member_id=detail.profile.id) }}">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="full_name" class="form-control" value="{{ detail.profile.full_name }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address (Login Identity)</label>
+          <input type="email" class="form-control" value="{{ detail.profile.email }}" disabled style="opacity: 0.6;">
+          <small style="color: var(--text-muted);">Managed through Supabase Auth account</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="text" name="phone" class="form-control" value="{{ detail.profile.phone or '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account Status</label>
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+            <input type="checkbox" id="is_active" name="is_active" {% if detail.profile.is_active %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--accent-neon);">
+            <label for="is_active" style="cursor: pointer; font-size: 0.95rem;">Active Member Profile</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emergency Contact Name</label>
+          <input type="text" name="emergency_contact_name" class="form-control" value="{{ detail.member_details.emergency_contact_name if detail.member_details else '' }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emergency Contact Phone</label>
+          <input type="text" name="emergency_contact_phone" class="form-control" value="{{ detail.member_details.emergency_contact_phone if detail.member_details else '' }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fitness Goals</label>
+        <textarea name="fitness_goals" class="form-control" rows="2">{{ detail.member_details.fitness_goals if detail.member_details else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Medical Notes / Health Clearance</label>
+        <textarea name="medical_notes" class="form-control" rows="3" placeholder="Injuries, medical conditions, or dietary alerts...">{{ detail.member_details.medical_notes if detail.member_details else '' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">SAVE PROFILE CHANGES</button>
+    </form>
+  </div>
+</div>
+
+<!-- TAB 3: SUBSCRIPTIONS -->
+<div id="tab-subscriptions" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h3 style="margin: 0;">SUBSCRIPTION TIMELINE</h3>
+      <a href="{{ url_for('admin.subscriptions') }}" class="btn btn-outline btn-sm">+ CREATE SUBSCRIPTION</a>
+    </div>
+
+    {% if detail.subscriptions %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in detail.subscriptions %}
+              <tr>
+                <td><strong>{{ sub.membership_plans.name if sub.membership_plans else 'Membership' }}</strong></td>
+                <td>
+                  {% if sub.status == 'active' %}
+                    <span class="badge badge-lime">ACTIVE</span>
+                  {% elif sub.status == 'pending' %}
+                    <span class="badge badge-warning">PENDING CASH</span>
+                  {% elif sub.status == 'expired' %}
+                    <span class="badge" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8;">EXPIRED</span>
+                  {% else %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger);">CANCELLED</span>
+                  {% endif %}
+                </td>
+                <td>{{ sub.start_date or 'Not Activated' }}</td>
+                <td>{{ sub.end_date or 'N/A' }}</td>
+                <td>KES {{ "{:,.0f}".format(sub.membership_plans.price) if sub.membership_plans else 0 }}</td>
+                <td>
+                  {% if sub.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('admin.activate_subscription', sub_id=sub.id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-primary btn-sm">Activate</button>
+                    </form>
+                  {% elif sub.status == 'active' %}
+                    <form method="POST" action="{{ url_for('admin.cancel_subscription', sub_id=sub.id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-outline btn-sm" onclick="return confirm('Cancel subscription?');">Cancel</button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🔄</div>
+        <h3>No Subscriptions Recorded</h3>
+        <p>This member does not have any subscription history yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 4: CASH PAYMENTS & RECEIPTS -->
+<div id="tab-payments" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div>
+        <h3 style="margin: 0;">VERIFIED PHYSICAL CASH RECEIPTS</h3>
+        <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">All payments are strictly manual physical cash with printed receipts.</p>
+      </div>
+      <a href="{{ url_for('admin.payments') }}?member_id={{ detail.profile.id }}" class="btn btn-primary btn-sm">💵 RECORD CASH PAYMENT</a>
+    </div>
+
+    {% if detail.payments %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Receipt Number</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Recorded By</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pay in detail.payments %}
+              <tr>
+                <td><strong class="text-lime">{{ pay.receipt_number }}</strong></td>
+                <td style="font-weight: 700;">KES {{ "{:,.0f}".format(pay.amount) }}</td>
+                <td>{{ pay.payment_date[:16] if pay.payment_date else 'N/A' }}</td>
+                <td>
+                  {% if pay.status == 'completed' %}
+                    <span class="badge badge-lime">PAID IN CASH</span>
+                  {% elif pay.status == 'reversed' %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger);">REVERSED</span>
+                  {% else %}
+                    <span class="badge badge-warning">{{ pay.status.upper() }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ pay.recorded_by_profile.full_name if pay.recorded_by_profile else 'Front Desk' }}</td>
+                <td style="color: var(--text-secondary); font-size: 0.85rem;">{{ pay.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">💵</div>
+        <h3>No Cash Payments Recorded</h3>
+        <p>Physical cash payments recorded at the front desk will generate verified receipts here.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 5: ATTENDANCE -->
+<div id="tab-attendance" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h3 style="margin: 0;">FACILITY ACCESS & CHECK-IN LOGS</h3>
+      <a href="{{ url_for('admin.attendance') }}" class="btn btn-outline btn-sm">MANUAL FRONT-DESK CHECK-IN</a>
+    </div>
+
+    {% if detail.attendance %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date & Time</th>
+              <th>Access Status</th>
+              <th>Check-in Type</th>
+              <th>Front Desk Agent</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for att in detail.attendance %}
+              <tr>
+                <td><strong>{{ att.check_in_time[:16] if att.check_in_time else 'N/A' }}</strong></td>
+                <td>
+                  {% if att.status == 'verified' %}
+                    <span class="badge badge-lime">VERIFIED ENTRY</span>
+                  {% elif att.status == 'denied' %}
+                    <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger);">DENIED</span>
+                  {% else %}
+                    <span class="badge badge-cyan">{{ att.status.upper() }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ att.check_in_type or 'manual' }}</td>
+                <td>{{ att.recorded_by_profile.full_name if att.recorded_by_profile else 'Front Desk' }}</td>
+                <td style="color: var(--text-secondary); font-size: 0.85rem;">{{ att.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No Attendance History</h3>
+        <p>Member has not checked in to the facility yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 6: WORKOUTS & COACHING -->
+<div id="tab-workouts" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <h3 style="margin-bottom: 1.5rem;">ASSIGNED WORKOUT PLANS & COACHING</h3>
+    {% if detail.workout_plans %}
+      <div class="grid-2">
+        {% for plan in detail.workout_plans %}
+          <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <h4 style="margin: 0;">{{ plan.title }}</h4>
+              <span class="badge badge-lime">{{ plan.difficulty_level or 'All Levels' }}</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">{{ plan.description or 'Custom coaching plan.' }}</p>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Created: {{ plan.created_at[:10] if plan.created_at else 'N/A' }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🏋️‍♂️</div>
+        <h3>No Workout Plans Assigned</h3>
+        <p>Trainers can design customized workout programmes for this athlete.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 7: FITNESS PROGRESS -->
+<div id="tab-progress" class="detail-tab-pane" style="display: none;">
+  <div class="card">
+    <h3 style="margin-bottom: 1.5rem;">ATHLETIC PROGRESSION METRICS</h3>
+    {% if detail.progress_logs %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Weight (kg)</th>
+              <th>Body Fat %</th>
+              <th>Chest (cm)</th>
+              <th>Waist (cm)</th>
+              <th>Arms (cm)</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in detail.progress_logs %}
+              <tr>
+                <td><strong>{{ log.recorded_date or log.created_at[:10] }}</strong></td>
+                <td class="text-lime font-weight-bold">{{ log.weight_kg or '—' }}</td>
+                <td>{{ log.body_fat_percentage or '—' }}%</td>
+                <td>{{ log.chest_cm or '—' }}</td>
+                <td>{{ log.waist_cm or '—' }}</td>
+                <td>{{ log.arms_cm or '—' }}</td>
+                <td style="color: var(--text-secondary); font-size: 0.85rem;">{{ log.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📈</div>
+        <h3>No Fitness Progress Entries</h3>
+        <p>Measurements logged by trainers or the member will appear here.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Archive Modal -->
+<div id="archiveMemberModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 style="margin-bottom: 1rem; color: var(--color-danger);">ARCHIVE ATHLETE RECORD</h3>
+    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+      Archiving preserves all historic cash transactions, receipts, and attendance logs for audit compliance while removing the member from active facility operations.
+    </p>
+    <form method="POST" action="{{ url_for('admin.archive_member', member_id=detail.profile.id) }}">
+      <div class="form-group">
+        <label class="form-label">Archival Reason</label>
+        <textarea name="reason" class="form-control" rows="3" required placeholder="Member relocated, account closure request, etc."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('archiveMemberModal')">CANCEL</button>
+        <button type="submit" class="btn btn-danger">CONFIRM ARCHIVE</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function switchDetailTab(tabId, btn) {
+  document.querySelectorAll('.detail-tab-pane').forEach(el => el.style.display = 'none');
+  const target = document.getElementById(tabId);
+  if (target) target.style.display = 'block';
+
+  document.querySelectorAll('.active-tab').forEach(el => {
+    el.classList.remove('active-tab');
+    el.classList.remove('btn-primary');
+    el.classList.add('btn-secondary');
+  });
+
+  btn.classList.add('active-tab');
+  btn.classList.remove('btn-secondary');
+  btn.classList.add('btn-primary');
+}
+</script>
+{% endblock %}

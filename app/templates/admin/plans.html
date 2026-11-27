@@ -1,0 +1,267 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Plans & Tiers | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Tier Configuration
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Plans &amp; Tiers
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Configure membership packages, duration periods, entitlements, and official pricing in KES.
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-primary" onclick="openModal('addPlanModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>Create Package</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="grid-4">
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TOTAL PLANS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        {{ plans|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">Configured tiers</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE TIERS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+        {{ plans|selectattr('is_active')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Available for enrollment</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">PAYMENT CURRENCY</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        KES
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Strict physical cash</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ARCHIVED PLANS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-muted); margin: 4px 0 2px 0;">
+        {{ plans|selectattr('is_archived')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Legacy packages preserved</span>
+    </div>
+  </div>
+
+  <!-- Package Cards Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+    {% for p in plans %}
+      <div class="card" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span class="badge badge-forest" style="font-size: 11px; text-transform: uppercase;">
+              {{ p.duration_days }} DAYS &bull; {{ p.duration_type|capitalize }}
+            </span>
+            {% if p.is_archived %}
+              <span class="badge" style="background: var(--color-danger-tint); color: var(--color-danger); font-size: 10px;">Archived</span>
+            {% elif p.is_active %}
+              <span class="badge badge-forest" style="font-size: 10px;">Active</span>
+            {% else %}
+              <span class="badge" style="background: #E5E7EB; color: #4B5563; font-size: 10px;">Inactive</span>
+            {% endif %}
+          </div>
+
+          <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px 0;">
+            {{ p.name }}
+          </h3>
+
+          <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-forest); margin-bottom: 10px;">
+            KES {{ "{:,.0f}".format(p.price|float) }}
+          </div>
+
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0 0 14px 0;">
+            {{ p.description or 'Comprehensive facility access package with full training clearance.' }}
+          </p>
+
+          {% if p.benefits %}
+            <div style="border-top: 1px solid var(--border-line); padding-top: 12px; margin-bottom: 14px;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 6px;">Entitlements</span>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
+                {% for b in p.benefits[:4] %}
+                  <li style="font-size: 12px; color: var(--text-ink); display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="check" style="width: 13px; height: 13px; color: var(--primary-forest);"></i>
+                    <span>{{ b }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="border-top: 1px solid var(--border-line); padding-top: 12px; display: flex; justify-content: flex-end; gap: 6px;">
+          <button type="button" class="btn btn-outline btn-sm" style="font-size: 11.5px; padding: 4px 8px;"
+                  data-id="{{ p.id }}"
+                  data-name="{{ p.name }}"
+                  data-price="{{ p.price }}"
+                  data-duration="{{ p.duration_days }}"
+                  data-dtype="{{ p.duration_type }}"
+                  data-desc="{{ p.description or '' }}"
+                  data-benefits="{{ p.benefits|join(', ') if p.benefits else '' }}"
+                  data-active="{{ 'true' if p.is_active else 'false' }}"
+                  onclick="openEditPlanModal(this)">
+            Edit
+          </button>
+          {% if not p.is_archived %}
+            <form method="POST" action="{{ url_for('admin.archive_plan', plan_id=p.id) }}" onsubmit="return confirm('Archive plan {{ p.name }}? Existing athlete subscriptions will continue uninterrupted.');" style="display:inline; margin: 0;">
+              <button type="submit" class="btn btn-outline btn-sm" style="font-size: 11.5px; padding: 4px 8px; color: var(--accent-rose); border-color: var(--border-line);">
+                Archive
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- Modal: Add Plan -->
+<div id="addPlanModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Create Membership Package</h3>
+      <button type="button" onclick="closeModal('addPlanModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.plans') }}">
+      <div class="form-group">
+        <label class="form-label" for="plan_name">Package Name *</label>
+        <input type="text" id="plan_name" name="name" class="form-control" placeholder="e.g. Monthly Standard" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="plan_price">Price (KES) *</label>
+          <input type="number" id="plan_price" name="price" class="form-control" placeholder="3500" step="50" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="plan_duration_days">Duration (Days) *</label>
+          <input type="number" id="plan_duration_days" name="duration_days" class="form-control" placeholder="30" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="plan_duration_type">Duration Category</label>
+        <select id="plan_duration_type" name="duration_type" class="form-control">
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly (3 Months)</option>
+          <option value="biannual">Biannual (6 Months)</option>
+          <option value="annual">Annual</option>
+          <option value="daily">Day Pass</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="plan_benefits">Entitlements (Comma-separated)</label>
+        <input type="text" id="plan_benefits" name="benefits" class="form-control" placeholder="Full gym access, Locker usage, Trainer check-in">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="plan_description">Package Description</label>
+        <textarea id="plan_description" name="description" class="form-control" rows="2" placeholder="Summary of member privileges..."></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('addPlanModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create Tier</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Plan -->
+<div id="editPlanModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Edit Membership Package</h3>
+      <button type="button" onclick="closeModal('editPlanModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form id="editPlanForm" method="POST" action="">
+      <div class="form-group">
+        <label class="form-label" for="edit_plan_name">Package Name *</label>
+        <input type="text" id="edit_plan_name" name="name" class="form-control" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="edit_plan_price">Price (KES) *</label>
+          <input type="number" id="edit_plan_price" name="price" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_plan_duration_days">Duration (Days) *</label>
+          <input type="number" id="edit_plan_duration_days" name="duration_days" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_plan_duration_type">Duration Category</label>
+        <select id="edit_plan_duration_type" name="duration_type" class="form-control">
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly (3 Months)</option>
+          <option value="biannual">Biannual (6 Months)</option>
+          <option value="annual">Annual</option>
+          <option value="daily">Day Pass</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_plan_benefits">Entitlements (Comma-separated)</label>
+        <input type="text" id="edit_plan_benefits" name="benefits" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_plan_description">Package Description</label>
+        <textarea id="edit_plan_description" name="description" class="form-control" rows="2"></textarea>
+      </div>
+
+      <div class="form-group" style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.75rem;">
+        <input type="checkbox" id="edit_plan_is_active" name="is_active" value="true" style="width: 16px; height: 16px; accent-color: var(--primary-forest);">
+        <label for="edit_plan_is_active" style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-ink);">Active for Enrollment</label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('editPlanModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Update Package</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditPlanModal(btn) {
+  const form = document.getElementById('editPlanForm');
+  form.action = '/admin/plans/edit/' + btn.dataset.id;
+  document.getElementById('edit_plan_name').value = btn.dataset.name || '';
+  document.getElementById('edit_plan_price').value = btn.dataset.price || '';
+  document.getElementById('edit_plan_duration_days').value = btn.dataset.duration || '';
+  document.getElementById('edit_plan_duration_type').value = btn.dataset.dtype || 'monthly';
+  document.getElementById('edit_plan_benefits').value = btn.dataset.benefits || '';
+  document.getElementById('edit_plan_description').value = btn.dataset.desc || '';
+  document.getElementById('edit_plan_is_active').checked = (btn.dataset.active === 'true');
+  openModal('editPlanModal');
+}
+</script>
+{% endblock %}

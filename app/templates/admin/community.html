@@ -1,0 +1,138 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Community Oversight & Moderation | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Athlete Engagement &bull; Moderation
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Community Oversight &amp; Feed Moderation
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Monitor member and coach interactions, celebrate fitness milestones, and moderate community content according to facility standards.
+      </p>
+    </div>
+    <div>
+      <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+        <span>Moderation Logs</span>
+      </a>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start;">
+    <!-- Community Post Feed -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Recent Community Posts</h3>
+        <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Shared athlete activity, personal records, and workouts</p>
+      </div>
+      <span class="badge badge-forest">{{ posts|length }} Total Posts</span>
+    </div>
+
+    {% if posts %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for post in posts %}
+          <div style="background: var(--pearl-bg); border: 1px solid var(--border-line); border-radius: 12px; padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: #FFFFFF; border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--forest-primary); font-size: 0.95rem;">
+                  {{ post.author.full_name[:2].upper() if post.author else 'ME' }}
+                </div>
+                <div>
+                  <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--ink-dark);">{{ post.author.full_name if post.author else 'Member' }}</h4>
+                  <span style="font-size: 0.78rem; color: var(--ink-muted);">{{ post.created_at[:16] if post.created_at else 'Recent' }}</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                {% if post.is_hidden %}
+                  <span class="badge badge-rose">Hidden</span>
+                  <form method="POST" action="{{ url_for('admin.unhide_community_post', post_id=post.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-primary btn-sm">Unhide</button>
+                  </form>
+                {% else %}
+                  <form method="POST" action="{{ url_for('admin.hide_community_post', post_id=post.id) }}" style="display: inline;">
+                    <input type="hidden" name="reason" value="Administrative moderation">
+                    <button type="submit" class="btn btn-outline-rose btn-sm" onclick="return confirm('Hide this post from the community feed?');">
+                      Hide
+                    </button>
+                  </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('admin.delete_community_post', post_id=post.id) }}" onsubmit="return confirm('Permanently remove this community post?');" style="display: inline;">
+                  <button type="submit" class="btn btn-outline-rose btn-sm">Delete</button>
+                </form>
+              </div>
+            </div>
+
+            <p style="color: var(--ink-dark); font-size: 0.92rem; margin: 0 0 1rem; line-height: 1.5; white-space: pre-line;">
+              {{ post.content }}
+            </p>
+
+            {% if post.media_url %}
+              <div style="border-radius: 8px; overflow: hidden; margin-bottom: 0.85rem; max-height: 260px; border: 1px solid var(--border-line);">
+                <img src="{{ post.media_url }}" alt="Post attachment" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 1.25rem; font-size: 0.82rem; color: var(--ink-muted); border-top: 1px solid var(--border-line); padding-top: 0.65rem;">
+              <span style="display: flex; align-items: center; gap: 0.35rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                {{ post.likes_count or 0 }} Cheers
+              </span>
+              <span style="display: flex; align-items: center; gap: 0.35rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                {{ post.comments_count or 0 }} Comments
+              </span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Community Posts Yet</h4>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">When athletes and trainers share workouts, goals, and achievements, they will appear here for supervision.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Moderation Guidelines Sidebar -->
+  <div>
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--forest-primary);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--forest-dark);">Community Standards</h3>
+      </div>
+      <p style="color: var(--ink-secondary); font-size: 0.85rem; line-height: 1.55; margin: 0 0 0.85rem;">
+        The Strakly Fitness Community promotes athletic achievement, accountability, and respect. Staff may hide posts violating facility rules:
+      </p>
+      <ul style="color: var(--ink-secondary); font-size: 0.82rem; padding-left: 1.1rem; line-height: 1.6; margin: 0;">
+        <li>Disrespectful language, insults, or harassment.</li>
+        <li>Unauthorized commercial selling or spam.</li>
+        <li>Unverified fitness claims or hazardous advice.</li>
+        <li>Photos or videos violating member privacy.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4 style="margin: 0 0 0.5rem; font-size: 0.95rem; font-weight: 700; color: var(--ink-dark);">Append-Only Moderation Audit</h4>
+      <p style="font-size: 0.82rem; color: var(--ink-muted); margin: 0 0 1rem; line-height: 1.45;">
+        All moderation actions are recorded directly into the permanent system audit trail for compliance oversight.
+      </p>
+      <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center;">
+        View System Audit Logs
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,706 @@
+{% extends 'base_app.html' %}
+
+{% block extra_head %}
+<style>
+  :root {
+    --fp-bg: #F3F3F3;
+    --fp-surface: #FFFFFF;
+    --fp-surface-alt: #FAFAFA;
+    --fp-ink: #0D0704;
+    --fp-muted: #79787E;
+    --fp-lime: #C3E716;
+    --fp-lime-hover: #A8C90E;
+    --fp-coral: #DA281C;
+    --fp-sand: #E1C8A5;
+    --fp-border: #EAEAEB;
+    --fp-border-subtle: #F0F0F1;
+  }
+
+  body {
+    background-color: var(--fp-bg) !important;
+    color: var(--fp-ink) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  /* FitPulse Shell Structure */
+  .fp-shell {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--fp-bg);
+  }
+
+  /* Left Navigation Sidebar */
+  .fp-sidebar {
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
+    background: #FFFFFF;
+    border-right: 1px solid var(--fp-border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: transform 0.25s ease;
+  }
+
+  .fp-sidebar-header {
+    height: 68px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--fp-border-subtle);
+  }
+
+  .fp-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--fp-ink);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-size: 1.1rem;
+  }
+
+  .fp-brand-badge {
+    background: var(--fp-lime);
+    color: var(--fp-ink);
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Athlete Quick Profile Card in Sidebar */
+  .fp-sidebar-athlete {
+    padding: 14px 18px;
+    margin: 12px 14px 8px 14px;
+    background: #F8F8F9;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--fp-border-subtle);
+  }
+
+  .fp-athlete-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--fp-ink);
+    color: var(--fp-lime);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .fp-athlete-info {
+    overflow: hidden;
+    line-height: 1.25;
+  }
+
+  .fp-athlete-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--fp-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  .fp-athlete-status {
+    font-size: 0.7rem;
+    color: var(--fp-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
+  .fp-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10B981;
+    display: inline-block;
+  }
+
+  /* Navigation Links */
+  .fp-nav-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px 24px 12px;
+  }
+
+  .fp-nav-group-title {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 12px 10px 4px 10px;
+    margin-top: 4px;
+  }
+
+  .fp-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .fp-nav-item {
+    margin-bottom: 2px;
+  }
+
+  .fp-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #4B5563;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+  }
+
+  .fp-nav-link:hover {
+    background: #F3F4F6;
+    color: var(--fp-ink);
+  }
+
+  .fp-nav-link.active {
+    background: var(--fp-ink);
+    color: #FFFFFF;
+    font-weight: 600;
+  }
+
+  .fp-nav-link.active i {
+    color: var(--fp-lime);
+  }
+
+  .fp-nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Main Viewport Container */
+  .fp-main-wrap {
+    flex: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top Navigation Bar */
+  .fp-topbar {
+    height: 68px;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--fp-border);
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    z-index: 50;
+  }
+
+  .fp-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fp-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .fp-mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--fp-ink);
+  }
+
+  .fp-page-title-box h1 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--fp-ink);
+    margin: 0;
+  }
+
+  .fp-page-title-box p {
+    font-size: 0.78rem;
+    color: var(--fp-muted);
+    margin: 0;
+  }
+
+  /* Action Buttons & Badges */
+  .fp-btn-lime {
+    background: var(--fp-lime);
+    color: var(--fp-ink);
+    border: none;
+    font-weight: 700;
+    font-size: 0.82rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .fp-btn-lime:hover {
+    background: var(--fp-lime-hover);
+    color: var(--fp-ink);
+  }
+
+  .fp-btn-dark {
+    background: var(--fp-ink);
+    color: #FFFFFF;
+    border: none;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .fp-btn-dark:hover {
+    opacity: 0.9;
+    color: #FFFFFF;
+  }
+
+  .fp-btn-outline {
+    background: transparent;
+    border: 1px solid var(--fp-border);
+    color: var(--fp-ink);
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 7px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .fp-btn-outline:hover {
+    background: #F3F4F6;
+  }
+
+  .fp-icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--fp-border);
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fp-ink);
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .fp-badge-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background: var(--fp-coral);
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+  }
+
+  /* Content Scroll Area */
+  .fp-content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px 48px 28px;
+    background-color: var(--fp-bg);
+  }
+
+  /* FitPulse Generic Card */
+  .fp-card {
+    background: var(--fp-surface);
+    border-radius: 16px;
+    border: 1px solid var(--fp-border);
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  }
+
+  /* Modal Backdrop & Container */
+  .fp-modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(13, 7, 4, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .fp-modal {
+    background: #FFFFFF;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: fpModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fpModalPop {
+    0% { transform: scale(0.96); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .fp-modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--fp-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .fp-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--fp-ink);
+  }
+
+  .fp-modal-body {
+    padding: 24px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .fp-form-group {
+    margin-bottom: 16px;
+  }
+
+  .fp-form-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--fp-ink);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .fp-form-control {
+    width: 100%;
+    border: 1px solid var(--fp-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--fp-ink);
+    background: #FFFFFF;
+    transition: border-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .fp-form-control:focus {
+    outline: none;
+    border-color: var(--fp-ink);
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 900px) {
+    .fp-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      transform: translateX(-100%);
+    }
+    .fp-sidebar.open {
+      transform: translateX(0);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    .fp-mobile-toggle {
+      display: block;
+    }
+    .fp-content-scroll {
+      padding: 16px;
+    }
+    .fp-topbar {
+      padding: 0 16px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block app_shell %}
+<div class="fp-shell">
+  <!-- Left FitPulse Navigation -->
+  <aside class="fp-sidebar" id="fpSidebar">
+    <div class="fp-sidebar-header">
+      <a href="{{ url_for('member.dashboard') }}" class="fp-brand">
+        <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--fp-ink); border-radius: 8px; color: var(--fp-lime);">
+          <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
+        </span>
+        STRAKLY
+        <span class="fp-brand-badge">ATHLETE</span>
+      </a>
+      <button class="fp-mobile-toggle" onclick="toggleSidebar()" style="display: none;" id="closeSidebarBtn">
+        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+      </button>
+    </div>
+
+    <!-- Athlete Identity Snippet -->
+    <a href="{{ url_for('member.profile') }}" class="fp-sidebar-athlete" style="text-decoration: none;">
+      <div class="fp-athlete-avatar">
+        {% if current_user.avatar_url %}
+          <img src="{{ current_user.avatar_url }}" alt="{{ current_user.full_name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        {% else %}
+          {{ current_user.full_name[:2].upper() if current_user.full_name else 'ME' }}
+        {% endif %}
+      </div>
+      <div class="fp-athlete-info">
+        <span class="fp-athlete-name">{{ current_user.full_name or 'Strakly Athlete' }}</span>
+        <span class="fp-athlete-status">
+          <span class="fp-status-dot"></span> Active Athlete
+        </span>
+      </div>
+    </a>
+
+    <!-- Navigation Scroll Container (All 17 Modules) -->
+    <div class="fp-nav-scroll">
+      <!-- CORE FITNESS -->
+      <div class="fp-nav-group-title">Core Fitness</div>
+      <ul class="fp-nav-list">
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.dashboard') }}" class="fp-nav-link {% if request.endpoint == 'member.dashboard' %}active{% endif %}">
+            <i data-lucide="layout-dashboard" class="fp-nav-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.workouts') }}" class="fp-nav-link {% if request.endpoint == 'member.workouts' %}active{% endif %}">
+            <i data-lucide="dumbbell" class="fp-nav-icon"></i>
+            <span>Workout Centre</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.exercises') }}" class="fp-nav-link {% if request.endpoint == 'member.exercises' %}active{% endif %}">
+            <i data-lucide="book-open" class="fp-nav-icon"></i>
+            <span>Movement Library</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.calendar') }}" class="fp-nav-link {% if request.endpoint == 'member.calendar' %}active{% endif %}">
+            <i data-lucide="calendar-days" class="fp-nav-icon"></i>
+            <span>Training Calendar</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.progress') }}" class="fp-nav-link {% if request.endpoint == 'member.progress' %}active{% endif %}">
+            <i data-lucide="trending-up" class="fp-nav-icon"></i>
+            <span>Progress Studio</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- COACHING & SESSIONS -->
+      <div class="fp-nav-group-title">Coaching & Classes</div>
+      <ul class="fp-nav-list">
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.trainer') }}" class="fp-nav-link {% if request.endpoint == 'member.trainer' %}active{% endif %}">
+            <i data-lucide="user-check" class="fp-nav-icon"></i>
+            <span>Dedicated Coach</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.classes') }}" class="fp-nav-link {% if request.endpoint == 'member.classes' %}active{% endif %}">
+            <i data-lucide="calendar" class="fp-nav-icon"></i>
+            <span>Class Schedule</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.challenges') }}" class="fp-nav-link {% if request.endpoint == 'member.challenges' %}active{% endif %}">
+            <i data-lucide="trophy" class="fp-nav-icon"></i>
+            <span>Challenges & Badges</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- FACILITY & GEAR -->
+      <div class="fp-nav-group-title">Facility & Gear</div>
+      <ul class="fp-nav-list">
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.gear') }}" class="fp-nav-link {% if request.endpoint == 'member.gear' %}active{% endif %}">
+            <i data-lucide="shield-check" class="fp-nav-icon"></i>
+            <span>Gym Equipment</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.store') }}" class="fp-nav-link {% if request.endpoint == 'member.store' %}active{% endif %}">
+            <i data-lucide="shopping-bag" class="fp-nav-icon"></i>
+            <span>Strakly Store</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.services') }}" class="fp-nav-link {% if request.endpoint == 'member.services' %}active{% endif %}">
+            <i data-lucide="sparkles" class="fp-nav-icon"></i>
+            <span>Gym Services</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- MEMBERSHIP & ACCOUNT -->
+      <div class="fp-nav-group-title">Membership & Account</div>
+      <ul class="fp-nav-list">
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.membership') }}" class="fp-nav-link {% if request.endpoint == 'member.membership' %}active{% endif %}">
+            <i data-lucide="credit-card" class="fp-nav-icon"></i>
+            <span>My Membership</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.payments') }}" class="fp-nav-link {% if request.endpoint == 'member.payments' %}active{% endif %}">
+            <i data-lucide="receipt" class="fp-nav-icon"></i>
+            <span>Cash Receipts</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.attendance') }}" class="fp-nav-link {% if request.endpoint == 'member.attendance' %}active{% endif %}">
+            <i data-lucide="clipboard-check" class="fp-nav-icon"></i>
+            <span>Attendance History</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('community.index') }}" class="fp-nav-link {% if request.blueprint == 'community' %}active{% endif %}">
+            <i data-lucide="message-circle" class="fp-nav-icon"></i>
+            <span>Community Hub</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.notifications') }}" class="fp-nav-link {% if request.endpoint == 'member.notifications' %}active{% endif %}">
+            <i data-lucide="bell" class="fp-nav-icon"></i>
+            <span>Notifications</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.support') }}" class="fp-nav-link {% if request.endpoint == 'member.support' %}active{% endif %}">
+            <i data-lucide="help-circle" class="fp-nav-icon"></i>
+            <span>Help & Support</span>
+          </a>
+        </li>
+        <li class="fp-nav-item">
+          <a href="{{ url_for('member.settings') }}" class="fp-nav-link {% if request.endpoint == 'member.settings' %}active{% endif %}">
+            <i data-lucide="settings" class="fp-nav-icon"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Right Viewport Shell -->
+  <main class="fp-main-wrap">
+    <!-- Topbar -->
+    <header class="fp-topbar">
+      <div class="fp-topbar-left">
+        <button class="fp-mobile-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu" style="width: 22px; height: 22px;"></i>
+        </button>
+        <div class="fp-page-title-box">
+          <h1>{% block page_title %}Trainee Portal{% endblock %}</h1>
+          <p>{% block page_subtitle %}Manage your workouts, coaching, and fitness milestones{% endblock %}</p>
+        </div>
+      </div>
+
+      <div class="fp-topbar-right">
+        {% block topbar_actions %}{% endblock %}
+
+        <!-- Notifications -->
+        <a href="{{ url_for('member.notifications') }}" class="fp-icon-btn" title="Notifications">
+          <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+          <span class="fp-badge-dot"></span>
+        </a>
+
+        <!-- Profile Avatar Link -->
+        <a href="{{ url_for('member.profile') }}" class="fp-icon-btn" title="My Fitness Profile">
+          <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+        </a>
+
+        <!-- Sign Out -->
+        <a href="{{ url_for('public.logout') }}" class="fp-icon-btn" title="Sign Out" style="color: var(--fp-coral);">
+          <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Page Content Scroll -->
+    <div class="fp-content-scroll">
+      {% block member_content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sb = document.getElementById('fpSidebar');
+    if (sb) {
+      sb.classList.toggle('open');
+    }
+  }
+
+  // Modal helpers
+  function openModal(id) {
+    const m = document.getElementById(id);
+    if (m) {
+      m.style.display = 'flex';
+    }
+  }
+
+  function closeModal(id) {
+    const m = document.getElementById(id);
+    if (m) {
+      m.style.display = 'none';
+    }
+  }
+
+  // Close modals on backdrop click
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('fp-modal-backdrop')) {
+      e.target.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,317 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Class Schedule & Capacity | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Group Training Operations
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Class Schedule &amp; Capacity
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Schedule group training sessions, allocate certified instructors, and enforce athlete headcount limits.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addClassModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>Schedule Class</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+    <!-- Schedule Class Form -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Schedule Fitness Class</h3>
+        <span class="badge badge-forest" style="font-size: 10.5px;">Session</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.classes') }}">
+        <div class="form-group">
+          <label class="form-label" for="name">Class Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Iron Strength & Power" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="class_date">Date <span style="color: var(--accent-rose);">*</span></label>
+            <input type="date" id="class_date" name="class_date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="start_time">Start Time <span style="color: var(--accent-rose);">*</span></label>
+            <input type="time" id="start_time" name="start_time" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="duration_minutes">Duration (Min)</label>
+            <input type="number" id="duration_minutes" name="duration_minutes" class="form-control" value="60" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="capacity">Capacity <span style="color: var(--accent-rose);">*</span></label>
+            <input type="number" id="capacity" name="capacity" class="form-control" value="20" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="trainer_id">Assigned Coach</label>
+          <select id="trainer_id" name="trainer_id" class="form-control">
+            <option value="">-- No Dedicated Coach --</option>
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Class Focus / Description</label>
+          <textarea id="description" name="description" class="form-control" rows="2" placeholder="Barbell mechanics, power conditioning..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i data-lucide="calendar" style="width: 15px; height: 15px;"></i>
+          <span>Confirm Class Schedule</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Scheduled Classes Table -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Scheduled Sessions</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Group classes scheduled across the facility</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">{{ classes|length }} Scheduled</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+              <th style="padding: 10px 12px;">Class Session</th>
+              <th style="padding: 10px 12px;">Date &amp; Time</th>
+              <th style="padding: 10px 12px;">Coach</th>
+              <th style="padding: 10px 12px;">Capacity</th>
+              <th style="padding: 10px 12px;">Status</th>
+              <th style="padding: 10px 12px; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+        </thead>
+        <tbody>
+          {% for c in classes %}
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--ink-dark);">{{ c.name }}</div>
+                {% if c.description %}
+                  <div style="font-size: 0.78rem; color: var(--ink-muted);">{{ c.description[:55] }}...</div>
+                {% endif %}
+              </td>
+              <td>
+                <div style="font-weight: 600; color: var(--forest-primary); font-size: 0.88rem;">{{ c.class_date }}</div>
+                <div style="font-size: 0.78rem; color: var(--ink-muted);">{{ c.start_time }} ({{ c.duration_minutes }} min)</div>
+              </td>
+              <td>
+                <span style="font-weight: 600; color: var(--ink-secondary);">{{ c.profiles.full_name if c.profiles else 'Staff Coach' }}</span>
+              </td>
+              <td>
+                <span class="badge badge-neutral">{{ c.capacity }} Max</span>
+              </td>
+              <td>
+                {% if c.is_cancelled %}
+                  <span class="badge badge-rose">Cancelled</span>
+                {% else %}
+                  <span class="badge badge-forest">Open</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right;">
+                <div style="display: flex; gap: 0.35rem; justify-content: flex-end; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary btn-sm"
+                          data-id="{{ c.id }}"
+                          data-name="{{ c.name }}"
+                          data-date="{{ c.class_date }}"
+                          data-time="{{ c.start_time }}"
+                          data-dur="{{ c.duration_minutes }}"
+                          data-cap="{{ c.capacity }}"
+                          data-trainer="{{ c.trainer_id or '' }}"
+                          data-desc="{{ c.description or '' }}"
+                          onclick="openEditClassModal(this)">Edit</button>
+                  {% if not c.is_cancelled %}
+                    <form method="POST" action="{{ url_for('admin.cancel_class', class_id=c.id) }}" onsubmit="return confirm('Cancel this class session?');" style="display:inline;">
+                      <button type="submit" class="btn btn-outline-rose btn-sm">Cancel</button>
+                    </form>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('admin.delete_class', class_id=c.id) }}" onsubmit="return confirm('Permanently remove this class record?');" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-rose">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 3rem 1rem;">
+                <div class="empty-state">
+                  <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </div>
+                  <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Scheduled Classes</h4>
+                  <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">Schedule group fitness sessions like Iron Strength, HIIT, or Mobility Flow.</p>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Class -->
+<div id="editClassModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Fitness Class</h3>
+        <p class="modal-subtitle">Update schedule timing, capacity, or assigned coach</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editClassModal')">&times;</button>
+    </div>
+    <form id="editClassForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="edit_class_name">Class Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="edit_class_name" name="name" class="form-control" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_class_date">Date <span style="color: var(--accent-rose);">*</span></label>
+            <input type="date" id="edit_class_date" name="class_date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_start_time">Start Time <span style="color: var(--accent-rose);">*</span></label>
+            <input type="time" id="edit_start_time" name="start_time" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_duration_minutes">Duration (Minutes)</label>
+            <input type="number" id="edit_duration_minutes" name="duration_minutes" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_capacity">Athlete Capacity <span style="color: var(--accent-rose);">*</span></label>
+            <input type="number" id="edit_capacity" name="capacity" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_trainer_id">Assigned Coach</label>
+          <select id="edit_trainer_id" name="trainer_id" class="form-control">
+            <option value="">-- No Dedicated Coach --</option>
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_class_desc">Class Focus / Description</label>
+          <textarea id="edit_class_desc" name="description" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editClassModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Class Session</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Add Class (Header button target) -->
+<div id="addClassModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Schedule New Class</h3>
+        <p class="modal-subtitle">Add a group workout to the facility schedule</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addClassModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.classes') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="modal_class_name">Class Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="modal_class_name" name="name" class="form-control" placeholder="e.g. Iron Strength & Power" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="modal_class_date">Date <span style="color: var(--accent-rose);">*</span></label>
+            <input type="date" id="modal_class_date" name="class_date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal_start_time">Start Time <span style="color: var(--accent-rose);">*</span></label>
+            <input type="time" id="modal_start_time" name="start_time" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="modal_duration_minutes">Duration (Min)</label>
+            <input type="number" id="modal_duration_minutes" name="duration_minutes" class="form-control" value="60" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal_capacity">Capacity <span style="color: var(--accent-rose);">*</span></label>
+            <input type="number" id="modal_capacity" name="capacity" class="form-control" value="20" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal_trainer_id">Assigned Coach</label>
+          <select id="modal_trainer_id" name="trainer_id" class="form-control">
+            <option value="">-- No Dedicated Coach --</option>
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal_description">Description</label>
+          <textarea id="modal_description" name="description" class="form-control" rows="2" placeholder="Barbell mechanics, conditioning..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addClassModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Schedule Session</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditClassModal(btn) {
+  const form = document.getElementById('editClassForm');
+  form.action = '/admin/classes/edit/' + btn.dataset.id;
+  document.getElementById('edit_class_name').value = btn.dataset.name || '';
+  document.getElementById('edit_class_date').value = btn.dataset.date || '';
+  document.getElementById('edit_start_time').value = btn.dataset.time || '';
+  document.getElementById('edit_duration_minutes').value = btn.dataset.dur || 60;
+  document.getElementById('edit_capacity').value = btn.dataset.cap || 20;
+  document.getElementById('edit_trainer_id').value = btn.dataset.trainer || '';
+  document.getElementById('edit_class_desc').value = btn.dataset.desc || '';
+  openModal('editClassModal');
+}
+</script>
+{% endblock %}

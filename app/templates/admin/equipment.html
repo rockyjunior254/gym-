@@ -1,0 +1,328 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Assets & Equipment Register | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Facility Assets &amp; Inventory
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Assets &amp; Equipment Register
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Track gym machinery, free weights, barbell platforms, and maintenance status. Keep training zones inspected and operational.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addEquipmentModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>Register Asset</span>
+      </button>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+    <!-- Register Equipment Form -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Register New Asset</h3>
+        <span class="badge badge-forest" style="font-size: 10.5px;">Inventory</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.equipment') }}">
+        <input type="hidden" name="action" value="register_equipment">
+        <div class="form-group">
+          <label class="form-label" for="name">Asset Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Eleiko Competition Barbell 20kg" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="category">Category</label>
+            <select id="category" name="category" class="form-control">
+              <option value="Free Weights">Free Weights</option>
+              <option value="Cardio">Cardio</option>
+              <option value="Racks & Benches">Racks & Benches</option>
+              <option value="Cables & Machines">Cables & Machines</option>
+              <option value="Recovery & Accessories">Recovery & Gear</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="location">Zone / Location</label>
+            <input type="text" id="location" name="location" class="form-control" placeholder="e.g. Platform Zone A">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="condition">Operational Condition</label>
+          <select id="condition" name="condition" class="form-control">
+            <option value="excellent">Excellent</option>
+            <option value="good" selected>Good</option>
+            <option value="fair">Fair</option>
+            <option value="needs_service">Needs Maintenance</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Specifications / Serial Notes</label>
+          <textarea id="description" name="description" class="form-control" rows="2" placeholder="Asset serial number, manufacturer specs..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i data-lucide="shield" style="width: 15px; height: 15px;"></i>
+          <span>Register Equipment Asset</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Equipment Register Table -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Facility Asset Inventory</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Operational machinery and condition status</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">{{ equipment|length }} Registered Assets</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+              <th style="padding: 10px 12px;">Asset Name</th>
+              <th style="padding: 10px 12px;">Category</th>
+              <th style="padding: 10px 12px;">Zone</th>
+              <th style="padding: 10px 12px;">Condition</th>
+              <th style="padding: 10px 12px;">Availability</th>
+              <th style="padding: 10px 12px; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+        </thead>
+        <tbody>
+          {% for eq in equipment %}
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--ink-dark);">{{ eq.name }}</div>
+                {% if eq.notes %}
+                  <div style="font-size: 0.78rem; color: var(--ink-muted);">{{ eq.notes[:55] }}...</div>
+                {% endif %}
+              </td>
+              <td><span class="badge badge-neutral" style="font-size: 0.72rem;">{{ eq.category }}</span></td>
+              <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ eq.location or 'Main Floor' }}</td>
+              <td>
+                {% if eq.condition == 'excellent' or eq.condition == 'good' %}
+                  <span class="badge badge-forest">{{ eq.condition|upper }}</span>
+                {% elif eq.condition == 'needs_service' or eq.condition == 'needs_maintenance' %}
+                  <span class="badge badge-rose">Needs Service</span>
+                {% else %}
+                  <span class="badge badge-warning">{{ eq.condition|upper }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if eq.is_available %}
+                  <span class="badge badge-forest">Available</span>
+                {% else %}
+                  <span class="badge badge-rose">Out of Service</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openMaintenanceModal('{{ eq.id }}', '{{ eq.name }}')">
+                  Log Service
+                </button>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 3rem 1rem;">
+                <div class="empty-state">
+                  <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  </div>
+                  <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Equipment Registered</h4>
+                  <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">Register gym equipment to monitor servicing schedules and athlete safety.</p>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Maintenance Logs Section -->
+<div class="card" style="margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Maintenance & Servicing History</h3>
+      <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Repair records, routine checkups, and servicing expenditures</p>
+    </div>
+    <span class="badge badge-forest">{{ maintenance_logs|length }} Service Events</span>
+  </div>
+
+  {% if maintenance_logs %}
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>Equipment Asset</th>
+            <th>Service Date</th>
+            <th>Issue / Work Done</th>
+            <th>Logged By</th>
+            <th>Cost (KES)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in maintenance_logs %}
+            <tr>
+              <td><strong>{{ log.gym_equipment.name if log.gym_equipment else 'Asset' }}</strong></td>
+              <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ log.service_date }}</td>
+              <td>
+                <div style="font-weight: 600; color: var(--ink-dark);">{{ log.issue_description }}</div>
+                {% if log.action_taken %}
+                  <div style="font-size: 0.78rem; color: var(--ink-muted);">Action: {{ log.action_taken }}</div>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ log.profiles.full_name if log.profiles else 'Staff' }}</td>
+              <td><span style="font-weight: 700; color: var(--forest-primary);">KES {{ "{:,.2f}".format(log.cost or 0) }}</span></td>
+              <td>
+                <span class="badge {% if log.status == 'resolved' %}badge-forest{% else %}badge-warning{% endif %}">
+                  {{ log.status|upper }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color: var(--ink-muted); font-size: 0.88rem; margin: 0;">No maintenance events logged yet. All equipment is in operational order.</p>
+  {% endif %}
+</div>
+
+<!-- Modal: Log Maintenance -->
+<div id="maintenanceModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Log Maintenance Service</h3>
+        <p class="modal-subtitle">Record equipment servicing, repairs, and associated expenses</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('maintenanceModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.equipment') }}">
+      <input type="hidden" name="action" value="log_maintenance">
+      <input type="hidden" id="maint_equipment_id" name="equipment_id" value="">
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Equipment Asset</label>
+          <input type="text" id="maint_equipment_name" class="form-control" readonly style="background: var(--pearl-bg); font-weight: 700;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="issue_description">Issue / Fault Description <span style="color: var(--accent-rose);">*</span></label>
+          <textarea id="issue_description" name="issue_description" class="form-control" rows="2" placeholder="e.g. Cable fraying on high pulley stack" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="action_taken">Action Taken / Service Notes</label>
+          <textarea id="action_taken" name="action_taken" class="form-control" rows="2" placeholder="e.g. Replaced pulley cable with aircraft steel 5mm"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="cost">Service Cost (KES)</label>
+            <input type="number" id="cost" name="cost" class="form-control" step="0.01" value="0.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="status">Job Status</label>
+            <select id="status" name="status" class="form-control">
+              <option value="resolved">Resolved</option>
+              <option value="in_progress">In Progress</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('maintenanceModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Service Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Add Equipment (Header button target) -->
+<div id="addEquipmentModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Register Equipment Asset</h3>
+        <p class="modal-subtitle">Add a machine or free-weight item to the gym inventory</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addEquipmentModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.equipment') }}">
+      <input type="hidden" name="action" value="register_equipment">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="modal_eq_name">Asset Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="modal_eq_name" name="name" class="form-control" placeholder="e.g. Eleiko Competition Barbell 20kg" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="modal_eq_category">Category</label>
+            <select id="modal_eq_category" name="category" class="form-control">
+              <option value="Free Weights">Free Weights</option>
+              <option value="Cardio">Cardio</option>
+              <option value="Racks & Benches">Racks & Benches</option>
+              <option value="Cables & Machines">Cables & Machines</option>
+              <option value="Recovery & Accessories">Recovery & Gear</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="modal_eq_location">Zone / Location</label>
+            <input type="text" id="modal_eq_location" name="location" class="form-control" placeholder="e.g. Platform Zone A">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal_eq_condition">Operational Condition</label>
+          <select id="modal_eq_condition" name="condition" class="form-control">
+            <option value="excellent">Excellent</option>
+            <option value="good" selected>Good</option>
+            <option value="fair">Fair</option>
+            <option value="needs_service">Needs Maintenance</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal_eq_description">Specifications / Notes</label>
+          <textarea id="modal_eq_description" name="description" class="form-control" rows="2" placeholder="Asset serial number, manufacturer specs..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addEquipmentModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Register Asset</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openMaintenanceModal(id, name) {
+  document.getElementById('maint_equipment_id').value = id;
+  document.getElementById('maint_equipment_name').value = name;
+  openModal('maintenanceModal');
+}
+</script>
+{% endblock %}

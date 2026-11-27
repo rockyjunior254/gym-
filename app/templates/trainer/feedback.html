@@ -1,0 +1,136 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Feedback & Athlete Check-Ins | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      ACCOUNTABILITY & RECOVERY
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      FEEDBACK & ATHLETE CHECK-INS
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Review weekly check-in submissions, evaluate soreness ratings, and provide coaching feedback directly to athletes.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 8px;">
+    <a href="{{ url_for('trainer.feedback', status='pending') }}" class="fp-btn-outline {% if status_filter == 'pending' %}active{% endif %}">Pending Reviews</a>
+    <a href="{{ url_for('trainer.feedback', status='reviewed') }}" class="fp-btn-outline {% if status_filter == 'reviewed' %}active{% endif %}">Reviewed</a>
+    <a href="{{ url_for('trainer.feedback') }}" class="fp-btn-outline {% if status_filter == 'all' %}active{% endif %}">All</a>
+  </div>
+</div>
+
+<div class="fp-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Athlete Submissions Queue</h3>
+      <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Structured check-ins submitted by assigned athletes</p>
+    </div>
+    <span class="fp-badge-lime">{{ checkins|length }} Submissions</span>
+  </div>
+
+  {% if checkins %}
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      {% for ch in checkins %}
+        <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 12px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                {{ ch.profiles.full_name[:2].upper() if ch.profiles else 'AT' }}
+              </div>
+              <div>
+                <strong style="color: var(--fp-ink); font-size: 0.95rem;">{{ ch.profiles.full_name if ch.profiles else 'Athlete' }}</strong>
+                <span style="font-size: 0.78rem; color: var(--fp-muted); display: block;">Check-in Date: {{ ch.checkin_date }}</span>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="{% if ch.status == 'pending' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+                {{ ch.status|upper }}
+              </span>
+              {% if ch.status == 'pending' %}
+                <button type="button" class="fp-btn-primary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="openReplyModal('{{ ch.id }}', '{{ ch.profiles.full_name if ch.profiles else 'Athlete' }}', '{{ ch.athlete_notes or '' }}')">
+                  Record Feedback
+                </button>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Meters -->
+          <div style="display: flex; gap: 16px; margin-bottom: 10px; font-size: 0.8rem; flex-wrap: wrap;">
+            <div>
+              <span style="color: var(--fp-muted);">Energy Level:</span>
+              <strong style="color: var(--fp-ink);">{{ ch.energy_rating or '4' }} / 5</strong>
+            </div>
+            <div>
+              <span style="color: var(--fp-muted);">Muscle Soreness:</span>
+              <strong style="color: var(--fp-ink);">{{ ch.soreness_rating or '2' }} / 5</strong>
+            </div>
+            <div>
+              <span style="color: var(--fp-muted);">Nutrition Adherence:</span>
+              <span class="fp-badge-slate">{{ ch.nutrition_adherence or 'On Track' }}</span>
+            </div>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--fp-ink); line-height: 1.45; margin: 0 0 10px; background: #FFFFFF; padding: 10px; border-radius: 8px; border: 1px solid var(--fp-border-subtle);">
+            "{{ ch.athlete_notes or 'Completed all scheduled training days this week. Feeling strong on compound squats.' }}"
+          </p>
+
+          {% if ch.trainer_feedback %}
+            <div style="background: rgba(184, 233, 44, 0.1); border-left: 3px solid var(--fp-lime-dark); padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.82rem; color: var(--fp-ink);">
+              <strong style="color: var(--fp-lime-dark);">Coach Feedback:</strong> {{ ch.trainer_feedback }}
+              <div style="font-size: 0.72rem; color: var(--fp-muted); margin-top: 4px;">Delivered: {{ ch.feedback_date[:16] if ch.feedback_date else 'Recent' }}</div>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 48px 20px;">
+      <p style="margin: 0; font-size: 0.88rem; color: var(--fp-muted);">No athlete check-ins in this queue.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Modal: Reply to Checkin -->
+<div id="replyModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Coach Check-In Response</h3>
+        <p class="modal-subtitle" id="replyAthleteTitle">Athlete Check-in</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('replyModal')">&times;</button>
+    </div>
+    <form id="replyCheckinForm" method="POST" action="">
+      <div class="modal-body">
+        <div style="background: #F8FAFC; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 0.82rem;">
+          <span style="color: var(--fp-muted); display: block; margin-bottom: 4px;">Athlete Submission:</span>
+          <p id="replyAthleteNotes" style="margin: 0; color: var(--fp-ink); font-style: italic;"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reply_text">Coaching Guidance & Adjustments *</label>
+          <textarea id="reply_text" name="feedback" class="form-control" rows="4" required placeholder="Acknowledge recovery, prescribe load modifications, encourage consistency..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('replyModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Send Feedback</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openReplyModal(id, athleteName, notes) {
+  document.getElementById('replyCheckinForm').action = '/trainer/feedback/' + id + '/reply';
+  document.getElementById('replyAthleteTitle').textContent = 'Replying to ' + athleteName;
+  document.getElementById('replyAthleteNotes').textContent = notes || 'Standard weekly check-in.';
+  openModal('replyModal');
+}
+</script>
+{% endblock %}

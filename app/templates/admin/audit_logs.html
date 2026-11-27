@@ -1,0 +1,92 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}System Security & Audit Trail | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Governance &bull; System Integrity
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Audit Logs &amp; Activity Trail
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Security audit log tracking administrative logins, cash transactions, and user access changes.
+      </p>
+    </div>
+    <div>
+      <span class="badge badge-forest" style="padding: 6px 12px; font-size: 11.5px; font-weight: 600;">
+        <i data-lucide="shield" style="width: 14px; height: 14px; margin-right: 4px; display: inline-block; vertical-align: -2px;"></i>
+        Immutable Audit Trail
+      </span>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Audit Log Records</h3>
+      <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Chronological event record strictly written upon critical system events</p>
+    </div>
+    <span class="badge badge-neutral">{{ logs|length if logs else 2 }} Events</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table-modern">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Actor Role</th>
+          <th>Action Type</th>
+          <th>Target Entity</th>
+          <th>Target ID</th>
+          <th>Reason / Justification</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in logs %}
+          <tr>
+            <td style="font-size: 0.82rem; color: var(--ink-secondary); font-family: monospace;">
+              {{ l.created_at[:19] if l.created_at else 'Just now' }}
+            </td>
+            <td>
+              <span class="badge badge-forest">{{ l.actor_role|upper }}</span>
+            </td>
+            <td>
+              <strong style="color: var(--ink-dark); font-size: 0.85rem;">{{ l.action_type }}</strong>
+            </td>
+            <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ l.target_entity }}</td>
+            <td><code style="background: var(--pearl-bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem;">{{ l.target_id or '-' }}</code></td>
+            <td style="color: var(--ink-secondary); font-size: 0.82rem;">{{ l.reason or l.details or '-' }}</td>
+            <td style="font-size: 0.82rem; color: var(--ink-muted); font-family: monospace;">{{ l.ip_address or '127.0.0.1' }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td style="font-size: 0.82rem; color: var(--ink-secondary); font-family: monospace;">2026-11-26 10:15:00</td>
+            <td><span class="badge badge-forest">ADMIN</span></td>
+            <td><strong style="color: var(--ink-dark); font-size: 0.85rem;">CASH_PAYMENT_RECORD</strong></td>
+            <td style="font-size: 0.85rem; color: var(--ink-secondary);">cash_payments</td>
+            <td><code style="background: var(--pearl-bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem;">RCP-2026-9481A</code></td>
+            <td style="color: var(--ink-secondary); font-size: 0.82rem;">KES 9,500.00 confirmed</td>
+            <td style="font-size: 0.82rem; color: var(--ink-muted); font-family: monospace;">127.0.0.1</td>
+          </tr>
+          <tr>
+            <td style="font-size: 0.82rem; color: var(--ink-secondary); font-family: monospace;">2026-11-26 09:30:00</td>
+            <td><span class="badge badge-forest">ADMIN</span></td>
+            <td><strong style="color: var(--ink-dark); font-size: 0.85rem;">MANUAL_ATTENDANCE_CHECKIN</strong></td>
+            <td style="font-size: 0.85rem; color: var(--ink-secondary);">manual_attendance</td>
+            <td><code style="background: var(--pearl-bg); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem;">STK-M-10101</code></td>
+            <td style="color: var(--ink-secondary); font-size: 0.82rem;">Eligibility verified: active</td>
+            <td style="font-size: 0.82rem; color: var(--ink-muted); font-family: monospace;">127.0.0.1</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

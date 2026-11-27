@@ -1,0 +1,121 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Gym Facility Services{% endblock %}
+{% block page_subtitle %}Elevate your recovery, physiotherapy, sauna sessions, and nutrition consultations{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Member Inquiries History -->
+  {% if inquiries %}
+    <div class="fp-card" style="border-left: 4px solid var(--fp-lime);">
+      <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0 0 14px 0; color: var(--fp-ink);">My Service Consultations</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for inq in inquiries %}
+          <div style="padding: 12px 16px; background: #FAFAFA; border-radius: 12px; border: 1px solid var(--fp-border); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ inq.service.name }}</span>
+              <span class="fp-brand-badge" style="margin-left: 8px;">{{ inq.status|upper }}</span>
+              <div style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 2px;">
+                Requested on {{ inq.created_at[:10] }} &bull; {{ inq.notes or 'General inquiry' }}
+              </div>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--fp-muted);">Front desk will confirm appointment</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Services Directory -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Specialised Facility Amenities</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Book consultations with licensed specialists and recovery staff</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">RECOVERY & AMENITIES</span>
+    </div>
+
+    {% if services %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+        {% for s in services %}
+          <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="fp-brand-badge" style="background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);">FACILITY</span>
+                <span style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink);">KES {{ s.price or 'Included' }}</span>
+              </div>
+
+              <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ s.name }}</h4>
+              <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 16px 0; line-height: 1.4;">
+                {{ s.description or 'Specialist gym amenity designed for optimal athlete recovery.' }}
+              </p>
+            </div>
+
+            <button type="button" class="fp-btn-dark" style="width: 100%; justify-content: center;"
+                    data-id="{{ s.id }}" data-name="{{ s.name }}"
+                    onclick="selectServiceForInquiry(this)">
+              Inquire / Book Consultation
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <i data-lucide="sparkles" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">Services Updating</h3>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">Facility services and consultation slots will be published shortly.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Inquire Service Modal -->
+<div class="fp-modal-backdrop" id="inquireServiceModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3 id="serviceModalTitle">Inquire About Service</h3>
+      <button type="button" onclick="closeModal('inquireServiceModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.inquire_service') }}" method="POST">
+      <input type="hidden" name="service_id" id="inquireServiceId">
+      <div class="fp-modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Preferred Date</label>
+            <input type="date" name="preferred_date" class="fp-form-control">
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Preferred Time</label>
+            <input type="time" name="preferred_time" class="fp-form-control" value="14:00">
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Consultation Questions / Details</label>
+          <textarea name="notes" class="fp-form-control" rows="3" placeholder="Describe any specific needs, sports injury history, or session targets..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('inquireServiceModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Send Inquiry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function selectServiceForInquiry(btn) {
+    const sId = btn.getAttribute('data-id');
+    const sName = btn.getAttribute('data-name');
+    document.getElementById('inquireServiceId').value = sId;
+    document.getElementById('serviceModalTitle').textContent = 'Inquire About ' + sName;
+    openModal('inquireServiceModal');
+  }
+</script>
+{% endblock %}

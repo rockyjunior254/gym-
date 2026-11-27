@@ -1,0 +1,295 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Athlete Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ current_user.full_name or 'Champion' }}! Ready to conquer today's goals?{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{{ url_for('member.workouts') }}" class="fp-btn-lime">
+    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+    Log Session
+  </a>
+  <a href="{{ url_for('member.classes') }}" class="fp-btn-dark">
+    <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
+    Book Class
+  </a>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Hero Highlight Row: Daily Target Progress + Quick Stats -->
+  <div style="display: grid; grid-template-columns: 360px 1fr; gap: 20px;">
+    <!-- FitPulse Circular Daily Target Card -->
+    <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1E1611 100%); color: #FFFFFF; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: rgba(195, 231, 22, 0.08); border-radius: 50%;"></div>
+      
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span style="font-size: 0.75rem; font-weight: 800; color: var(--fp-lime); text-transform: uppercase; letter-spacing: 0.06em;">Daily Training Goal</span>
+          <span style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">Today</span>
+        </div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em;">Workout Discipline</h2>
+        <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Target: 60 mins intense training or active recovery.</p>
+      </div>
+
+      <!-- Circular Metric & Streak Visual -->
+      <div style="display: flex; align-items: center; gap: 24px; margin: 24px 0;">
+        <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
+          <svg style="width: 96px; height: 96px; transform: rotate(-90deg);">
+            <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.12)" stroke-width="8" fill="transparent"/>
+            <circle cx="48" cy="48" r="40" stroke="var(--fp-lime)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" fill="transparent"/>
+          </svg>
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; line-height: 1;">75%</span>
+            <span style="font-size: 0.62rem; color: var(--fp-lime); font-weight: 700; text-transform: uppercase;">Done</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(218, 40, 28, 0.2); display: flex; align-items: center; justify-content: center; color: var(--fp-coral);">
+              <i data-lucide="flame" style="width: 16px; height: 16px;"></i>
+            </div>
+            <div>
+              <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 600;">ACTIVE STREAK</div>
+              <div style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF;">{{ streak }} Days Strong</div>
+            </div>
+          </div>
+          <div style="font-size: 0.75rem; color: #D1D5DB;">Front-desk verified attendance</div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.75rem; color: #9CA3AF;">Status: Active Athlete</span>
+        <a href="{{ url_for('member.workouts') }}" style="color: var(--fp-lime); font-size: 0.78rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          View Routine <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- 4 Stats Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+      <!-- Stat 1: Membership Validity -->
+      <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">Membership Tier</span>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-ink); margin-top: 4px;">
+              {{ active_sub.plan_name if active_sub else 'No Active Plan' }}
+            </div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; color: var(--fp-ink);">
+            <i data-lucide="credit-card" style="width: 18px; height: 18px;"></i>
+          </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+          {% if active_sub %}
+            <span style="color: #10B981; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+              <span class="fp-status-dot"></span> Valid until {{ active_sub.end_date }}
+            </span>
+          {% else %}
+            <span style="color: var(--fp-coral); font-weight: 600;">Renewal Required</span>
+          {% endif %}
+          <a href="{{ url_for('member.membership') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">Manage</a>
+        </div>
+      </div>
+
+      <!-- Stat 2: Dedicated Coach -->
+      <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">Dedicated Coach</span>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-ink); margin-top: 4px;">
+              {{ coach_assignment.trainer.full_name if coach_assignment and coach_assignment.trainer else 'Unassigned' }}
+            </div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(195, 231, 22, 0.25); display: flex; align-items: center; justify-content: center; color: var(--fp-ink);">
+            <i data-lucide="award" style="width: 18px; height: 18px;"></i>
+          </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+          <span style="color: var(--fp-muted);">PT Wallet: <strong>{{ pt_wallet.sessions_remaining or 0 }} sessions left</strong></span>
+          <a href="{{ url_for('member.trainer') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">Details</a>
+        </div>
+      </div>
+
+      <!-- Stat 3: Total Workouts Completed -->
+      <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">Workouts Logged</span>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-ink); margin-top: 4px;">
+              {{ attendance|length }} Sessions
+            </div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; color: var(--fp-ink);">
+            <i data-lucide="dumbbell" style="width: 18px; height: 18px;"></i>
+          </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+          <span style="color: #10B981; font-weight: 700;">+3 this week</span>
+          <a href="{{ url_for('member.attendance') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">Log</a>
+        </div>
+      </div>
+
+      <!-- Stat 4: Top Personal Record -->
+      <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">Top Personal Record</span>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-coral); margin-top: 4px;">
+              {{ prs[0].exercise_name if prs else 'No PRs Yet' }}
+            </div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(218, 40, 28, 0.1); display: flex; align-items: center; justify-content: center; color: var(--fp-coral);">
+            <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+          </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem;">
+          <span style="color: var(--fp-muted);">{{ prs[0].weight_kg ~ ' kg (' ~ prs[0].reps ~ ' reps)' if prs else 'Record your lifts' }}</span>
+          <a href="{{ url_for('member.progress') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">Progress</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle Row: Activity Chart & Upcoming Classes -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+    <!-- Weekly Training Volume Chart -->
+    <div class="fp-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Weekly Training Consistency</h3>
+          <p style="font-size: 0.75rem; color: var(--fp-muted); margin: 2px 0 0 0;">Check-ins and completed workouts across the week</p>
+        </div>
+        <span style="background: var(--fp-lime); color: var(--fp-ink); font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 12px;">This Week</span>
+      </div>
+      <div style="height: 220px;">
+        <canvas id="weeklyActivityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Upcoming Group Classes Schedule -->
+    <div class="fp-card" style="display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Upcoming Classes</h3>
+        <a href="{{ url_for('member.classes') }}" style="font-size: 0.75rem; color: var(--fp-ink); font-weight: 700; text-decoration: none;">View All</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+        {% if upcoming_classes %}
+          {% for c in upcoming_classes %}
+            <div style="padding: 12px; background: #FAFAFA; border-radius: 12px; border: 1px solid var(--fp-border); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--fp-ink);">{{ c.name }}</div>
+                <div style="font-size: 0.72rem; color: var(--fp-muted); margin-top: 2px;">
+                  <i data-lucide="clock" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle;"></i> {{ c.start_time }} &bull; {{ c.room or 'Main Studio' }}
+                </div>
+              </div>
+              <form action="{{ url_for('member.book_class', class_id=c.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="fp-btn-lime" style="padding: 5px 12px; font-size: 0.75rem;">Book</button>
+              </form>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align: center; padding: 32px 16px; color: var(--fp-muted); font-size: 0.82rem;">
+            <i data-lucide="calendar" style="width: 32px; height: 32px; margin-bottom: 8px; opacity: 0.4;"></i>
+            <div>No classes scheduled today</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row: Active Goals & Quick Movement Highlights -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <!-- Active Fitness Goals -->
+    <div class="fp-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Active Fitness Milestones</h3>
+        <a href="{{ url_for('member.progress') }}" style="font-size: 0.75rem; color: var(--fp-ink); font-weight: 700; text-decoration: none;">+ Set Goal</a>
+      </div>
+
+      {% if active_goals %}
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          {% for g in active_goals %}
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 6px;">
+                <span>{{ g.title }}</span>
+                <span style="color: var(--fp-muted);">{{ g.current_value }} / {{ g.target_value }} {{ g.unit }}</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden;">
+                {% set pct = [((g.current_value / g.target_value) * 100)|round|int if g.target_value else 0, 100]|min %}
+                <div style="width: {{ pct }}%; height: 100%; background: var(--fp-lime); border-radius: 4px;"></div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
+          No active targets set. Establish a new personal milestone in Progress Studio.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick Shortcuts Card -->
+    <div class="fp-card" style="background: #FAFAFA; border: 1px dashed var(--fp-border);">
+      <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0 0 12px 0; color: var(--fp-ink);">Trainee Quick Access</h3>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+        <a href="{{ url_for('member.exercises') }}" style="background: #FFFFFF; padding: 12px; border-radius: 12px; border: 1px solid var(--fp-border); text-decoration: none; color: var(--fp-ink); display: flex; align-items: center; gap: 10px; font-size: 0.82rem; font-weight: 700;">
+          <i data-lucide="book-open" style="width: 16px; height: 16px; color: var(--fp-ink);"></i> Movement Library
+        </a>
+        <a href="{{ url_for('member.gear') }}" style="background: #FFFFFF; padding: 12px; border-radius: 12px; border: 1px solid var(--fp-border); text-decoration: none; color: var(--fp-ink); display: flex; align-items: center; gap: 10px; font-size: 0.82rem; font-weight: 700;">
+          <i data-lucide="shield-check" style="width: 16px; height: 16px; color: var(--fp-ink);"></i> Borrow Gear
+        </a>
+        <a href="{{ url_for('member.store') }}" style="background: #FFFFFF; padding: 12px; border-radius: 12px; border: 1px solid var(--fp-border); text-decoration: none; color: var(--fp-ink); display: flex; align-items: center; gap: 10px; font-size: 0.82rem; font-weight: 700;">
+          <i data-lucide="shopping-bag" style="width: 16px; height: 16px; color: var(--fp-ink);"></i> Strakly Store
+        </a>
+        <a href="{{ url_for('member.calendar') }}" style="background: #FFFFFF; padding: 12px; border-radius: 12px; border: 1px solid var(--fp-border); text-decoration: none; color: var(--fp-ink); display: flex; align-items: center; gap: 10px; font-size: 0.82rem; font-weight: 700;">
+          <i data-lucide="calendar-days" style="width: 16px; height: 16px; color: var(--fp-ink);"></i> Training Schedule
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('weeklyActivityChart');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: {{ activity_labels|tojson }},
+          datasets: [{
+            label: 'Sessions',
+            data: {{ activity_data|tojson }},
+            backgroundColor: '#C3E716',
+            borderRadius: 6,
+            barThickness: 24
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, color: '#79787E' },
+              grid: { color: '#F0F0F1' }
+            },
+            x: {
+              ticks: { color: '#79787E' },
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

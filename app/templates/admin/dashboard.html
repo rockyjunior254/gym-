@@ -1,0 +1,465 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Dashboard | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Enterprise Header & Quick Actions -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Operations &amp; Intelligence
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Business Overview
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Monitor gym operations, membership activity and daily performance.
+      </p>
+    </div>
+
+    <!-- Quick Action Launchpad -->
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <!-- Date Range Filter Toolbar -->
+      <div style="display: flex; background: #FFFFFF; border: 1px solid var(--border-line); border-radius: var(--radius-btn); padding: 3px; gap: 2px;">
+        <a href="{{ url_for('admin.dashboard', range='today') }}" class="btn btn-sm {% if range_param == 'today' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 4px 10px; font-size: 0.78rem; border: none;">Today</a>
+        <a href="{{ url_for('admin.dashboard', range='7d') }}" class="btn btn-sm {% if range_param == '7d' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 4px 10px; font-size: 0.78rem; border: none;">7D</a>
+        <a href="{{ url_for('admin.dashboard', range='30d') }}" class="btn btn-sm {% if range_param == '30d' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 4px 10px; font-size: 0.78rem; border: none;">30D</a>
+        <a href="{{ url_for('admin.dashboard', range='month') }}" class="btn btn-sm {% if range_param == 'month' %}btn-primary{% else %}btn-outline{% endif %}" style="padding: 4px 10px; font-size: 0.78rem; border: none;">This Month</a>
+      </div>
+
+      <a href="{{ url_for('admin.payments') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="banknote" style="width: 15px; height: 15px;"></i>
+        <span>Record Cash</span>
+      </a>
+      <a href="{{ url_for('admin.attendance') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="clipboard-check" style="width: 15px; height: 15px;"></i>
+        <span>Desk Check-In</span>
+      </a>
+      <a href="{{ url_for('admin.members') }}" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="user-plus" style="width: 15px; height: 15px;"></i>
+        <span>Add Member</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Primary 4 KPI Cards Row -->
+  <div class="grid-4">
+    <!-- Total Members -->
+    <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TOTAL MEMBERS</span>
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+          {{ total_members }}
+        </div>
+        <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">+{{ new_registrations }} this cycle</span>
+      </div>
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <!-- Active Subscriptions -->
+    <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE SUBSCRIPTIONS</span>
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+          {{ active_subscriptions }}
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">{{ expired_subscriptions }} expired / inactive</span>
+      </div>
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <!-- Cash Revenue -->
+    <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">CASH COLLECTIONS</span>
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+          KES {{ "{:,.0f}".format(total_cash) }}
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">Counter cash payments</span>
+      </div>
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--bg-blush); color: var(--accent-rose); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="banknote" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <!-- Today's Attendance -->
+    <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TODAY'S ATTENDANCE</span>
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+          {{ today_attendance }}
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">Front-desk check-ins</span>
+      </div>
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="clipboard-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary 4 Metrics Bar -->
+  <div class="grid-4">
+    <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">New Registrations</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink);">{{ new_registrations }}</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--color-warning-tint); color: var(--color-warning-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pending Cash Actions</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--color-warning-text);">{{ pending_subscriptions|length }}</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--bg-blush); color: var(--accent-rose); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Upcoming Classes</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink);">{{ upcoming_classes }}</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="award" style="width: 16px; height: 16px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Coaches</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink);">{{ active_trainers }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Operational Alert Banner (if pending subscriptions exist) -->
+  {% if pending_subscriptions %}
+    <div class="card" style="border-left: 4px solid var(--color-warning); background: #FFFDF7; padding: 16px 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--color-warning-tint); color: var(--color-warning-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
+          </div>
+          <div>
+            <h4 style="color: var(--color-warning-text); margin: 0; font-size: 0.9rem; font-weight: 700;">
+              Attention: {{ pending_subscriptions|length }} Pending Cash Subscriptions
+            </h4>
+            <p style="margin: 2px 0 0; font-size: 0.82rem; color: var(--text-secondary);">
+              Members awaiting cash payment confirmation at reception before access clearance.
+            </p>
+          </div>
+        </div>
+        <a href="{{ url_for('admin.subscriptions') }}" class="btn btn-sm btn-outline" style="border-color: var(--color-warning); color: var(--color-warning-text); font-size: 0.78rem;">
+          Review Subscriptions
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Second Row — Analytics Panels: Revenue Trends & Status Distribution -->
+  <div class="grid-2">
+    <!-- Cash Collection Trends -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Cash Revenue Trends (KES)</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Physical counter cash collections across cycles</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">Counter Cash</span>
+      </div>
+      <div style="height: 260px; position: relative;">
+        <canvas id="cashCollectionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Membership Status Distribution -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Subscription Status Breakdown</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Active vs expired member allocations</p>
+        </div>
+        <span class="badge badge-neutral" style="font-size: 11px;">Enrollment</span>
+      </div>
+      <div style="height: 260px; position: relative;">
+        <canvas id="subscriptionStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Third Row — Attendance & Package Distribution -->
+  <div class="grid-2">
+    <!-- Attendance Overview -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Attendance Activity</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Daily front-desk check-in entries</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">Front Desk</span>
+      </div>
+      <div style="height: 260px; position: relative;">
+        <canvas id="attendanceActivityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Package Distribution -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Popular Membership Packages</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Active subscription plan allocation</p>
+        </div>
+        <span class="badge badge-rose" style="font-size: 11px;">Package Tiers</span>
+      </div>
+      <div style="height: 260px; position: relative;">
+        <canvas id="planPopularityChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fourth Row — Operational Activity Tables -->
+  <div class="grid-2">
+    <!-- Recent Physical Cash Receipts -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Recent Cash Receipts</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Authenticated front-desk payments</p>
+        </div>
+        <a href="{{ url_for('admin.payments') }}" class="btn btn-sm btn-outline" style="font-size: 11.5px; padding: 4px 10px;">View All</a>
+      </div>
+
+      {% if recent_payments %}
+        <div style="overflow-x: auto;">
+          <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+                <th style="padding: 10px 12px;">Receipt #</th>
+                <th style="padding: 10px 12px;">Member</th>
+                <th style="padding: 10px 12px;">Amount</th>
+                <th style="padding: 10px 12px;">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in recent_payments[:5] %}
+                <tr style="border-bottom: 1px solid var(--border-line);">
+                  <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-forest);">{{ p.receipt_number }}</td>
+                  <td style="padding: 10px 12px; font-weight: 600;">{{ p.profiles.full_name if p.profiles else 'Member' }}</td>
+                  <td style="padding: 10px 12px; font-weight: 700; color: var(--text-ink);">KES {{ "{:,.0f}".format(p.amount) }}</td>
+                  <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">{{ p.payment_date[:10] if p.payment_date else 'Recent' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.85rem;">
+          <i data-lucide="banknote" style="width: 28px; height: 28px; opacity: 0.4; margin-bottom: 6px;"></i>
+          <div>No physical cash receipts recorded in this period.</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Recent Manual Attendance Log -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Today's Check-ins</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Members verified at entry</p>
+        </div>
+        <a href="{{ url_for('admin.attendance') }}" class="btn btn-sm btn-outline" style="font-size: 11.5px; padding: 4px 10px;">View All</a>
+      </div>
+
+      {% if recent_attendance %}
+        <div style="overflow-x: auto;">
+          <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+                <th style="padding: 10px 12px;">Time</th>
+                <th style="padding: 10px 12px;">Member</th>
+                <th style="padding: 10px 12px;">Status</th>
+                <th style="padding: 10px 12px;">Recorded By</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in recent_attendance[:5] %}
+                <tr style="border-bottom: 1px solid var(--border-line);">
+                  <td style="padding: 10px 12px; font-weight: 600; color: var(--text-muted);">{{ a.check_in_time[11:16] if a.check_in_time else '—' }}</td>
+                  <td style="padding: 10px 12px; font-weight: 700;">{{ a.profiles.full_name if a.profiles else 'Member' }}</td>
+                  <td style="padding: 10px 12px;">
+                    <span class="badge badge-forest" style="font-size: 10.5px;">Verified</span>
+                  </td>
+                  <td style="padding: 10px 12px; font-size: 12px; color: var(--text-muted);">{{ a.recorder.full_name if a.recorder else 'Desk Staff' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); font-size: 0.85rem;">
+          <i data-lucide="clipboard-check" style="width: 28px; height: 28px; opacity: 0.4; margin-bottom: 6px;"></i>
+          <div>No member check-ins recorded today yet.</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js Live Rendering Script (Strakly Pearl, Forest, Rose Light Palette) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const chartAnalytics = {{ chart_analytics|tojson if chart_analytics else '{}' }};
+  
+  // Strakly Brand Chart Palette
+  const forestPrimary = '#2F6B4F';
+  const roseAccent = '#B64A6E';
+  const sageColor = '#7FA893';
+  const amberWarning = '#E0A030';
+  
+  const textMuted = '#566860';
+  const gridBorder = '#E9DFDB';
+
+  // 1. Cash Collection Chart
+  const ctxRevenue = document.getElementById('cashCollectionChart');
+  if (ctxRevenue) {
+    const revLabels = chartAnalytics.revenue_trend ? chartAnalytics.revenue_trend.map(d => d.date) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const revValues = chartAnalytics.revenue_trend ? chartAnalytics.revenue_trend.map(d => d.amount) : [0, 0, 0, 0, 0, 0, 0];
+
+    new Chart(ctxRevenue, {
+      type: 'line',
+      data: {
+        labels: revLabels,
+        datasets: [{
+          label: 'Cash Collections (KES)',
+          data: revValues,
+          borderColor: forestPrimary,
+          backgroundColor: 'rgba(47, 107, 79, 0.08)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: forestPrimary,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(c) { return 'KES ' + Number(c.raw).toLocaleString(); }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: gridBorder }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } } },
+          y: { grid: { color: gridBorder }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // 2. Subscription Status Doughnut Chart
+  const ctxStatus = document.getElementById('subscriptionStatusChart');
+  if (ctxStatus) {
+    const statusData = chartAnalytics.subscription_status || { active: {{ active_subscriptions }}, pending: {{ pending_subscriptions|length }}, expired: {{ expired_subscriptions }} };
+    new Chart(ctxStatus, {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Pending Cash', 'Expired'],
+        datasets: [{
+          data: [statusData.active || 0, statusData.pending || 0, statusData.expired || 0],
+          backgroundColor: [forestPrimary, amberWarning, '#C0B7B3'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#1E2B25', font: { family: "'Inter', sans-serif", size: 11 }, padding: 12 } }
+        },
+        cutout: '72%'
+      }
+    });
+  }
+
+  // 3. Attendance Activity Chart
+  const ctxAttendance = document.getElementById('attendanceActivityChart');
+  if (ctxAttendance) {
+    const attLabels = chartAnalytics.attendance_activity ? chartAnalytics.attendance_activity.map(d => d.date) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const attValues = chartAnalytics.attendance_activity ? chartAnalytics.attendance_activity.map(d => d.count) : [0, 0, 0, 0, 0, 0, 0];
+
+    new Chart(ctxAttendance, {
+      type: 'bar',
+      data: {
+        labels: attLabels,
+        datasets: [{
+          label: 'Daily Check-ins',
+          data: attValues,
+          backgroundColor: sageColor,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } } },
+          y: { grid: { color: gridBorder }, ticks: { color: textMuted, stepSize: 1, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // 4. Plan Popularity Horizontal Bar
+  const ctxPlans = document.getElementById('planPopularityChart');
+  if (ctxPlans) {
+    const planLabels = chartAnalytics.package_distribution ? chartAnalytics.package_distribution.map(d => d.name) : ['Monthly Gold', 'Annual Elite', 'Daily Pass'];
+    const planValues = chartAnalytics.package_distribution ? chartAnalytics.package_distribution.map(d => d.count) : [0, 0, 0];
+
+    new Chart(ctxPlans, {
+      type: 'bar',
+      data: {
+        labels: planLabels,
+        datasets: [{
+          label: 'Active Subscriptions',
+          data: planValues,
+          backgroundColor: roseAccent,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: gridBorder }, ticks: { color: textMuted, stepSize: 1, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true },
+          y: { grid: { display: false }, ticks: { color: '#1E2B25', font: { family: "'Inter', sans-serif", size: 11 } } }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

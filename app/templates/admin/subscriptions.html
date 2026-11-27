@@ -1,0 +1,291 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Subscriptions | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Header Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Enrollment Engine
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Member Subscriptions
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Manage member subscriptions, renewal terms, and pending front-desk cash verifications.
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-primary" onclick="openModal('addSubscriptionModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>New Subscription</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="grid-4">
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE SUBSCRIPTIONS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+        {{ subscriptions|selectattr('status', 'equalto', 'active')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Current facility members</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">PENDING CASH</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--color-warning-text); margin: 4px 0 2px 0;">
+        {{ subscriptions|selectattr('status', 'equalto', 'pending')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Awaiting desk payment</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">EXPIRED TIERS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--accent-rose); margin: 4px 0 2px 0;">
+        {{ subscriptions|selectattr('status', 'equalto', 'expired')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Renewal required</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TOTAL RECORDS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        {{ subscriptions|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Historical enrollments</span>
+    </div>
+  </div>
+
+  <!-- Main Subscriptions Table -->
+  <div class="card" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Subscription Register</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Active terms, validity dates, and cash verification states</p>
+      </div>
+      <span class="badge badge-forest" style="font-size: 11px;">{{ subscriptions|length }} ENROLLMENTS</span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+            <th style="padding: 10px 12px;">Member</th>
+            <th style="padding: 10px 12px;">Package</th>
+            <th style="padding: 10px 12px;">Status</th>
+            <th style="padding: 10px 12px;">Start Date</th>
+            <th style="padding: 10px 12px;">End Date</th>
+            <th style="padding: 10px 12px; text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in subscriptions %}
+            <tr style="border-bottom: 1px solid var(--border-line);">
+              <td style="padding: 10px 12px;">
+                <strong style="color: var(--text-ink); display: block; font-weight: 600;">{{ s.profiles.full_name if s.profiles else 'Member' }}</strong>
+                <span style="font-size: 11.5px; color: var(--text-muted);">{{ s.profiles.email if s.profiles else '' }}</span>
+              </td>
+              <td style="padding: 10px 12px; font-weight: 600; color: var(--primary-forest);">
+                {{ s.membership_plans.name if s.membership_plans else 'Standard Package' }}
+              </td>
+              <td style="padding: 10px 12px;">
+                {% if s.status == 'active' %}
+                  <span class="badge badge-forest" style="font-size: 10.5px;">Active</span>
+                {% elif s.status == 'pending' %}
+                  <span class="badge badge-warning" style="font-size: 10.5px;">Pending Cash</span>
+                {% elif s.status == 'expired' %}
+                  <span class="badge" style="background: #E5E7EB; color: #4B5563; font-size: 10.5px;">Expired</span>
+                {% else %}
+                  <span class="badge badge-neutral" style="font-size: 10.5px;">{{ s.status|capitalize }}</span>
+                {% endif %}
+              </td>
+              <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">
+                {{ s.start_date or '—' }}
+              </td>
+              <td style="padding: 10px 12px; font-size: 12px; color: var(--text-ink); font-weight: 600;">
+                {{ s.end_date or '—' }}
+              </td>
+              <td style="padding: 10px 12px; text-align: right;">
+                <div style="display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end;">
+                  {% if s.status == 'pending' %}
+                    <a href="{{ url_for('admin.payments') }}?member_id={{ s.member_id }}&plan_id={{ s.plan_id }}&amount={{ s.membership_plans.price if s.membership_plans else '' }}" class="btn btn-primary btn-sm" style="padding: 3px 8px; font-size: 11.5px;">
+                      Confirm Cash
+                    </a>
+                  {% endif %}
+                  <button type="button" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 11.5px;"
+                          data-id="{{ s.id }}"
+                          data-status="{{ s.status }}"
+                          data-start="{{ s.start_date or '' }}"
+                          data-end="{{ s.end_date or '' }}"
+                          data-name="{{ s.profiles.full_name if s.profiles else '' }}"
+                          data-plan="{{ s.membership_plans.name if s.membership_plans else '' }}"
+                          onclick="openEditSubscriptionModal(this)">
+                    Edit
+                  </button>
+                  <form method="POST" action="{{ url_for('admin.cancel_subscription', sub_id=s.id) }}" onsubmit="return confirm('Cancel this subscription?');" style="display:inline; margin: 0;">
+                    <button type="submit" class="btn btn-outline btn-sm" style="padding: 3px 6px; font-size: 11px; color: var(--color-danger); border-color: var(--border-line);">
+                      Cancel
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px 16px;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+                  <i data-lucide="refresh-cw" style="width: 36px; height: 36px; opacity: 0.35; margin-bottom: 8px;"></i>
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px 0;">No Subscriptions Found</h4>
+                  <p style="font-size: 0.82rem; margin: 0 0 14px 0;">Register new subscriptions to activate member access terms.</p>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="openModal('addSubscriptionModal')">
+                    Create Subscription
+                  </button>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: New Subscription -->
+<div id="addSubscriptionModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Create Member Subscription</h3>
+      <button type="button" onclick="closeModal('addSubscriptionModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.subscriptions') }}">
+      <div class="form-group">
+        <label class="form-label" for="sub_member_id">Select Member *</label>
+        <select id="sub_member_id" name="member_id" class="form-control" required>
+          <option value="">-- Choose Member --</option>
+          {% for m in members %}
+            <option value="{{ m.id }}">{{ m.full_name }} ({{ m.email }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="sub_plan_id">Select Membership Package *</label>
+        <select id="sub_plan_id" name="plan_id" class="form-control" required>
+          <option value="">-- Choose Package Tier --</option>
+          {% for p in plans %}
+            <option value="{{ p.id }}">{{ p.name }} — KES {{ "{:,.0f}".format(p.price|float) }} ({{ p.duration_days }} Days)</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="sub_start_date">Start Date *</label>
+        <input type="date" id="sub_start_date" name="start_date" class="form-control" required>
+      </div>
+
+      <div class="form-group" style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.75rem;">
+        <input type="checkbox" id="mark_paid" name="mark_paid" value="true" style="width: 16px; height: 16px; accent-color: var(--primary-forest);">
+        <label for="mark_paid" style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-ink);">Record Cash Received at Desk &amp; Activate Instantly</label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('addSubscriptionModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create Subscription</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Subscription -->
+<div id="editSubscriptionModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Update Subscription Term</h3>
+      <button type="button" onclick="closeModal('editSubscriptionModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form id="editSubscriptionForm" method="POST" action="">
+      <div style="background: var(--bg-pearl); border-radius: 8px; padding: 10px 12px; margin-bottom: 1rem;">
+        <div id="edit_sub_member_name" style="font-weight: 700; color: var(--text-ink); font-size: 13.5px;"></div>
+        <div id="edit_sub_plan_name" style="font-size: 12px; color: var(--primary-forest); font-weight: 600;"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_sub_status">Status *</label>
+        <select id="edit_sub_status" name="status" class="form-control" required>
+          <option value="active">Active (Access Cleared)</option>
+          <option value="pending">Pending Cash Collection</option>
+          <option value="expired">Expired</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="edit_sub_start_date">Start Date</label>
+          <input type="date" id="edit_sub_start_date" name="start_date" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_sub_end_date">End Date</label>
+          <input type="date" id="edit_sub_end_date" name="end_date" class="form-control">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('editSubscriptionModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Update Term</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Renew Subscription (Compatible alias modal) -->
+<div id="renewSubModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Renew Subscription Term</h3>
+      <button type="button" onclick="closeModal('renewSubModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form id="renewSubForm" method="POST" action="">
+      <div class="form-group">
+        <label class="form-label" for="renew_end_date">Extended End Date *</label>
+        <input type="date" id="renew_end_date" name="end_date" class="form-control" required>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('renewSubModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Confirm Renewal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditSubscriptionModal(btn) {
+  const form = document.getElementById('editSubscriptionForm');
+  form.action = '/admin/subscriptions/edit/' + btn.dataset.id;
+  document.getElementById('edit_sub_member_name').textContent = btn.dataset.name || 'Member';
+  document.getElementById('edit_sub_plan_name').textContent = btn.dataset.plan || 'Package';
+  document.getElementById('edit_sub_status').value = btn.dataset.status || 'active';
+  document.getElementById('edit_sub_start_date').value = btn.dataset.start || '';
+  document.getElementById('edit_sub_end_date').value = btn.dataset.end || '';
+  openModal('editSubscriptionModal');
+}
+
+function openRenewSubModal(btn) {
+  openEditSubscriptionModal(btn);
+}
+</script>
+{% endblock %}

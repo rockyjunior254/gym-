@@ -1,0 +1,85 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Movement Library{% endblock %}
+{% block page_subtitle %}Discover exercises, master movement mechanics, and filter by muscle groups{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Search & Muscle Filter Bar -->
+  <div class="fp-card">
+    <form method="GET" action="{{ url_for('member.exercises') }}" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+      <div style="display: flex; gap: 10px; flex: 1; min-width: 280px;">
+        <input type="text" name="q" class="fp-form-control" placeholder="Search exercises (e.g. Squat, Bench Press, Pull-Up)..." value="{{ request.args.get('q', '') }}">
+        <button type="submit" class="fp-btn-dark">Search</button>
+      </div>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <select name="muscle" class="fp-form-control" style="width: auto;" onchange="this.form.submit()">
+          <option value="">All Muscle Groups</option>
+          <option value="chest" {% if request.args.get('muscle') == 'chest' %}selected{% endif %}>Chest</option>
+          <option value="back" {% if request.args.get('muscle') == 'back' %}selected{% endif %}>Back</option>
+          <option value="legs" {% if request.args.get('muscle') == 'legs' %}selected{% endif %}>Legs / Quads / Hamstrings</option>
+          <option value="shoulders" {% if request.args.get('muscle') == 'shoulders' %}selected{% endif %}>Shoulders / Delts</option>
+          <option value="arms" {% if request.args.get('muscle') == 'arms' %}selected{% endif %}>Arms / Biceps / Triceps</option>
+          <option value="core" {% if request.args.get('muscle') == 'core' %}selected{% endif %}>Core / Abs</option>
+        </select>
+
+        <select name="difficulty" class="fp-form-control" style="width: auto;" onchange="this.form.submit()">
+          <option value="">All Difficulties</option>
+          <option value="beginner" {% if request.args.get('difficulty') == 'beginner' %}selected{% endif %}>Beginner</option>
+          <option value="intermediate" {% if request.args.get('difficulty') == 'intermediate' %}selected{% endif %}>Intermediate</option>
+          <option value="advanced" {% if request.args.get('difficulty') == 'advanced' %}selected{% endif %}>Advanced</option>
+        </select>
+
+        {% if request.args.get('q') or request.args.get('muscle') or request.args.get('difficulty') %}
+          <a href="{{ url_for('member.exercises') }}" class="fp-btn-outline">Reset</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Exercise Cards Grid -->
+  {% if exercises %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+      {% for ex in exercises %}
+        <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.15s ease;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <span class="fp-brand-badge" style="background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);">
+                {{ ex.target_muscle_group or 'General' }}
+              </span>
+              <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">
+                {{ ex.difficulty_level or 'All Levels' }}
+              </span>
+            </div>
+
+            <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ ex.name }}</h4>
+            <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 14px 0; line-height: 1.4;">
+              {{ ex.description or 'Compound gym movement focusing on functional athletic strength.' }}
+            </p>
+          </div>
+
+          <div style="border-top: 1px solid var(--fp-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+            <span style="color: var(--fp-muted); font-weight: 600;">
+              <i data-lucide="shield" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
+              {{ ex.equipment_required or 'Standard Equipment' }}
+            </span>
+            <a href="{{ url_for('member.workouts') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">
+              Add to Log
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="fp-card" style="text-align: center; padding: 48px 16px;">
+      <i data-lucide="book-open" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+      <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">No Movements Found</h3>
+      <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0 0 16px 0;">Try adjusting your search terms or clearing the muscle filters.</p>
+      <a href="{{ url_for('member.exercises') }}" class="fp-btn-dark">Reset All Filters</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

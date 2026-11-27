@@ -1,0 +1,146 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Workout Centre{% endblock %}
+{% block page_subtitle %}Access your coach-designed programs and log daily training sessions{% endblock %}
+
+{% block topbar_actions %}
+  <button type="button" class="fp-btn-lime" onclick="openModal('logWorkoutModal')">
+    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+    Log Workout Session
+  </button>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Assigned Coaching Programs -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Assigned Workout Programs</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Custom tailored training splits designed by your coaching staff</p>
+      </div>
+      <a href="{{ url_for('member.exercises') }}" class="fp-btn-outline" style="font-size: 0.78rem;">
+        <i data-lucide="book-open" style="width: 14px; height: 14px;"></i> Movement Library
+      </a>
+    </div>
+
+    {% if plans %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+        {% for plan in plans %}
+          <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">TRAINING SPLIT</span>
+                <span style="font-size: 0.72rem; color: var(--fp-muted); font-weight: 600;">Active</span>
+              </div>
+              <h4 style="font-size: 1.2rem; font-weight: 800; margin: 10px 0 6px 0; color: var(--fp-ink);">{{ plan.title }}</h4>
+              <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 12px 0;">{{ plan.description or 'Custom coaching regimen' }}</p>
+            </div>
+            
+            <div style="border-top: 1px solid var(--fp-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: var(--fp-muted);">Coach Guided</span>
+              <button type="button" class="fp-btn-lime" style="padding: 6px 12px; font-size: 0.75rem;" onclick="openModal('logWorkoutModal')">
+                Execute Routine
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 36px 16px; background: #FAFAFA; border-radius: 14px; border: 1px dashed var(--fp-border);">
+        <i data-lucide="dumbbell" style="width: 36px; height: 36px; color: var(--fp-muted); margin-bottom: 8px; opacity: 0.5;"></i>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--fp-ink);">No Custom Programs Assigned Yet</div>
+        <div style="font-size: 0.8rem; color: var(--fp-muted); max-width: 440px; margin: 4px auto 14px auto;">
+          Your dedicated coach will upload your structured routine here. In the meantime, feel free to log your self-directed training sessions below.
+        </div>
+        <button type="button" class="fp-btn-dark" onclick="openModal('logWorkoutModal')">
+          Log Self-Directed Session
+        </button>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Workout Logs -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Completed Session Logs</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Your historical training logs and athlete notes</p>
+      </div>
+      <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-ink);">{{ workout_logs|length }} SESSIONS</span>
+    </div>
+
+    {% if workout_logs %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Session Title</th>
+              <th style="padding: 10px 12px;">Duration</th>
+              <th style="padding: 10px 12px;">Notes / Observations</th>
+              <th style="padding: 10px 12px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in workout_logs %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; white-space: nowrap;">{{ log.created_at[:10] }}</td>
+                <td style="padding: 12px; font-weight: 700; color: var(--fp-ink);">{{ log.title }}</td>
+                <td style="padding: 12px;">{{ log.duration_minutes }} mins</td>
+                <td style="padding: 12px; color: var(--fp-muted);">{{ log.notes or '—' }}</td>
+                <td style="padding: 12px;">
+                  <span style="color: #10B981; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 4px;">
+                    <span class="fp-status-dot"></span> Completed
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
+        No workout logs recorded yet. Complete your first session and log it here!
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Log Workout Modal -->
+<div class="fp-modal-backdrop" id="logWorkoutModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Log Training Session</h3>
+      <button type="button" onclick="closeModal('logWorkoutModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.workouts') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Session Focus / Title</label>
+          <input type="text" name="title" class="fp-form-control" placeholder="e.g. Upper Body Hypertrophy or Heavy Squat Day" required>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Duration (Minutes)</label>
+          <input type="number" name="duration_minutes" class="fp-form-control" value="60" min="10" max="300" required>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Session Notes & Weights</label>
+          <textarea name="notes" class="fp-form-control" rows="4" placeholder="Detail your sets, reps, weight used, RPE, or recovery feedback..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('logWorkoutModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Save Workout Log</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

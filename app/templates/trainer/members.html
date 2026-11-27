@@ -1,0 +1,103 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}My Assigned Athletes | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      COACHING ROSTER
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      MY ASSIGNED ATHLETES
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Manage your dedicated athletes. Only athletes assigned to your coaching care through Admin appear here.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <span class="fp-badge-lime" style="font-size: 0.82rem; padding: 6px 12px;">
+      {{ members|length }} Athletes Assigned
+    </span>
+  </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="fp-card" style="padding: 14px 18px; margin-bottom: 24px;">
+  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 240px; position: relative;">
+      <input type="text" id="athleteSearch" class="form-control" placeholder="Search athletes by name or goal..." oninput="filterAthletes(this.value)" style="border-radius: 10px; padding-left: 36px; font-size: 0.85rem;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--fp-muted);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </div>
+  </div>
+</div>
+
+<!-- Athletes Grid (Card-Based Layout per Dribbble Ref) -->
+{% if members %}
+  <div id="athleteGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+    {% for m in members %}
+      <div class="fp-card athlete-card" data-name="{{ m.full_name|lower }}" data-goal="{{ m.goals|lower }}" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; overflow: hidden; flex-shrink: 0;">
+              {% if m.avatar_url %}
+                <img src="{{ m.avatar_url }}" alt="{{ m.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              {% else %}
+                {{ m.full_name[:2].upper() if m.full_name else 'AT' }}
+              {% endif %}
+            </div>
+            <div style="overflow: hidden;">
+              <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ m.full_name }}</h3>
+              <div style="font-size: 0.78rem; color: var(--fp-muted);">{{ m.email }}</div>
+            </div>
+          </div>
+
+          <div style="background: #F8FAFC; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.82rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: var(--fp-muted);">Goal:</span>
+              <strong style="color: var(--fp-ink);">{{ m.goals }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="color: var(--fp-muted);">Tier:</span>
+              <span class="fp-badge-slate">{{ m.plan_name }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--fp-muted);">Consistency:</span>
+              <span class="fp-badge-lime">{{ m.adherence }}% Adherence</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--fp-border-subtle); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <a href="{{ url_for('trainer.member_detail', member_id=m.id) }}" class="fp-btn-dark" style="font-size: 0.78rem; padding: 6px 12px; width: 100%; justify-content: center;">
+            Open Coaching Workspace &rarr;
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="fp-card" style="text-align: center; padding: 48px 20px;">
+    <div style="width: 52px; height: 52px; border-radius: 50%; background: #F8FAFC; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--fp-muted);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+    </div>
+    <h3 style="margin: 0 0 4px; font-size: 1.1rem; color: var(--fp-ink);">No Athletes Currently Assigned</h3>
+    <p style="margin: 0; font-size: 0.85rem; color: var(--fp-muted); max-width: 480px; margin: 0 auto;">
+      Administrators assign athletes to your coaching roster. Once assigned, you will be able to design custom workout plans and evaluate their progress here.
+    </p>
+  </div>
+{% endif %}
+
+<script>
+function filterAthletes(q) {
+  const term = q.toLowerCase();
+  const cards = document.querySelectorAll('.athlete-card');
+  cards.forEach(c => {
+    const name = c.dataset.name || '';
+    const goal = c.dataset.goal || '';
+    c.style.display = (name.includes(term) || goal.includes(term)) ? 'flex' : 'none';
+  });
+}
+</script>
+{% endblock %}

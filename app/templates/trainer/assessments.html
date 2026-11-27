@@ -1,0 +1,134 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Assessments & Evaluations | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      DIAGNOSTIC & PERFORMANCE
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      ASSESSMENTS & EVALUATIONS
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      File and compare structured fitness assessments for your assigned athletes. Form observations, mobility benchmarks, and coaching recommendations.
+    </p>
+  </div>
+
+  <div>
+    <button type="button" class="fp-btn-primary" onclick="openModal('createAssessmentModal')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Log New Evaluation
+    </button>
+  </div>
+</div>
+
+<div class="fp-card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Fitness Evaluations Register</h3>
+      <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Structured coaching assessments and performance history</p>
+    </div>
+    <span class="fp-badge-lime">{{ assessments|length }} Records</span>
+  </div>
+
+  {% if assessments %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;">
+      {% for ass in assessments %}
+        <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <div>
+                <strong style="color: var(--fp-ink); font-size: 1rem; display: block;">{{ ass.profiles.full_name if ass.profiles else 'Athlete' }}</strong>
+                <span style="font-size: 0.78rem; color: var(--fp-muted);">Assessed: {{ ass.assessment_date }}</span>
+              </div>
+              <span class="fp-badge-slate">Review: {{ ass.next_review_date or 'Next Phase' }}</span>
+            </div>
+
+            <div style="background: #FFFFFF; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 0.82rem;">
+              <div style="margin-bottom: 4px;"><strong>Objectives:</strong> {{ ass.fitness_objectives or 'Standard athletic development' }}</div>
+              {% if ass.strength_observations %}
+                <div style="color: var(--fp-muted);"><strong>Strength:</strong> {{ ass.strength_observations }}</div>
+              {% endif %}
+              {% if ass.mobility_observations %}
+                <div style="color: var(--fp-muted);"><strong>Mobility:</strong> {{ ass.mobility_observations }}</div>
+              {% endif %}
+            </div>
+
+            <div style="font-size: 0.82rem; color: var(--fp-ink); line-height: 1.4;">
+              <strong>Prescription:</strong> {{ ass.recommendations or 'Continue progressive overload with form checks.' }}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 48px 20px;">
+      <p style="margin: 0; font-size: 0.88rem; color: var(--fp-muted);">No fitness evaluations on file yet.</p>
+      <button type="button" class="fp-btn-primary" onclick="openModal('createAssessmentModal')" style="margin-top: 12px;">Create First Evaluation</button>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Modal: Create Assessment -->
+<div id="createAssessmentModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Record Fitness Assessment</h3>
+        <p class="modal-subtitle">Document athletic baseline, observations, and recommendations</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('createAssessmentModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('trainer.assessments') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="ass_athlete">Select Athlete *</label>
+          <select id="ass_athlete" name="member_id" class="form-control" required>
+            <option value="">-- Choose Assigned Athlete --</option>
+            {% for m in members %}
+              <option value="{{ m.id }}">{{ m.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="ass_date">Assessment Date *</label>
+            <input type="date" id="ass_date" name="assessment_date" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ass_next_date">Next Review Date</label>
+            <input type="date" id="ass_next_date" name="next_review_date" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ass_objectives">Fitness Objectives</label>
+          <input type="text" id="ass_objectives" name="fitness_objectives" class="form-control" placeholder="e.g. Squat depth improvement, 5kg lean mass gain">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ass_strength">Strength & Compound Mechanics Observations</label>
+          <textarea id="ass_strength" name="strength_observations" class="form-control" rows="2" placeholder="Bracing, hip hinge mechanics, overhead mobility..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ass_mobility">Endurance & Mobility Notes</label>
+          <textarea id="ass_mobility" name="mobility_observations" class="form-control" rows="2" placeholder="Ankle dorsiflexion, thoracic extension..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ass_recs">Coaching Prescription / Recommendations *</label>
+          <textarea id="ass_recs" name="recommendations" class="form-control" rows="3" required placeholder="Specific programming changes, exercise cues, recovery focus..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('createAssessmentModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Save Assessment</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

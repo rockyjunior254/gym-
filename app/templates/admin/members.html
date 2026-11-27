@@ -1,0 +1,337 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Members | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Membership Management
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Member Accounts
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Manage member directory, subscription access status and account records.
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-primary" onclick="openModal('registerMemberModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="user-plus" style="width: 15px; height: 15px;"></i>
+        <span>Add Member</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="grid-4">
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TOTAL MEMBERS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        {{ members|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">Registered accounts</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE ACCESS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+        {{ members|selectattr('is_active')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Clear for facility entry</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">SUSPENDED / HOLD</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--accent-rose); margin: 4px 0 2px 0;">
+        {{ members|rejectattr('is_active')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Access temporarily paused</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ARCHIVED PROFILES</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--color-warning-text); margin: 4px 0 2px 0;">
+        {{ members|selectattr('is_archived')|list|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Historical records</span>
+    </div>
+  </div>
+
+  <!-- Management Search & Filter Toolbar -->
+  <div class="card" style="padding: 14px 18px;">
+    <form method="GET" action="{{ url_for('admin.members') }}" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 2; min-width: 240px; position: relative;">
+        <input type="text" name="q" class="form-control" placeholder="Search by name, email, or member number..." value="{{ search_query or '' }}" style="padding-left: 36px;">
+        <i data-lucide="search" style="position: absolute; left: 12px; top: 11px; width: 15px; height: 15px; color: var(--text-muted);"></i>
+      </div>
+
+      <div style="flex: 1; min-width: 160px;">
+        <select name="status" class="form-control">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Members Only</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive / Suspended</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="filter" style="width: 14px; height: 14px;"></i>
+        <span>Filter</span>
+      </button>
+
+      {% if search_query or status_filter != 'all' %}
+        <a href="{{ url_for('admin.members') }}" class="btn btn-outline btn-sm">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Main Member Table -->
+  <div class="card" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Member Directory</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Official member profiles and facility authorizations</p>
+      </div>
+      <span class="badge badge-forest" style="font-size: 11px;">{{ members|length }} RECORDS</span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+            <th style="padding: 10px 12px;">Member</th>
+            <th style="padding: 10px 12px;">Member ID</th>
+            <th style="padding: 10px 12px;">Phone</th>
+            <th style="padding: 10px 12px;">Registration Date</th>
+            <th style="padding: 10px 12px;">Status</th>
+            <th style="padding: 10px 12px; text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in members %}
+            <tr style="border-bottom: 1px solid var(--border-line);">
+              <!-- Member Identity Cell -->
+              <td style="padding: 10px 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--bg-blush); border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary-forest); overflow: hidden; flex-shrink: 0;">
+                    {% if m.avatar_url %}
+                      <img src="{{ m.avatar_url }}" alt="{{ m.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                      {{ m.full_name[:2].upper() if m.full_name else 'MB' }}
+                    {% endif %}
+                  </div>
+                  <div>
+                    <a href="{{ url_for('admin.member_detail', member_id=m.id) }}" style="color: var(--text-ink); font-weight: 600; text-decoration: none; display: block;">
+                      {{ m.full_name }}
+                    </a>
+                    <span style="font-size: 11.5px; color: var(--text-muted);">{{ m.email }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Member ID -->
+              <td style="padding: 10px 12px;">
+                <span class="badge badge-neutral" style="font-size: 11px; font-weight: 600;">
+                  {{ m.member_details.member_number if m.member_details and m.member_details.member_number else 'STRK-' ~ m.id[:6].upper() }}
+                </span>
+              </td>
+
+              <!-- Phone -->
+              <td style="padding: 10px 12px; color: var(--text-ink); font-weight: 500;">
+                {{ m.phone or '—' }}
+              </td>
+
+              <!-- Registration Date -->
+              <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">
+                {{ m.created_at[:10] if m.created_at else 'Recent' }}
+              </td>
+
+              <!-- Status -->
+              <td style="padding: 10px 12px;">
+                {% if m.is_archived %}
+                  <span class="badge" style="background: var(--color-danger-tint); color: var(--color-danger); font-size: 10.5px;">Archived</span>
+                {% elif m.is_active %}
+                  <span class="badge badge-forest" style="font-size: 10.5px;">Active</span>
+                {% else %}
+                  <span class="badge" style="background: #E5E7EB; color: #4B5563; font-size: 10.5px;">Inactive</span>
+                {% endif %}
+              </td>
+
+              <!-- Row Actions -->
+              <td style="padding: 10px 12px; text-align: right;">
+                <div style="display: inline-flex; gap: 4px; align-items: center; justify-content: flex-end;">
+                  <a href="{{ url_for('admin.member_detail', member_id=m.id) }}" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 11.5px;" title="View Member Profile">
+                    View
+                  </a>
+                  <button type="button" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 11.5px;"
+                          data-id="{{ m.id }}"
+                          data-name="{{ m.full_name }}"
+                          data-phone="{{ m.phone or '' }}"
+                          data-ename="{{ m.member_details.emergency_contact_name if m.member_details else '' }}"
+                          data-ephone="{{ m.member_details.emergency_contact_phone if m.member_details else '' }}"
+                          data-goals="{{ m.member_details.fitness_goals if m.member_details else '' }}"
+                          data-active="{{ 'true' if m.is_active else 'false' }}"
+                          onclick="openEditMemberModal(this)">
+                    Edit
+                  </button>
+                  <a href="{{ url_for('admin.payments') }}?member_id={{ m.id }}" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 11.5px;">
+                    Pay
+                  </a>
+                  {% if not m.is_archived %}
+                    <form method="POST" action="{{ url_for('admin.archive_member', member_id=m.id) }}" onsubmit="return confirm('Archive member record? Historical financial and attendance records remain preserved.');" style="display:inline; margin: 0;">
+                      <button type="submit" class="btn btn-outline btn-sm" style="padding: 3px 6px; font-size: 11px; color: var(--accent-rose); border-color: var(--border-line);">
+                        Archive
+                      </button>
+                    </form>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('admin.delete_member', member_id=m.id) }}" onsubmit="return confirm('Permanently DELETE member account for {{ m.full_name }}?');" style="display:inline; margin: 0;">
+                    <button type="submit" class="btn btn-outline btn-sm" style="padding: 3px 6px; font-size: 11px; color: var(--color-danger); border-color: var(--border-line);">
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px 16px;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+                  <i data-lucide="users" style="width: 36px; height: 36px; opacity: 0.35; margin-bottom: 8px;"></i>
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px 0;">No Members Found</h4>
+                  <p style="font-size: 0.82rem; margin: 0 0 14px 0;">No member records match your current filter criteria.</p>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="openModal('registerMemberModal')">
+                    Register New Member
+                  </button>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Register Member -->
+<div id="registerMemberModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Register New Member</h3>
+      <button type="button" onclick="closeModal('registerMemberModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.members') }}">
+      <div class="form-group">
+        <label class="form-label" for="full_name">Full Name *</label>
+        <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Member full name" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address *</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="member@example.com" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" class="form-control" placeholder="+254 700 000 000">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="emergency_contact_phone">Emergency Phone</label>
+          <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" class="form-control" placeholder="+254 700 000 000">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="emergency_contact_name">Emergency Contact Name</label>
+        <input type="text" id="emergency_contact_name" name="emergency_contact_name" class="form-control" placeholder="Contact person">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fitness_goals">Primary Fitness Goals</label>
+        <input type="text" id="fitness_goals" name="fitness_goals" class="form-control" placeholder="e.g. Strength conditioning, athletic fitness">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="medical_notes">Medical Notes / Health Clearance</label>
+        <textarea id="medical_notes" name="medical_notes" class="form-control" rows="2" placeholder="Injuries or conditions to note..."></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('registerMemberModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Create Member Account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Member -->
+<div id="editMemberModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 500px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Edit Member Profile</h3>
+      <button type="button" onclick="closeModal('editMemberModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <form id="editMemberForm" method="POST" action="">
+      <div class="form-group">
+        <label class="form-label" for="edit_full_name">Full Name *</label>
+        <input type="text" id="edit_full_name" name="full_name" class="form-control" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="edit_phone">Phone Number</label>
+          <input type="tel" id="edit_phone" name="phone" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_emergency_contact_phone">Emergency Phone</label>
+          <input type="tel" id="edit_emergency_contact_phone" name="emergency_contact_phone" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_emergency_contact_name">Emergency Contact Name</label>
+        <input type="text" id="edit_emergency_contact_name" name="emergency_contact_name" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit_fitness_goals">Fitness Goals</label>
+        <input type="text" id="edit_fitness_goals" name="fitness_goals" class="form-control">
+      </div>
+
+      <div class="form-group" style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.75rem;">
+        <input type="checkbox" id="edit_is_active" name="is_active" value="true" style="width: 16px; height: 16px; accent-color: var(--primary-forest);">
+        <label for="edit_is_active" style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-ink);">Active Member Clearance</label>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; padding-top: 12px; border-top: 1px solid var(--border-line);">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('editMemberModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Update Member</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditMemberModal(btn) {
+  const form = document.getElementById('editMemberForm');
+  form.action = '/admin/members/edit/' + btn.dataset.id;
+  document.getElementById('edit_full_name').value = btn.dataset.name || '';
+  document.getElementById('edit_phone').value = btn.dataset.phone || '';
+  document.getElementById('edit_emergency_contact_name').value = btn.dataset.ename || '';
+  document.getElementById('edit_emergency_contact_phone').value = btn.dataset.ephone || '';
+  document.getElementById('edit_fitness_goals').value = btn.dataset.goals || '';
+  document.getElementById('edit_is_active').checked = (btn.dataset.active === 'true');
+  openModal('editMemberModal');
+}
+</script>
+{% endblock %}

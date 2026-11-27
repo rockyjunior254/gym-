@@ -1,0 +1,68 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Account & Profile Settings | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      PREFERENCES & SECURITY
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      TRAINER SETTINGS
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Manage your personal coach account preferences, contact number, and notification configurations.
+    </p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 640px) 300px; gap: 24px; align-items: start;">
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 12px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Account Identity</h3>
+      <span class="fp-badge-lime">Trainer Role</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('trainer.settings') }}">
+      <div class="form-group">
+        <label class="form-label" for="set_name">Full Name *</label>
+        <input type="text" id="set_name" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="set_email">Email Address</label>
+        <input type="email" id="set_email" class="form-control" value="{{ user.email }}" disabled style="background: #F8FAFC;">
+        <span style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 4px; display: block;">Managed by Supabase Auth</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="set_phone">Telephone Number</label>
+        <input type="tel" id="set_phone" name="phone" class="form-control" value="{{ user.phone or '+254 700 000 000' }}">
+      </div>
+
+      <button type="submit" class="fp-btn-primary" style="margin-top: 12px;">
+        Save Account Details
+      </button>
+    </form>
+  </div>
+
+  <div>
+    <div class="fp-card" style="margin-bottom: 20px;">
+      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--fp-ink);">Security & Role</h4>
+      <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 10px;">
+        You are authenticated with the <strong>Trainer</strong> role. Your access permissions allow scheduling sessions, managing assigned athletes, and authoring workout plans.
+      </p>
+      <span class="fp-badge-slate">Strict Front-Desk Cash Facility</span>
+    </div>
+
+    <div class="fp-card">
+      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--fp-ink);">Public Homepage Link</h4>
+      <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 12px;">
+        To manage what gym members and visitors see on the public website, use the dedicated Coach Profile workspace.
+      </p>
+      <a href="{{ url_for('trainer.profile') }}" class="fp-btn-outline" style="font-size: 0.78rem;">Open Coach Profile</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

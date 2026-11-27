@@ -1,0 +1,90 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Training Calendar{% endblock %}
+{% block page_subtitle %}Your unified schedule of logged workouts, booked fitness classes, and personal coaching sessions{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{{ url_for('member.classes') }}" class="fp-btn-lime">
+    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+    Book Group Class
+  </a>
+  <a href="{{ url_for('member.trainer') }}" class="fp-btn-dark">
+    <i data-lucide="award" style="width: 16px; height: 16px;"></i>
+    Book PT Session
+  </a>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Summary Schedule Timeline -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Upcoming & Recent Schedule</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Unified timeline of workouts, classes, and coaching appointments</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">{{ events|length }} SCHEDULED</span>
+    </div>
+
+    {% if events %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for ev in events %}
+          <div style="padding: 16px 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <!-- Type Badge -->
+              <div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+                {% if ev.type == 'class' %}
+                  background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);
+                {% elif ev.type == 'pt' %}
+                  background: rgba(218, 40, 28, 0.12); color: var(--fp-coral);
+                {% else %}
+                  background: #E5E7EB; color: var(--fp-ink);
+                {% endif %}">
+                {% if ev.type == 'class' %}
+                  <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+                {% elif ev.type == 'pt' %}
+                  <i data-lucide="award" style="width: 20px; height: 20px;"></i>
+                {% else %}
+                  <i data-lucide="dumbbell" style="width: 20px; height: 20px;"></i>
+                {% endif %}
+              </div>
+
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ ev.title }}</span>
+                  <span class="fp-brand-badge" style="
+                    {% if ev.type == 'class' %}background: var(--fp-lime); color: var(--fp-ink);
+                    {% elif ev.type == 'pt' %}background: var(--fp-coral); color: #FFFFFF;
+                    {% else %}background: #E5E7EB; color: var(--fp-ink);{% endif %}">
+                    {{ ev.badge }}
+                  </span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--fp-muted); margin-top: 3px;">
+                  {{ ev.notes or 'Gym Floor Session' }}
+                </div>
+              </div>
+            </div>
+
+            <div style="text-align: right;">
+              <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">{{ ev.date }}</div>
+              <div style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 2px;">{{ ev.time or 'Logged Workout' }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <i data-lucide="calendar-days" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">Schedule is Clear</h3>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0 0 16px 0;">Book a fitness class or request a personal coaching session to populate your calendar.</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <a href="{{ url_for('member.classes') }}" class="fp-btn-lime">Explore Classes</a>
+          <a href="{{ url_for('member.trainer') }}" class="fp-btn-dark">Book Coach</a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

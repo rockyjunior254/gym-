@@ -1,0 +1,118 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Classes Schedule | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 5rem;">
+  <div class="container">
+    <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
+      <span class="section-subtitle">GROUP PERFORMANCE</span>
+      <h1 class="section-title" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">UPCOMING FITNESS CLASSES</h1>
+      <p style="font-size: 1.1rem; color: #94A3B8;">High-energy, coach-led athletic sessions. Registered members reserve slots directly in advance through the Athlete Portal.</p>
+    </div>
+
+    <div class="grid-3" style="gap: 24px;">
+      {% for c in classes %}
+        <div class="bento-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          {% if c.image_url %}
+            <div style="height: 220px; overflow: hidden; position: relative;">
+              <img src="{{ c.image_url }}" alt="{{ c.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              <div style="position: absolute; top: 12px; left: 12px;">
+                <span class="badge badge-lime">{{ c.duration_minutes }} MINS</span>
+              </div>
+            </div>
+          {% else %}
+            <div style="height: 180px; overflow: hidden; position: relative;">
+              <img src="{{ url_for('static', filename='images/classes/power-hiit.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ c.name }}">
+              <div style="position: absolute; top: 12px; left: 12px;">
+                <span class="badge badge-lime">{{ c.duration_minutes }} MINS</span>
+              </div>
+            </div>
+          {% endif %}
+
+          <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                <span style="font-size: 0.8rem; color: #C3E716; font-weight: 700; text-transform: uppercase;">{{ c.category or 'ATHLETIC' }}</span>
+                <span style="font-size: 0.8rem; color: #94A3B8;">Cap: {{ c.capacity }} Athletes</span>
+              </div>
+              <h3 style="font-size: 1.35rem; color: #FFFFFF; margin-bottom: 0.6rem;">{{ c.name }}</h3>
+              <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 1.25rem; line-height: 1.5;">
+                {{ c.description or 'Specialized group athletic conditioning led by certified coaching staff.' }}
+              </p>
+              <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 12px; font-size: 0.82rem; color: #CBD5E1; margin-bottom: 1.25rem; display: flex; justify-content: space-between;">
+                <span>📅 {{ c.class_date }}</span>
+                <span style="color: #C3E716; font-weight: 700;">⏰ {{ c.start_time }}</span>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+              <a href="{{ url_for('public.login') }}" class="btn-neon" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 10px;">
+                RESERVE IN ATHLETE PORTAL
+              </a>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <!-- Default scheduled showcase when database awaiting live classes -->
+        <div class="bento-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="height: 200px; overflow: hidden; position: relative;">
+            <img src="{{ url_for('static', filename='images/classes/iron-strength.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Iron Strength">
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="badge badge-lime">60 MINS</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.35rem; color: #fff; margin-bottom: 0.5rem;">IRON STRENGTH &amp; POWER</h3>
+              <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 1.25rem;">Barbell fundamentals and hypertrophy volume on the main platform.</p>
+              <p style="font-size: 0.85rem; color: #C3E716;"><strong>Daily:</strong> 06:00 AM &amp; 05:30 PM</p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+              <a href="{{ url_for('public.login') }}" class="btn-neon" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 10px;">RESERVE IN PORTAL</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="height: 200px; overflow: hidden; position: relative;">
+            <img src="{{ url_for('static', filename='images/classes/power-hiit.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Power HIIT">
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="badge badge-lime">45 MINS</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.35rem; color: #fff; margin-bottom: 0.5rem;">POWER HIIT &amp; CONDITIONING</h3>
+              <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 1.25rem;">Fast-paced intervals using assault bikes, kettlebells, and sprint turf.</p>
+              <p style="font-size: 0.85rem; color: #38BDF8;"><strong>Daily:</strong> 07:30 AM &amp; 06:30 PM</p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+              <a href="{{ url_for('public.login') }}" class="btn-neon" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 10px;">RESERVE IN PORTAL</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="height: 200px; overflow: hidden; position: relative;">
+            <img src="{{ url_for('static', filename='images/classes/mobility-flow.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Mobility Flow">
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="badge badge-lime">50 MINS</span>
+            </div>
+          </div>
+          <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.35rem; color: #fff; margin-bottom: 0.5rem;">KINETIC MOBILITY &amp; RECOVERY</h3>
+              <p style="font-size: 0.88rem; color: #94A3B8; margin-bottom: 1.25rem;">Joint decompression, thoracic mobility, and banded drills for lifters.</p>
+              <p style="font-size: 0.85rem; color: #A855F7;"><strong>Daily:</strong> 08:30 AM &amp; 04:00 PM</p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+              <a href="{{ url_for('public.login') }}" class="btn-neon" style="width: 100%; justify-content: center; font-size: 0.82rem; padding: 10px;">RESERVE IN PORTAL</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

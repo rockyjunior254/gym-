@@ -1,0 +1,162 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}My Schedule & Availability | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      CALENDAR & TIME SLOTS
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      MY SCHEDULE & AVAILABILITY
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Manage your weekly coaching availability, inspect scheduled 1-on-1 sessions, and prevent overlapping commitments.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 10px;">
+    <button type="button" class="fp-btn-primary" onclick="openModal('availabilityModal')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Set Day Availability
+    </button>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start;">
+  <!-- Weekly Availability Configuration Table -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Weekly Hours</h3>
+      <span class="fp-badge-lime">Availability</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      {% for day in availability %}
+        <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 8px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="font-size: 0.88rem; color: var(--fp-ink); display: block;">{{ day.day_name }}</strong>
+            <span style="font-size: 0.78rem; color: var(--fp-muted);">
+              {% if day.is_available %}
+                {{ day.start_time }} – {{ day.end_time }}
+              {% else %}
+                Unavailable / Off
+              {% endif %}
+            </span>
+          </div>
+          <div>
+            {% if day.is_available %}
+              <span class="fp-badge-lime" style="font-size: 0.7rem;">ACTIVE</span>
+            {% else %}
+              <span class="fp-badge-slate" style="font-size: 0.7rem;">OFF</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Upcoming Schedule Events -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Confirmed Sessions & Classes</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Upcoming athlete commitments on the gym floor</p>
+      </div>
+      <span class="fp-badge-slate">{{ sessions|length }} Bookings</span>
+    </div>
+
+    {% if sessions %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for s in sessions %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="background: #FFFFFF; border: 1px solid var(--fp-border); border-radius: 8px; padding: 6px 12px; text-align: center;">
+                <div style="font-size: 0.72rem; color: var(--fp-muted); text-transform: uppercase;">DATE</div>
+                <div style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ s.session_date }}</div>
+              </div>
+              <div>
+                <strong style="font-size: 0.95rem; color: var(--fp-ink); display: block;">
+                  {{ s.profiles.full_name if s.profiles else 'Athlete' }}
+                </strong>
+                <span style="font-size: 0.82rem; color: var(--fp-muted);">
+                  Time: {{ s.start_time[:5] }} • Focus: {{ s.focus_area or 'Strength' }}
+                </span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="{% if s.status == 'completed' %}fp-badge-slate{% elif s.status == 'cancelled' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+                {{ s.status|upper }}
+              </span>
+              {% if s.status == 'confirmed' or s.status == 'requested' %}
+                <form method="POST" action="{{ url_for('trainer.complete_session', session_id=s.id) }}" style="display:inline;">
+                  <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 8px;">Mark Done</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 36px 16px; background: #F8FAFC; border-radius: 10px;">
+        <p style="margin: 0; font-size: 0.88rem; color: var(--fp-muted);">No upcoming training sessions scheduled.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal: Set Availability -->
+<div id="availabilityModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Configure Day Availability</h3>
+        <p class="modal-subtitle">Update operating coaching hours for a specific day</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('availabilityModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('trainer.update_availability') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="day_select">Day of Week *</label>
+          <select id="day_select" name="day_of_week" class="form-control" required>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="avail_start">Start Time</label>
+            <input type="time" id="avail_start" name="start_time" class="form-control" value="06:00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="avail_end">End Time</label>
+            <input type="time" id="avail_end" name="end_time" class="form-control" value="20:00" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+          <input type="checkbox" id="avail_check" name="is_available" checked style="width: 18px; height: 18px; accent-color: var(--fp-lime-dark);">
+          <label for="avail_check" style="cursor: pointer; font-size: 0.88rem; color: var(--fp-ink);">Available for 1-on-1 athlete bookings on this day</label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="avail_notes">Notes / Special Instructions</label>
+          <input type="text" id="avail_notes" name="notes" class="form-control" placeholder="e.g. Morning deck hours only">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('availabilityModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Save Availability</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

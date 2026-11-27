@@ -1,0 +1,93 @@
+{% extends 'base_public.html' %}
+
+{% block title %}About Our Facility | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 5rem;">
+  <div class="container">
+    <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
+      <span class="section-subtitle">THE STRAKLY IDENTITY</span>
+      <h1 class="section-title" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">BUILT FOR IRON. ENGINEERED FOR STRENGTH.</h1>
+      <p style="font-size: 1.1rem; color: #94A3B8;">An athletic performance center free from commercial gym distractions. Pure barbell steel, calibrated bumper plates, CSCS coaching, and 100% transparent physical cash memberships.</p>
+    </div>
+
+    <!-- Hero Two-Column Showcase -->
+    <div class="bento-card" style="padding: 3rem; margin-bottom: 4rem; background: linear-gradient(145deg, #131814 0%, #0C0F0D 100%); border-color: rgba(195, 231, 22, 0.3);">
+      <div class="grid-2" style="align-items: center; gap: 3rem;">
+        <div>
+          <span style="font-size: 0.78rem; font-weight: 800; color: #C3E716; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 0.8rem;">OUR ETHOS &amp; CULTURE</span>
+          <h2 style="margin-bottom: 1.25rem; font-size: 2rem; color: #FFFFFF; font-family: var(--font-heading); line-height: 1.2;">
+            STRENGTH IS AN HONEST PURSUIT
+          </h2>
+          <p style="margin-bottom: 1.2rem; font-size: 0.98rem; line-height: 1.7; color: #94A3B8;">
+            Strakly was founded on a simple premise: commercial fitness chains have lost their way with predatory digital contracts, auto-billing loops, and crowded equipment. We built a home where dedicated lifters and everyday athletes train with focus, dignity, and real progression.
+          </p>
+          <p style="margin-bottom: 2rem; font-size: 0.98rem; line-height: 1.7; color: #94A3B8;">
+            We maintain physical cash custody at our front desk—ensuring zero unexpected bank deductions. Our front-desk team verifies each arrival manually without biometric friction, and certified coaches supervise progressive overload with precision.
+          </p>
+          <div style="display: flex; gap: 1.25rem; flex-wrap: wrap;">
+            <a href="{{ url_for('public.register') }}" class="btn-neon">JOIN THE FACILITY</a>
+            <a href="{{ url_for('public.memberships') }}" class="btn-glass">VIEW MEMBERSHIP PRICING</a>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <div style="position: relative; overflow: hidden; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 50px rgba(0,0,0,0.7);">
+            <img src="{{ url_for('static', filename='images/homepage/about-athlete.jpg') }}" alt="Athlete at Strakly" style="width: 100%; height: 420px; object-fit: cover; display: block;">
+          </div>
+          <div style="position: absolute; bottom: -15px; right: -15px; background: rgba(18, 22, 19, 0.95); backdrop-filter: blur(14px); border: 1px solid rgba(195, 231, 22, 0.4); padding: 1rem 1.4rem; border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6);">
+            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; display: block;">EQUIPMENT STANDARD</span>
+            <strong style="color: #C3E716; font-family: var(--font-heading); font-size: 1.05rem;">ELEIKO &amp; ROGUE IRON</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility Equipment Highlights Grid -->
+    <div style="margin-top: 4rem;">
+      <div class="section-header" style="margin-bottom: 2.5rem;">
+        <span class="section-subtitle">ARSENAL</span>
+        <h2 class="section-title">COMMERCIAL EQUIPMENT HIGHLIGHTS</h2>
+        <p style="color: #94A3B8;">Precision-calibrated bars, competition platforms, and performance machinery.</p>
+      </div>
+
+      <div class="grid-3" style="gap: 24px;">
+        {% for eq in equipment %}
+          <div class="bento-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              {% if eq.image_url %}
+                <img src="{{ eq.image_url }}" alt="{{ eq.name }}" style="width: 100%; height: 200px; object-fit: cover;">
+              {% else %}
+                <div style="height: 160px; background: #161D18; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #C3E716;">🏋️</div>
+              {% endif %}
+              <div style="padding: 1.5rem;">
+                <span class="badge badge-lime" style="margin-bottom: 0.6rem; display: inline-block;">{{ eq.category }}</span>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #FFFFFF;">{{ eq.name }}</h3>
+                <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Location: {{ eq.location or 'Main Floor Deck' }}</p>
+              </div>
+            </div>
+            <div style="padding: 0 1.5rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+              <span style="font-size: 0.78rem; color: #C3E716; font-weight: 700;">★ VERIFIED COMMERCIAL STANDARD</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="bento-card" style="padding: 2rem;">
+            <span class="badge badge-lime" style="margin-bottom: 0.8rem; display: inline-block;">FREE WEIGHTS</span>
+            <h3 style="font-size: 1.35rem; color: #FFFFFF; margin-bottom: 0.6rem;">Eleiko Olympic Competition Barbells</h3>
+            <p style="font-size: 0.9rem; color: #94A3B8;">Calibrated 20kg competition bars and bumper plates on reinforced lifting platforms.</p>
+          </div>
+          <div class="bento-card" style="padding: 2rem;">
+            <span class="badge badge-lime" style="margin-bottom: 0.8rem; display: inline-block;">POWER CAGES</span>
+            <h3 style="font-size: 1.35rem; color: #FFFFFF; margin-bottom: 0.6rem;">Heavy Commercial Power Racks</h3>
+            <p style="font-size: 0.9rem; color: #94A3B8;">Integrated safety pins, multi-grip pull-up handles and Olympic squat stations.</p>
+          </div>
+          <div class="bento-card" style="padding: 2rem;">
+            <span class="badge badge-lime" style="margin-bottom: 0.8rem; display: inline-block;">CONDITIONING</span>
+            <h3 style="font-size: 1.35rem; color: #FFFFFF; margin-bottom: 0.6rem;">Woodway Non-Motorized Treadmills</h3>
+            <p style="font-size: 0.9rem; color: #94A3B8;">Curved manual decks designed for explosive athletic cadence and interval sprints.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Location & Hours | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 5rem;">
+  <div class="container" style="max-width: 1000px;">
+    <div class="section-header" style="text-align: center; margin-bottom: 4rem;">
+      <span class="section-subtitle">VISIT OUR FACILITY</span>
+      <h1 class="section-title" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">LOCATION &amp; OPERATING HOURS</h1>
+      <p style="font-size: 1.1rem; color: #94A3B8;">Drop in during reception hours for member registration, tour of our lifting platforms, or cash membership renewals.</p>
+    </div>
+
+    <div class="grid-2" style="gap: 32px; align-items: start;">
+      <!-- Facility Info Card -->
+      <div class="bento-card" style="padding: 2.5rem;">
+        <span class="badge badge-lime" style="margin-bottom: 1rem; display: inline-block;">RECEPTION &amp; FACILITY</span>
+        <h2 style="font-size: 1.8rem; color: #FFFFFF; margin-bottom: 1.5rem;">ATHLETIC HEADQUARTERS</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2rem;">
+          <div>
+            <span style="font-size: 0.78rem; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 1px;">Address</span>
+            <p style="font-size: 1.05rem; color: #FFFFFF; margin: 4px 0 0;">{{ gym_settings.address }}</p>
+          </div>
+          <div>
+            <span style="font-size: 0.78rem; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 1px;">Direct Telephone</span>
+            <p style="font-size: 1.05rem; color: #FFFFFF; margin: 4px 0 0;">📞 {{ gym_settings.phone }}</p>
+          </div>
+          <div>
+            <span style="font-size: 0.78rem; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 1px;">Official Email</span>
+            <p style="font-size: 1.05rem; color: #FFFFFF; margin: 4px 0 0;">✉️ {{ gym_settings.email }}</p>
+          </div>
+        </div>
+
+        <div style="background: rgba(195, 231, 22, 0.08); border: 1px dashed rgba(195, 231, 22, 0.4); border-radius: 12px; padding: 1.25rem;">
+          <strong style="color: #C3E716; font-size: 0.88rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">STRICT CASH-ONLY INTEGRITY:</strong>
+          <p style="margin: 0; font-size: 0.88rem; color: #CBD5E1; line-height: 1.5;">All payments are conducted strictly in physical cash at the reception desk. Instant official receipts (<code>RCP-2026-XXXX</code>) are generated immediately.</p>
+        </div>
+      </div>
+
+      <!-- Hours & Contact Form -->
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="bento-card" style="padding: 2.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 1rem; display: inline-block;">TRAINING SCHEDULE</span>
+          <h2 style="font-size: 1.8rem; color: #FFFFFF; margin-bottom: 1.5rem;">HOURS OF OPERATION</h2>
+          
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+              <span style="color: #94A3B8;">Monday – Friday</span>
+              <strong style="color: #FFFFFF;">05:30 AM – 10:00 PM</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+              <span style="color: #94A3B8;">Saturday</span>
+              <strong style="color: #FFFFFF;">06:00 AM – 08:00 PM</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+              <span style="color: #94A3B8;">Sunday</span>
+              <strong style="color: #FFFFFF;">08:00 AM – 04:00 PM</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 0.25rem;">
+              <span style="color: #94A3B8;">Public Holidays</span>
+              <strong style="color: #C3E716;">08:00 AM – 04:00 PM</strong>
+            </div>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <a href="{{ url_for('public.register') }}" class="btn-neon" style="width: 100%; justify-content: center; font-size: 0.88rem; padding: 12px;">REGISTER AS MEMBER</a>
+          </div>
+        </div>
+
+        <!-- Contact Form Box -->
+        <div class="bento-card" style="padding: 2rem;">
+          <h3 style="font-size: 1.3rem; color: #FFFFFF; margin-bottom: 1rem;">SEND AN INQUIRY</h3>
+          <form method="POST" action="{{ url_for('public.contact') }}" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+              <input type="text" name="name" placeholder="Your Full Name" required style="width: 100%; padding: 12px; background: #141A16; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff;">
+            </div>
+            <div>
+              <input type="email" name="email" placeholder="Your Email Address" required style="width: 100%; padding: 12px; background: #141A16; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff;">
+            </div>
+            <div>
+              <textarea name="message" rows="3" placeholder="How can our coaching team assist you?" required style="width: 100%; padding: 12px; background: #141A16; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff;"></textarea>
+            </div>
+            <button type="submit" class="btn-neon" style="width: 100%; justify-content: center; padding: 12px;">SUBMIT INQUIRY</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

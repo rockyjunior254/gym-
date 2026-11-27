@@ -1,0 +1,118 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Challenges & Achievements{% endblock %}
+{% block page_subtitle %}Compete in gym-wide fitness milestones, push personal boundaries, and unlock athletic badges{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Active Club Challenges -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Active Club Challenges</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Participate and earn exclusive gym recognition and digital medals</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink);">COMMUNITY CONTESTS</span>
+    </div>
+
+    {% if challenges %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;">
+        {% for ch in challenges %}
+          <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">
+                  {{ ch.category or 'Challenge' }}
+                </span>
+                <span style="font-size: 0.72rem; color: var(--fp-muted); font-weight: 600;">
+                  Ends: {{ ch.end_date }}
+                </span>
+              </div>
+
+              <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ ch.title }}</h4>
+              <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 14px 0; line-height: 1.4;">
+                {{ ch.description }}
+              </p>
+
+              <div style="background: #FAFAFA; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--fp-border); font-size: 0.75rem; color: var(--fp-ink); margin-bottom: 16px;">
+                <div><strong>Target Metric:</strong> {{ ch.target_value }} {{ ch.target_metric }}</div>
+                <div style="margin-top: 2px;"><strong>Reward Badge:</strong> {{ ch.badge_name or 'Finisher Medal' }}</div>
+              </div>
+            </div>
+
+            {% if ch.id in joined_ids %}
+              <button type="button" class="fp-btn-outline" style="width: 100%; justify-content: center; background: #ECFDF5; color: #065F46; border-color: #A7F3D0;" disabled>
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i> Active Participant
+              </button>
+            {% else %}
+              <form action="{{ url_for('member.join_challenge', challenge_id=ch.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="fp-btn-lime" style="width: 100%; justify-content: center;">
+                  Enter Challenge
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <i data-lucide="trophy" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">No Active Challenges</h3>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">Check back soon for upcoming strength and consistency challenges.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Unlocked Badges & Achievements -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">My Badges & Medals</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Milestones unlocked throughout your training tenure</p>
+      </div>
+      <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-ink);">HALL OF FAME</span>
+    </div>
+
+    {% if achievements %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+        {% for a in achievements %}
+          <div style="padding: 16px; border-radius: 12px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; align-items: center; gap: 14px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(195, 231, 22, 0.3); color: var(--fp-ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="award" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div>
+              <div style="font-size: 0.9rem; font-weight: 800; color: var(--fp-ink);">{{ a.title }}</div>
+              <div style="font-size: 0.72rem; color: var(--fp-muted); margin-top: 2px;">Unlocked {{ a.unlocked_at[:10] }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+        <!-- Locked Badge Previews -->
+        <div style="padding: 16px; border-radius: 12px; border: 1px dashed var(--fp-border); background: #FFFFFF; display: flex; align-items: center; gap: 14px; opacity: 0.6;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #F3F4F6; color: var(--fp-muted); display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--fp-ink);">First 10 Check-ins</div>
+            <div style="font-size: 0.7rem; color: var(--fp-muted);">Consistency Milestone</div>
+          </div>
+        </div>
+
+        <div style="padding: 16px; border-radius: 12px; border: 1px dashed var(--fp-border); background: #FFFFFF; display: flex; align-items: center; gap: 14px; opacity: 0.6;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: #F3F4F6; color: var(--fp-muted); display: flex; align-items: center; justify-content: center;">
+            <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--fp-ink);">Heavy Lifter</div>
+            <div style="font-size: 0.7rem; color: var(--fp-muted);">Log PR Lift > 100kg</div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

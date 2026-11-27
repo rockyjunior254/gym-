@@ -1,0 +1,182 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Facility Bulletins & Announcements | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Communication Center
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Bulletins &amp; Facility Announcements
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Broadcast facility updates, schedule adjustments, holiday hours, and alerts to athletes and staff.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addAnnouncementModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>Post Announcement</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Announcements Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;">
+  {% for a in announcements %}
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+          <span class="badge badge-neutral" style="font-size: 0.72rem;">AUDIENCE: {{ a.target_audience.upper() if a.target_audience else 'ALL' }}</span>
+          {% if a.is_published %}
+            <span class="badge badge-forest">Live</span>
+          {% else %}
+            <span class="badge badge-neutral">Draft</span>
+          {% endif %}
+        </div>
+
+        <h3 style="margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 700; color: var(--ink-dark);">{{ a.title }}</h3>
+
+        <p style="color: var(--ink-secondary); font-size: 0.88rem; line-height: 1.5; white-space: pre-line; margin: 0 0 1rem;">
+          {{ a.content }}
+        </p>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-line); padding-top: 0.85rem; font-size: 0.78rem; color: var(--ink-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <span>{{ a.created_at[:10] if a.created_at else 'Recent' }}</span> •
+          <span>{{ a.author.full_name if a.author else 'Admin' }}</span>
+        </div>
+        <div style="display: flex; gap: 0.35rem;">
+          <button type="button" class="btn btn-secondary btn-sm"
+                  data-id="{{ a.id }}"
+                  data-title="{{ a.title }}"
+                  data-target="{{ a.target_audience or 'all' }}"
+                  data-content="{{ a.content or '' }}"
+                  data-published="{{ 'true' if a.is_published else 'false' }}"
+                  onclick="openEditAnnModal(this)">Edit</button>
+          <form method="POST" action="{{ url_for('admin.delete_announcement', announcement_id=a.id) }}" onsubmit="return confirm('Remove announcement?');" style="display:inline;">
+            <button type="submit" class="btn btn-outline-rose btn-sm">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div style="grid-column: 1 / -1;">
+      <div class="empty-state">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        </div>
+        <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Announcements Published</h4>
+        <p style="margin: 0 0 1rem; font-size: 0.85rem; color: var(--ink-muted);">Keep your athletic community informed by publishing facility notices.</p>
+        <button class="btn btn-primary" onclick="openModal('addAnnouncementModal')">Post First Bulletin</button>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Modal: Post Announcement -->
+<div id="addAnnouncementModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Publish Facility Announcement</h3>
+        <p class="modal-subtitle">Broadcast official notices across member and coach portals</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addAnnouncementModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.announcements') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Announcement Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" name="title" class="form-control" placeholder="e.g. Facility Holiday Schedule Update" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Audience</label>
+          <select name="target_audience" class="form-control">
+            <option value="all">Everyone (All Athletes & Staff)</option>
+            <option value="member">Members Only</option>
+            <option value="trainer">Trainers & Coaches Only</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Announcement Content <span style="color: var(--accent-rose);">*</span></label>
+          <textarea name="content" class="form-control" rows="5" placeholder="Write bulletin details clearly..." required></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="is_published_ann" name="is_published" checked style="width: 18px; height: 18px; accent-color: var(--forest-primary);">
+          <label for="is_published_ann" style="cursor: pointer; font-size: 0.88rem; color: var(--ink-dark);">Publish immediately</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addAnnouncementModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Broadcast Bulletin</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Announcement -->
+<div id="editAnnouncementModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Announcement</h3>
+        <p class="modal-subtitle">Update bulletin contents and audience targeting</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editAnnouncementModal')">&times;</button>
+    </div>
+    <form id="editAnnouncementForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Announcement Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="edit_ann_title" name="title" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Audience</label>
+          <select id="edit_ann_target" name="target_role" class="form-control">
+            <option value="all">Everyone (All Athletes & Staff)</option>
+            <option value="member">Members Only</option>
+            <option value="trainer">Trainers & Coaches Only</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Announcement Content <span style="color: var(--accent-rose);">*</span></label>
+          <textarea id="edit_ann_content" name="content" class="form-control" rows="5" required></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="edit_ann_published" name="is_published" value="on" style="width: 18px; height: 18px; accent-color: var(--forest-primary);">
+          <label for="edit_ann_published" style="cursor: pointer; font-size: 0.88rem; color: var(--ink-dark);">Live and published</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editAnnouncementModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Bulletin</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditAnnModal(btn) {
+  const form = document.getElementById('editAnnouncementForm');
+  form.action = '/admin/announcements/edit/' + btn.dataset.id;
+  document.getElementById('edit_ann_title').value = btn.dataset.title || '';
+  document.getElementById('edit_ann_target').value = btn.dataset.target || 'all';
+  document.getElementById('edit_ann_content').value = btn.dataset.content || '';
+  document.getElementById('edit_ann_published').checked = (btn.dataset.published === 'true');
+  openModal('editAnnouncementModal');
+}
+</script>
+{% endblock %}

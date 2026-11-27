@@ -1,0 +1,278 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}{{ athlete.full_name }} — Athlete Workspace | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<!-- Breadcrumb Header -->
+<div style="margin-bottom: 20px;">
+  <a href="{{ url_for('trainer.members') }}" style="font-size: 0.82rem; color: var(--fp-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+    &larr; Back to My Athletes
+  </a>
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">
+        {% if athlete.avatar_url %}
+          <img src="{{ athlete.avatar_url }}" alt="{{ athlete.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+        {% else %}
+          {{ athlete.full_name[:2].upper() if athlete.full_name else 'AT' }}
+        {% endif %}
+      </div>
+      <div>
+        <h1 style="margin: 0; font-size: 1.65rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">{{ athlete.full_name }}</h1>
+        <div style="font-size: 0.82rem; color: var(--fp-muted);">{{ athlete.email }} • Member Since {{ athlete.created_at[:10] if athlete.created_at else '2026' }}</div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('trainer.plans') }}" class="fp-btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Assign New Plan
+      </a>
+      <a href="{{ url_for('trainer.sessions') }}" class="fp-btn-dark">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Book Session
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div style="display: flex; gap: 8px; border-bottom: 1px solid var(--fp-border); margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px;">
+  <button type="button" class="tab-btn active" onclick="switchTab('overview', this)">Overview & Profile</button>
+  <button type="button" class="tab-btn" onclick="switchTab('plans', this)">Training Plans ({{ plans|length }})</button>
+  <button type="button" class="tab-btn" onclick="switchTab('progress', this)">Progress & Metrics ({{ progress_logs|length }})</button>
+  <button type="button" class="tab-btn" onclick="switchTab('sessions', this)">Coaching Sessions ({{ sessions|length }})</button>
+  <button type="button" class="tab-btn" onclick="switchTab('assessments', this)">Assessments ({{ assessments|length }})</button>
+  <button type="button" class="tab-btn" onclick="switchTab('checkins', this)">Check-ins & Feedback ({{ checkins|length }})</button>
+</div>
+
+<style>
+  .tab-btn {
+    background: transparent;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--fp-muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover {
+    color: var(--fp-ink);
+    background: #F1F5F9;
+  }
+  .tab-btn.active {
+    color: var(--fp-ink);
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid var(--fp-border);
+  }
+  .tab-pane {
+    display: none;
+  }
+  .tab-pane.active {
+    display: block;
+  }
+</style>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-overview" class="tab-pane active">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="fp-card">
+      <h3 style="margin: 0 0 16px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Athlete Profile</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 6px;">
+          <span style="color: var(--fp-muted);">Full Name:</span>
+          <strong>{{ athlete.full_name }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 6px;">
+          <span style="color: var(--fp-muted);">Contact Email:</span>
+          <span>{{ athlete.email }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 6px;">
+          <span style="color: var(--fp-muted);">Telephone:</span>
+          <span>{{ athlete.phone or 'Not provided' }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 6px;">
+          <span style="color: var(--fp-muted);">Fitness Objectives:</span>
+          <strong style="color: var(--fp-lime-dark);">{{ details.fitness_goals or 'General strength & conditioning' }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--fp-muted);">Emergency Contact:</span>
+          <span>{{ details.emergency_contact_name or '—' }} ({{ details.emergency_contact_phone or '—' }})</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fp-card">
+      <h3 style="margin: 0 0 16px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Coaching Directives</h3>
+      <div style="background: #F8FAFC; border-radius: 10px; padding: 14px; font-size: 0.85rem; color: var(--fp-ink); line-height: 1.5; margin-bottom: 14px;">
+        {{ details.notes or 'No specific administrative restrictions recorded. Standard progressive overload and movement mechanics review.' }}
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <span class="fp-badge-lime">1-on-1 Coached</span>
+        <span class="fp-badge-slate">Strict Cash Verified</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: TRAINING PLANS -->
+<div id="tab-plans" class="tab-pane">
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Assigned Workout Routines</h3>
+      <a href="{{ url_for('trainer.plans') }}" class="fp-btn-primary" style="font-size: 0.78rem;">+ Create Plan</a>
+    </div>
+
+    {% if plans %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for p in plans %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <strong style="font-size: 0.95rem; color: var(--fp-ink);">{{ p.title }}</strong>
+                <span class="fp-badge-lime">{{ p.status|upper }}</span>
+              </div>
+              <p style="margin: 0; font-size: 0.82rem; color: var(--fp-muted);">Goal: {{ p.goal or 'Strength' }} • {{ p.days_per_week }} Days/Week</p>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--fp-muted);">
+              Created: {{ p.created_at[:10] if p.created_at else 'Recent' }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No workout plans authored for this athlete yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 3: PROGRESS & METRICS -->
+<div id="tab-progress" class="tab-pane">
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Historical Measurements</h3>
+      <a href="{{ url_for('trainer.progress', member_id=athlete.id) }}" class="fp-btn-outline" style="font-size: 0.78rem;">Log New Metric</a>
+    </div>
+
+    {% if progress_logs %}
+      <div class="table-responsive">
+        <table class="table-modern" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--fp-border); text-align: left; color: var(--fp-muted);">
+              <th style="padding: 8px;">Date</th>
+              <th style="padding: 8px;">Weight (kg)</th>
+              <th style="padding: 8px;">Body Fat %</th>
+              <th style="padding: 8px;">Chest (cm)</th>
+              <th style="padding: 8px;">Waist (cm)</th>
+              <th style="padding: 8px;">Arms (cm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pr in progress_logs %}
+              <tr style="border-bottom: 1px solid var(--fp-border-subtle);">
+                <td style="padding: 8px; font-weight: 600;">{{ pr.record_date }}</td>
+                <td style="padding: 8px;">{{ pr.weight_kg or '—' }}</td>
+                <td style="padding: 8px;">{{ pr.body_fat_pct or '—' }}%</td>
+                <td style="padding: 8px;">{{ pr.chest_cm or '—' }}</td>
+                <td style="padding: 8px;">{{ pr.waist_cm or '—' }}</td>
+                <td style="padding: 8px;">{{ pr.arms_cm or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No biometric logs on file yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 4: SESSIONS -->
+<div id="tab-sessions" class="tab-pane">
+  <div class="fp-card">
+    <h3 style="margin: 0 0 16px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Session History</h3>
+    {% if sessions %}
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for s in sessions %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="font-size: 0.9rem; color: var(--fp-ink);">{{ s.session_date }} at {{ s.start_time[:5] }}</strong>
+              <div style="font-size: 0.8rem; color: var(--fp-muted);">Focus: {{ s.focus_area or 'General Fitness' }}</div>
+            </div>
+            <span class="fp-badge-lime">{{ s.status|upper }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No 1-on-1 sessions booked with this athlete yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 5: ASSESSMENTS -->
+<div id="tab-assessments" class="tab-pane">
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Fitness Evaluations</h3>
+      <a href="{{ url_for('trainer.assessments') }}" class="fp-btn-primary" style="font-size: 0.78rem;">+ File Evaluation</a>
+    </div>
+
+    {% if assessments %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for ass in assessments %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <strong style="color: var(--fp-ink); font-size: 0.92rem;">Evaluation: {{ ass.assessment_date }}</strong>
+              <span class="fp-badge-slate">Next Review: {{ ass.next_review_date or 'TBD' }}</span>
+            </div>
+            <p style="margin: 0 0 6px; font-size: 0.84rem; color: var(--fp-muted);">Objectives: {{ ass.fitness_objectives or 'Standard strength baseline' }}</p>
+            <p style="margin: 0; font-size: 0.84rem; color: var(--fp-ink);">Recommendations: {{ ass.recommendations or 'Continue progressive overload.' }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No formal fitness evaluations conducted yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TAB 6: CHECK-INS -->
+<div id="tab-checkins" class="tab-pane">
+  <div class="fp-card">
+    <h3 style="margin: 0 0 16px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Athlete Weekly Check-Ins</h3>
+    {% if checkins %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for ch in checkins %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <strong style="color: var(--fp-ink); font-size: 0.9rem;">Date: {{ ch.checkin_date }}</strong>
+              <span class="{% if ch.status == 'pending' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">{{ ch.status|upper }}</span>
+            </div>
+            <p style="margin: 0 0 6px; font-size: 0.84rem; color: var(--fp-muted);">Athlete Notes: {{ ch.athlete_notes or 'Weekly check-in submitted.' }}</p>
+            {% if ch.trainer_feedback %}
+              <div style="background: #FFFFFF; border-left: 3px solid var(--fp-lime-dark); padding: 8px 12px; font-size: 0.82rem; color: var(--fp-ink);">
+                <strong>Coach Feedback:</strong> {{ ch.trainer_feedback }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No check-ins submitted by athlete yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

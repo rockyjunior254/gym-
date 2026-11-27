@@ -1,0 +1,272 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Cash Payments | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Financial Transactions &bull; Counter Collections
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Cash Payments
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Record physical cash receipts, verify transactions, and monitor front-desk collection registers.
+      </p>
+    </div>
+    <div>
+      <button type="button" class="btn btn-primary" onclick="openModal('recordPaymentModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="banknote" style="width: 15px; height: 15px;"></i>
+        <span>Record Cash Collection</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cash Policy Summary Banner -->
+  <div class="card" style="padding: 14px 18px; border-left: 4px solid var(--primary-forest);">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+        </div>
+        <div>
+          <div style="font-weight: 700; color: var(--text-ink); font-size: 0.9rem;">Physical Counter Cash Policy</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">All gym dues are received in physical cash at the front desk. Staff record transactions to generate verifiable receipts.</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <span class="badge badge-forest" style="font-size: 11px;">Counter Cash</span>
+        <span class="badge badge-neutral" style="font-size: 11px;">Audited Ledger</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="grid-4">
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">TOTAL TRANSACTIONS</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        {{ payments|length }}
+      </div>
+      <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">Recorded receipts</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">CASH REVENUE TODAY</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+        KES {{ "{:,.0f}".format(today_cash if today_cash is defined else 0) }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Front-desk takings</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">MONTH REVENUE</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        KES {{ "{:,.0f}".format(month_cash if month_cash is defined else 0) }}
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Current calendar month</span>
+    </div>
+
+    <div class="card" style="padding: 18px;">
+      <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">PAYMENT METHOD</span>
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
+        CASH
+      </div>
+      <span style="font-size: 12px; color: var(--text-muted);">Strict physical currency</span>
+    </div>
+  </div>
+
+  <!-- Main Grid: Fast Entry Form & Payment Table -->
+  <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+    <!-- Record Cash Form -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+        <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Record Cash Received</h3>
+        <span class="badge badge-forest" style="font-size: 10.5px;">Front Desk</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.payments') }}">
+        <div class="form-group">
+          <label class="form-label" for="pay_member_id">Member <span style="color: var(--accent-rose);">*</span></label>
+          <select id="pay_member_id" name="member_id" class="form-control" required>
+            <option value="">-- Choose Member --</option>
+            {% for m in members %}
+              <option value="{{ m.id }}" {% if selected_member_id == m.id %}selected{% endif %}>{{ m.full_name }} ({{ m.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pay_amount">Cash Amount (KES) <span style="color: var(--accent-rose);">*</span></label>
+          <div style="position: relative;">
+            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: 700; font-size: 0.8rem; color: var(--text-muted);">KES</span>
+            <input type="number" step="50" min="50" id="pay_amount" name="amount" class="form-control" placeholder="3500" required style="padding-left: 44px; font-weight: 700;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pay_subscription_id">Link to Subscription (Optional)</label>
+          <select id="pay_subscription_id" name="subscription_id" class="form-control">
+            <option value="">-- Direct Membership Subscription --</option>
+            {% for s in subscriptions %}
+              <option value="{{ s.id }}">{{ s.profiles.full_name if s.profiles else 'Member' }} — {{ s.membership_plans.name if s.membership_plans else 'Plan' }} ({{ s.status|upper }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pay_notes">Desk Reference / Locker / Notes</label>
+          <input type="text" id="pay_notes" name="notes" class="form-control" placeholder="e.g. Front desk drawer #1">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i data-lucide="receipt" style="width: 15px; height: 15px;"></i>
+          <span>Confirm Cash &amp; Issue Receipt</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Payments Records Table -->
+    <div class="card" style="padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Transaction Register</h3>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Physical cash payments verified and issued by desk staff</p>
+        </div>
+        <span class="badge badge-forest" style="font-size: 11px;">{{ payments|length }} Collections</span>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid var(--border-line); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+              <th style="padding: 10px 12px;">Receipt #</th>
+              <th style="padding: 10px 12px;">Member</th>
+              <th style="padding: 10px 12px;">Amount</th>
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Received By</th>
+              <th style="padding: 10px 12px; text-align: right;">Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in payments %}
+              <tr style="border-bottom: 1px solid var(--border-line);">
+                <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-forest);">
+                  {{ p.receipt_number }}
+                </td>
+                <td style="padding: 10px 12px;">
+                  <strong style="color: var(--text-ink); display: block; font-weight: 600;">{{ p.profiles.full_name if p.profiles else 'Member' }}</strong>
+                  <span style="font-size: 11.5px; color: var(--text-muted);">{{ p.profiles.email if p.profiles else '' }}</span>
+                </td>
+                <td style="padding: 10px 12px; font-weight: 700; color: var(--text-ink);">
+                  KES {{ "{:,.0f}".format(p.amount) }}
+                </td>
+                <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">
+                  {{ p.payment_date[:10] if p.payment_date else 'Recent' }}
+                </td>
+                <td style="padding: 10px 12px; font-size: 12px; color: var(--text-muted);">
+                  {{ p.receiver.full_name if p.receiver else 'Front Desk' }}
+                </td>
+                <td style="padding: 10px 12px; text-align: right;">
+                  <button type="button" class="btn btn-outline btn-sm" style="font-size: 11.5px; padding: 3px 8px;"
+                          data-rcp="{{ p.receipt_number }}"
+                          data-name="{{ p.profiles.full_name if p.profiles else 'Member' }}"
+                          data-amount="{{ p.amount }}"
+                          data-date="{{ p.payment_date[:10] if p.payment_date else '' }}"
+                          data-receiver="{{ p.receiver.full_name if p.receiver else 'Front Desk' }}"
+                          data-notes="{{ p.notes or '' }}"
+                          onclick="viewReceiptModal(this)">
+                    Receipt
+                  </button>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px 16px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+                    <i data-lucide="banknote" style="width: 36px; height: 36px; opacity: 0.35; margin-bottom: 8px;"></i>
+                    <h4 style="font-size: 1rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px 0;">No Cash Records Yet</h4>
+                    <p style="font-size: 0.82rem; margin: 0;">Physical collections entered at reception will appear here with printable receipts.</p>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: Printable Official Receipt Preview -->
+<div id="receiptModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 480px; padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--text-ink); margin: 0;">Official Cash Receipt</h3>
+      <button type="button" onclick="closeModal('receiptModal')" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+
+    <!-- Printable Receipt Card -->
+    <div id="printableReceiptArea" style="background: #FFFFFF; border: 1px solid var(--border-line); border-radius: 12px; padding: 20px; font-family: var(--font-body); margin-bottom: 1rem;">
+      <div style="text-align: center; border-bottom: 1px dashed var(--border-line); padding-bottom: 12px; margin-bottom: 14px;">
+        <h4 style="margin: 0; font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-forest);">{{ gym_settings.gym_name|upper }}</h4>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">OFFICIAL COUNTER CASH RECEIPT &bull; PHYSICAL RECORD</div>
+        <div id="modalRcpNumber" style="font-weight: 800; font-size: 1.1rem; color: var(--text-ink); margin-top: 6px;"></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Received From:</span>
+          <strong id="modalRcpName" style="color: var(--text-ink);"></strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Payment Date:</span>
+          <span id="modalRcpDate" style="color: var(--text-ink);"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Payment Tender:</span>
+          <span style="color: var(--primary-forest); font-weight: 700;">Physical Cash</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Attendant:</span>
+          <span id="modalRcpReceiver" style="color: var(--text-ink);"></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-line); padding-top: 10px; margin-top: 6px;">
+          <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-ink);">Total Paid:</span>
+          <span id="modalRcpAmount" style="font-size: 1.25rem; font-weight: 800; color: var(--primary-forest);"></span>
+        </div>
+      </div>
+
+      <div style="text-align: center; border-top: 1px dashed var(--border-line); padding-top: 12px; margin-top: 16px; font-size: 0.78rem; color: var(--text-muted);">
+        Verified at facility reception. Retain for entry record inquiries.
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 8px;">
+      <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('receiptModal')">Close</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
+        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+        <span>Print Receipt</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function viewReceiptModal(btn) {
+  document.getElementById('modalRcpNumber').textContent = btn.dataset.rcp || 'RCP-2026';
+  document.getElementById('modalRcpName').textContent = btn.dataset.name || 'Member';
+  document.getElementById('modalRcpAmount').textContent = 'KES ' + Number(btn.dataset.amount || 0).toLocaleString();
+  document.getElementById('modalRcpDate').textContent = btn.dataset.date || '';
+  document.getElementById('modalRcpReceiver').textContent = btn.dataset.receiver || 'Reception Staff';
+  openModal('receiptModal');
+}
+</script>
+{% endblock %}

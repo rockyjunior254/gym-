@@ -1,0 +1,67 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Join Strakly | Member Registration{% endblock %}
+
+{% block content %}
+<section class="section" style="min-height: 80vh; display: flex; align-items: center;">
+  <div class="container" style="max-width: 580px;">
+    <div class="card card-elevated" style="padding: 2.5rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="badge badge-lime" style="margin-bottom: 0.8rem;">MEMBER ONBOARDING</span>
+        <h2>JOIN THE FACILITY</h2>
+        <p style="font-size: 0.9rem;">Register your member account. Cash payment is confirmed physically at the front desk to activate your subscription.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('public.register') }}">
+        <div class="form-group">
+          <label class="form-label" for="full_name">Full Legal Name *</label>
+          <input type="text" id="full_name" name="full_name" class="form-control" placeholder="e.g. Oliver Bennett" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address *</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="david@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number *</label>
+            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+254 700 000 000" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Create Secure Password *</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Minimum 8 characters" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="plan_id">Select Membership Package</label>
+          <select id="plan_id" name="plan_id" class="form-control">
+            <option value="">-- Choose Desired Package --</option>
+            {% for p in plans %}
+              <option value="{{ p.id }}">{{ p.name }} — KES {{ p.price }} ({{ p.duration_days }} days)</option>
+            {% else %}
+              <option value="demo-daily">Daily Drop-In — KES 500 (1 day)</option>
+              <option value="demo-monthly" selected>Monthly Pro (Coached) — KES 9,500 (30 days)</option>
+              <option value="demo-quarterly">Quarterly Champion — KES 12,500 (90 days)</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="card" style="background: rgba(214, 255, 0, 0.05); border-color: var(--primary-lime); padding: 1rem; margin-bottom: 1.5rem;">
+          <p style="font-size: 0.85rem; margin: 0; color: var(--text-secondary);">
+            <strong>Notice:</strong> Your subscription will remain in <code>pending</code> status until cash payment is physically confirmed by reception staff at the gym.
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">SUBMIT REGISTRATION</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+        <p style="font-size: 0.9rem;">Already registered? <a href="{{ url_for('public.login') }}" class="text-lime" style="text-decoration: none; font-weight: bold;">Log in here</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}System Notifications | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 2rem;">
+  <div class="container" style="max-width: 850px;">
+    <div class="portal-banner">
+      <div>
+        <span class="badge badge-lime" style="margin-bottom: 0.8rem;">SYSTEM NOTIFICATIONS</span>
+        <h2>ALERTS & SYSTEM ACTIVITY</h2>
+        <p style="margin: 0; color: var(--text-secondary); max-width: 600px;">
+          Receipt confirmations, class booking reminders, workout plan updates, and gym announcements.
+        </p>
+      </div>
+    </div>
+
+    <div class="card card-elevated">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+        <h3>RECENT NOTIFICATIONS</h3>
+        <button class="btn btn-secondary btn-sm" onclick="alert('All notifications marked as read.');">MARK ALL AS READ</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="card" style="background: var(--bg-main); border-left: 4px solid var(--primary-lime); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <strong style="color: var(--primary-lime);">💵 CASH PAYMENT CONFIRMED</strong>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">2026-11-20 10:15</span>
+          </div>
+          <p style="margin: 0; font-size: 0.92rem;">
+            Your cash payment of <strong>KES 9,500.00</strong> was received and confirmed at reception. Official receipt <strong>#RCP-2026-9481A</strong> has been generated and is ready in your portal.
+          </p>
+        </div>
+
+        <div class="card" style="background: var(--bg-main); border-left: 4px solid var(--chart-accent); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <strong style="color: var(--chart-accent);">🏋️ NEW WORKOUT PROTOCOL ASSIGNED</strong>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">2026-11-20 11:30</span>
+          </div>
+          <p style="margin: 0; font-size: 0.92rem;">
+            Coach James Scott published <strong>4-Day Upper/Lower Strength Base (Week 4)</strong> to your profile. Inspect exercises, sets, and cues in Workout Plans.
+          </p>
+        </div>
+
+        <div class="card" style="background: var(--bg-main); border-left: 4px solid var(--color-warning); padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <strong style="color: var(--color-warning);">📢 FACILITY ANNOUNCEMENT</strong>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">2026-11-18 09:00</span>
+          </div>
+          <p style="margin: 0; font-size: 0.92rem;">
+            New Woodway curved non-motorized treadmills and calibrated Eleiko plates have arrived on Platform Zone A.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

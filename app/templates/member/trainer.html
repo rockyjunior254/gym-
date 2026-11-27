@@ -1,0 +1,278 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Dedicated Coaching & PT{% endblock %}
+{% block page_subtitle %}Collaborate with your coach, book 1-on-1 PT sessions, and track prepaid session credits{% endblock %}
+
+{% block topbar_actions %}
+  <button type="button" class="fp-btn-lime" onclick="openModal('bookPtModal')">
+    <i data-lucide="calendar-plus" style="width: 16px; height: 16px;"></i>
+    Book 1-on-1 Session
+  </button>
+  <button type="button" class="fp-btn-dark" onclick="openModal('requestCoachModal')">
+    <i data-lucide="user-check" style="width: 16px; height: 16px;"></i>
+    Request Coach Match
+  </button>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Top Row: Assigned Coach Profile & PT Session Wallet -->
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+    <!-- Coach Card -->
+    <div class="fp-card" style="display: flex; align-items: center; gap: 24px;">
+      <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; flex-shrink: 0;">
+        {% if coach and coach.trainer and coach.trainer.avatar_url %}
+          <img src="{{ coach.trainer.avatar_url }}" alt="{{ coach.trainer.full_name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        {% else %}
+          <i data-lucide="user-check" style="width: 32px; height: 32px;"></i>
+        {% endif %}
+      </div>
+
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.72rem; font-weight: 800; color: var(--fp-muted); text-transform: uppercase;">MY ASSIGNED COACH</span>
+          {% if coach %}
+            <span class="fp-brand-badge">ACTIVE MENTOR</span>
+          {% else %}
+            <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-muted);">SELF-GUIDED</span>
+          {% endif %}
+        </div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; margin: 4px 0; color: var(--fp-ink);">
+          {{ coach.trainer.full_name if coach and coach.trainer else 'No Coach Assigned' }}
+        </h2>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0 0 12px 0;">
+          {% if coach and coach.trainer_details %}
+            {{ coach.trainer_details.bio or 'Certified elite coach specialising in strength, hyper-mobility, and conditioning.' }}
+          {% else %}
+            You are currently on a self-guided track. Request a certified coach match below.
+          {% endif %}
+        </p>
+
+        {% if coach and coach.trainer %}
+          <div style="display: flex; gap: 16px; font-size: 0.78rem; color: var(--fp-ink);">
+            <span><strong>Email:</strong> {{ coach.trainer.email }}</span>
+            <span>&bull;</span>
+            <span><strong>Phone:</strong> {{ coach.trainer.phone or 'At Front Desk' }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PT Session Wallet Card -->
+    <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1A130E 100%); color: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <span style="font-size: 0.72rem; font-weight: 800; color: var(--fp-lime); text-transform: uppercase;">1-ON-1 PT WALLET</span>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-top: 6px; line-height: 1;">
+          {{ pt_wallet.sessions_remaining or 0 }}
+        </div>
+        <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 4px;">Sessions Remaining</div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+        <span style="color: #9CA3AF;">Used: {{ pt_wallet.sessions_used or 0 }}</span>
+        <span style="color: var(--fp-lime); font-weight: 700;">Top up at front desk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booked 1-on-1 Sessions -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Booked Personal Training Sessions</h3>
+      <button type="button" class="fp-btn-lime" style="padding: 6px 14px; font-size: 0.78rem;" onclick="openModal('bookPtModal')">
+        Book Session
+      </button>
+    </div>
+
+    {% if pt_sessions %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Time</th>
+              <th style="padding: 10px 12px;">Coach</th>
+              <th style="padding: 10px 12px;">Focus Area</th>
+              <th style="padding: 10px 12px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in pt_sessions %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; font-weight: 700;">{{ s.session_date }}</td>
+                <td style="padding: 12px;">{{ s.start_time }}</td>
+                <td style="padding: 12px;">{{ s.trainer.full_name if s.trainer else 'Staff Coach' }}</td>
+                <td style="padding: 12px;">{{ s.focus_area or 'General' }}</td>
+                <td style="padding: 12px;">
+                  {% if s.status == 'confirmed' %}
+                    <span style="color: #10B981; font-weight: 700;">Confirmed</span>
+                  {% elif s.status == 'completed' %}
+                    <span style="color: var(--fp-muted); font-weight: 600;">Completed</span>
+                  {% elif s.status == 'cancelled' %}
+                    <span style="color: var(--fp-coral); font-weight: 700;">Cancelled</span>
+                  {% else %}
+                    <span style="color: #F59E0B; font-weight: 700;">Requested</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+        No personal training sessions booked yet. Request a session with your coach above!
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Certified Coaching Staff Showcase -->
+  <div class="fp-card">
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Meet the Coaching Staff</h3>
+      <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Certified strength coaches, physiotherapists, and conditioning specialists</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+      {% for t in trainers %}
+        <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800;">
+                {{ t.full_name[:2].upper() }}
+              </div>
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">{{ t.full_name }}</h4>
+                <span class="fp-brand-badge" style="background: rgba(195, 231, 22, 0.25); color: var(--fp-ink); margin-top: 2px; display: inline-block;">COACH</span>
+              </div>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 0 0 12px 0; line-height: 1.4;">
+              {{ t.trainer_details.bio if t.trainer_details else 'Specialised in athletic performance, biomechanics, and strength development.' }}
+            </p>
+          </div>
+
+          <button type="button" class="fp-btn-dark" style="width: 100%; justify-content: center;"
+                  data-id="{{ t.id }}" data-name="{{ t.full_name }}"
+                  onclick="selectTrainerForPt(this)">
+            Book Session with {{ t.full_name.split()[0] }}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Book 1-on-1 PT Session Modal -->
+<div class="fp-modal-backdrop" id="bookPtModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Book 1-on-1 PT Session</h3>
+      <button type="button" onclick="closeModal('bookPtModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.book_pt') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Select Coach</label>
+          <select name="trainer_id" class="fp-form-control" id="ptTrainerSelect" required>
+            {% if coach and coach.trainer %}
+              <option value="{{ coach.trainer.id }}" selected>{{ coach.trainer.full_name }} (Assigned Coach)</option>
+            {% endif %}
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Session Date</label>
+            <input type="date" name="session_date" class="fp-form-control" required>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Preferred Time Slot</label>
+            <input type="time" name="start_time" class="fp-form-control" value="09:00" required>
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Session Focus Area</label>
+          <input type="text" name="focus_area" class="fp-form-control" placeholder="e.g. Squat Technique, Conditioning, Rehabilitation" value="General Conditioning">
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Notes for Coach</label>
+          <textarea name="notes" class="fp-form-control" rows="3" placeholder="Tell your coach what you want to achieve today..."></textarea>
+        </div>
+
+        <div style="background: #F8F8F9; padding: 12px; border-radius: 10px; font-size: 0.75rem; color: var(--fp-muted); border: 1px solid var(--fp-border);">
+          <strong>Session Deduction:</strong> Each booking uses 1 session from your PT wallet. Sessions can be purchased in cash at the reception desk.
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('bookPtModal')">Cancel</button>
+        <button type="submit" class="fp-btn-lime">Confirm PT Booking</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Request Coach Match Modal -->
+<div class="fp-modal-backdrop" id="requestCoachModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>Request Dedicated Coach Match</h3>
+      <button type="button" onclick="closeModal('requestCoachModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.request_coach') }}" method="POST">
+      <div class="fp-modal-body">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Request Type</label>
+          <select name="request_type" class="fp-form-control">
+            <option value="assign">Assign Me a Dedicated Coach</option>
+            <option value="change">Request Coach Change</option>
+            <option value="remove">Switch to Self-Guided (Remove Coach)</option>
+          </select>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Preferred Coach (Optional)</label>
+          <select name="preferred_trainer_id" class="fp-form-control">
+            <option value="">No preference — Match based on my goals</option>
+            {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">My Fitness Goals & Needs</label>
+          <textarea name="fitness_goals" class="fp-form-control" rows="3" placeholder="Describe your primary fitness targets (powerlifting, marathon prep, body recomposition)..."></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('requestCoachModal')">Cancel</button>
+        <button type="submit" class="fp-btn-dark">Submit Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function selectTrainerForPt(btn) {
+    const trainerId = btn.getAttribute('data-id');
+    const select = document.getElementById('ptTrainerSelect');
+    if (select) {
+      select.value = trainerId;
+    }
+    openModal('bookPtModal');
+  }
+</script>
+{% endblock %}

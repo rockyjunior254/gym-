@@ -1,0 +1,236 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}User Accounts & Access Control | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Identity &bull; Access Control
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        User Accounts &amp; Permissions
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Manage platform access, role authorizations (Admin, Trainer, Member), account statuses, and member security.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addUserModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="user-plus" style="width: 15px; height: 15px;"></i>
+        <span>Add User Account</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Registered Accounts Directory</h3>
+      <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Staff and member identities configured in Supabase Auth</p>
+    </div>
+    <span class="badge badge-forest">{{ users|length }} Accounts</span>
+  </div>
+
+  {% if users %}
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>User Identity</th>
+            <th>Email Address</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Role Assignment</th>
+            <th style="text-align: right;">Access Control</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--pearl-bg); border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: center; font-size: 0.88rem; font-weight: 700; color: var(--forest-primary);">
+                    {{ u.full_name[:2].upper() if u.full_name else 'US' }}
+                  </div>
+                  <div>
+                    <strong style="color: var(--ink-dark);">{{ u.full_name }}</strong>
+                    {% if u.id == session.user.id %}
+                      <span class="badge badge-forest" style="font-size: 0.68rem; margin-left: 0.35rem;">YOU</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td style="color: var(--ink-secondary); font-size: 0.85rem;">{{ u.email }}</td>
+              <td>
+                {% if u.role == 'admin' %}
+                  <span class="badge badge-forest">Administrator</span>
+                {% elif u.role == 'trainer' %}
+                  <span class="badge badge-neutral">Trainer</span>
+                {% else %}
+                  <span class="badge badge-neutral">Member</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.is_active %}
+                  <span class="badge badge-forest">Active</span>
+                {% else %}
+                  <span class="badge badge-rose">Suspended</span>
+                {% endif %}
+              </td>
+              <td style="color: var(--ink-muted); font-size: 0.82rem;">{{ u.created_at[:10] if u.created_at else 'N/A' }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('admin.update_user_role', user_id=u.id) }}" style="display: flex; gap: 0.35rem; align-items: center;">
+                  <select name="role" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; width: auto;" {% if u.id == session.user.id %}disabled{% endif %}>
+                    <option value="member" {% if u.role == 'member' %}selected{% endif %}>Member</option>
+                    <option value="trainer" {% if u.role == 'trainer' %}selected{% endif %}>Trainer</option>
+                    <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                  </select>
+                  {% if u.id != session.user.id %}
+                    <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.6rem;">Set</button>
+                  {% endif %}
+                </form>
+              </td>
+              <td style="text-align: right;">
+                <div style="display: flex; gap: 0.35rem; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary btn-sm"
+                          data-id="{{ u.id }}"
+                          data-name="{{ u.full_name }}"
+                          data-phone="{{ u.phone or '' }}"
+                          data-role="{{ u.role }}"
+                          onclick="openEditUserModal(this)">Edit</button>
+                  {% if u.id != session.user.id %}
+                    <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}" style="display: inline;">
+                      <input type="hidden" name="is_active" value="{{ 'false' if u.is_active else 'true' }}">
+                      {% if u.is_active %}
+                        <button type="submit" class="btn btn-outline-rose btn-sm" onclick="return confirm('Suspend user account?');">Suspend</button>
+                      {% else %}
+                        <button type="submit" class="btn btn-primary btn-sm">Reactivate</button>
+                      {% endif %}
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.delete_user', user_id=u.id) }}" onsubmit="return confirm('Archive/Deactivate this user account?');" style="display: inline;">
+                      <button type="submit" class="btn btn-outline-rose btn-sm">Delete</button>
+                    </form>
+                  {% else %}
+                    <span style="font-size: 0.78rem; color: var(--ink-muted);">(Current Admin)</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No User Accounts Found</h4>
+      <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">Users register through the public registration interface or administrator invites.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Modal: Add User -->
+<div id="addUserModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Create User Account</h3>
+        <p class="modal-subtitle">Provision account identity and assign role permissions</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.users') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="u_full_name">Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="u_full_name" name="full_name" class="form-control" placeholder="e.g. Oliver Bennett" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="u_email">Email Address <span style="color: var(--accent-rose);">*</span></label>
+          <input type="email" id="u_email" name="email" class="form-control" placeholder="user@strakly.com" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="u_role">Account Role <span style="color: var(--accent-rose);">*</span></label>
+            <select id="u_role" name="role" class="form-control" required>
+              <option value="member" selected>Member (Athlete)</option>
+              <option value="trainer">Trainer (Coach)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="u_phone">Phone Number</label>
+            <input type="tel" id="u_phone" name="phone" class="form-control" placeholder="+254 700 000 000">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit User -->
+<div id="editUserModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit User Account</h3>
+        <p class="modal-subtitle">Update user profile information and permissions</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
+    </div>
+    <form id="editUserForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="edit_u_name">Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="edit_u_name" name="full_name" class="form-control" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_u_role">Account Role <span style="color: var(--accent-rose);">*</span></label>
+            <select id="edit_u_role" name="role" class="form-control" required>
+              <option value="member">Member (Athlete)</option>
+              <option value="trainer">Trainer (Coach)</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edit_u_phone">Phone Number</label>
+            <input type="tel" id="edit_u_phone" name="phone" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditUserModal(btn) {
+  const form = document.getElementById('editUserForm');
+  form.action = '/admin/users/edit/' + btn.dataset.id;
+  document.getElementById('edit_u_name').value = btn.dataset.name || '';
+  document.getElementById('edit_u_phone').value = btn.dataset.phone || '';
+  document.getElementById('edit_u_role').value = btn.dataset.role || 'member';
+  openModal('editUserModal');
+}
+</script>
+{% endblock %}

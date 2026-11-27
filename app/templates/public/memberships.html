@@ -1,0 +1,129 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Pricing & Memberships | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 5rem;">
+  <div class="container">
+    <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
+      <span class="section-subtitle">TRANSPARENT VALUE</span>
+      <h1 class="section-title" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">MEMBERSHIP PACKAGES &amp; CASH PRICING</h1>
+      <p style="font-size: 1.1rem; color: #94A3B8;">Zero hidden transaction fees. Zero recurring card charges. All memberships are confirmed in physical cash directly at our front desk with an instant official receipt.</p>
+    </div>
+
+    <!-- Cash Integrity Banner -->
+    <div class="bento-card" style="padding: 1.5rem 2rem; margin-bottom: 3.5rem; background: rgba(195, 231, 22, 0.05); border: 1px dashed rgba(195, 231, 22, 0.35); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="width: 44px; height: 44px; border-radius: 10px; background: #C3E716; color: #0A0D0B; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800;">
+          💵
+        </div>
+        <div>
+          <strong style="color: #FFFFFF; font-family: var(--font-heading); font-size: 1.1rem; text-transform: uppercase; display: block;">PHYSICAL CASH PAYMENT CUSTODY</strong>
+          <span style="font-size: 0.88rem; color: #94A3B8;">Pay at the front desk upon arrival. Staff immediately issue an official receipt (e.g. <code>RCP-2026-XXXX</code>) printable in your Athlete Portal.</span>
+        </div>
+      </div>
+      <span class="badge badge-lime" style="font-size: 0.78rem;">100% TRANSPARENT</span>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="grid-3" style="gap: 28px; margin-bottom: 4rem; align-items: stretch;">
+      {% for p in plans %}
+        <div class="bento-card" style="{% if p.is_featured %}border-color: #C3E716; box-shadow: 0 0 35px rgba(195, 231, 22, 0.22); background: linear-gradient(180deg, #162018 0%, #101511 100%); transform: scale(1.02);{% endif %} display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              {% if p.is_featured %}
+                <span class="badge badge-lime" style="background: #C3E716; color: #0A0D0B; font-weight: 800; font-size: 0.72rem;">★ FEATURED ATHLETE CHOICE</span>
+              {% else %}
+                <span class="badge" style="background: rgba(255,255,255,0.08); color: #FFFFFF; font-size: 0.72rem;">{{ p.duration_type|upper }}</span>
+              {% endif %}
+            </div>
+
+            <h3 style="font-size: 1.6rem; color: #FFFFFF; margin-bottom: 0.4rem;">{{ p.name }}</h3>
+
+            <div style="margin: 1.5rem 0;">
+              <span style="font-size: 1.25rem; color: #C3E716; font-weight: 800;">KES</span>
+              <span style="font-family: var(--font-heading); font-size: 3.4rem; font-weight: 800; color: #FFFFFF; line-height: 1;">{{ "{:,.0f}".format(p.price|float) }}</span>
+              <span style="color: #94A3B8; font-size: 0.95rem;">/ {{ p.duration_days }} days</span>
+            </div>
+
+            <p style="font-size: 0.92rem; color: #94A3B8; margin-bottom: 1.5rem; line-height: 1.6;">{{ p.description }}</p>
+
+            {% if p.benefits %}
+              <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem; color: #CBD5E1;">
+                {% for b in p.benefits %}
+                  <li style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #C3E716; font-weight: bold;">✓</span> {{ b }}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem;">
+            <a href="{{ url_for('public.register') }}?plan={{ p.id }}" class="{% if p.is_featured %}btn-neon{% else %}btn-glass{% endif %}" style="width: 100%; justify-content: center; font-size: 0.88rem; padding: 12px;">
+              SELECT PLAN &amp; PAY AT FRONT DESK
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <!-- Default verified packages -->
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <span class="badge" style="background: rgba(255,255,255,0.08); color: #fff; font-size: 0.72rem; margin-bottom: 0.8rem; display: inline-block;">DAILY PASS</span>
+            <h3 style="font-size: 1.5rem; color: #fff;">DAILY DROP-IN</h3>
+            <div style="margin: 1.5rem 0;">
+              <span style="font-size: 1.25rem; color: #C3E716; font-weight: 800;">KES</span>
+              <span style="font-family: var(--font-heading); font-size: 3.4rem; font-weight: 800; color: #fff; line-height: 1;">500</span>
+              <span style="color: #94A3B8;">/ 1 day</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #94A3B8; margin-bottom: 1.5rem;">Full facility access for drop-in lifters and visiting athletes.</p>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem;">
+            <a href="{{ url_for('public.register') }}" class="btn-glass" style="width: 100%; justify-content: center;">SELECT PLAN</a>
+          </div>
+        </div>
+
+        <div class="bento-card" style="border-color: #C3E716; box-shadow: 0 0 35px rgba(195, 231, 22, 0.22); background: linear-gradient(180deg, #162018 0%, #101511 100%); transform: scale(1.02); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <span class="badge badge-lime" style="background: #C3E716; color: #0A0D0B; font-weight: 800; font-size: 0.72rem; margin-bottom: 0.8rem; display: inline-block;">COACHED • MOST POPULAR</span>
+            <h3 style="font-size: 1.5rem; color: #fff;">MONTHLY PRO (COACHED)</h3>
+            <div style="margin: 1.5rem 0;">
+              <span style="font-size: 1.25rem; color: #C3E716; font-weight: 800;">KES</span>
+              <span style="font-family: var(--font-heading); font-size: 3.4rem; font-weight: 800; color: #C3E716; line-height: 1;">9,500</span>
+              <span style="color: #94A3B8;">/ 30 days</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #94A3B8; margin-bottom: 1.5rem;">Dedicated CSCS coach assignment, progressive weekly periodization, and form checks.</p>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem;">
+            <a href="{{ url_for('public.register') }}" class="btn-neon" style="width: 100%; justify-content: center;">SELECT PLAN &amp; PAY AT FRONT DESK</a>
+          </div>
+        </div>
+
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <span class="badge" style="background: rgba(255,255,255,0.08); color: #fff; font-size: 0.72rem; margin-bottom: 0.8rem; display: inline-block;">LONG TERM</span>
+            <h3 style="font-size: 1.5rem; color: #fff;">QUARTERLY CHAMPION</h3>
+            <div style="margin: 1.5rem 0;">
+              <span style="font-size: 1.25rem; color: #C3E716; font-weight: 800;">KES</span>
+              <span style="font-family: var(--font-heading); font-size: 3.4rem; font-weight: 800; color: #fff; line-height: 1;">12,500</span>
+              <span style="color: #94A3B8;">/ 90 days</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #94A3B8; margin-bottom: 1.5rem;">90 days of continuous access with priority booking for all fitness classes.</p>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.25rem;">
+            <a href="{{ url_for('public.register') }}" class="btn-glass" style="width: 100%; justify-content: center;">SELECT PLAN</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Strict Cash Policy Notice -->
+    <div class="bento-card" style="border-left: 4px solid #C3E716; padding: 2rem;">
+      <h4 style="color: #C3E716; margin-bottom: 0.5rem; font-family: var(--font-heading); font-size: 1.25rem;">STRICT CASH PAYMENT POLICY</h4>
+      <p style="margin: 0; font-size: 0.95rem; color: #94A3B8; line-height: 1.7;">
+        To ensure total operational transparency and eliminate electronic transaction fees, Strakly Fitness Facility processes all memberships physically in <strong>cash at our front desk</strong>. Our authorised staff record payments immediately into the system, generating an official printable receipt accessible at any time through your Athlete Portal.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

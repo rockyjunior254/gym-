@@ -1,0 +1,150 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Help & Support Desk{% endblock %}
+{% block page_subtitle %}Frequently asked questions and direct support ticket management with gym administration{% endblock %}
+
+{% block topbar_actions %}
+  <button type="button" class="fp-btn-lime" onclick="openModal('createTicketModal')">
+    <i data-lucide="message-square-plus" style="width: 16px; height: 16px;"></i>
+    New Support Ticket
+  </button>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Support Tickets Section -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">My Support Tickets</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Direct inquiries addressed to Strakly Gym front desk and management</p>
+      </div>
+      <button type="button" class="fp-btn-dark" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openModal('createTicketModal')">
+        + Create Ticket
+      </button>
+    </div>
+
+    {% if tickets %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Ticket #</th>
+              <th style="padding: 10px 12px;">Date</th>
+              <th style="padding: 10px 12px;">Category</th>
+              <th style="padding: 10px 12px;">Subject</th>
+              <th style="padding: 10px 12px;">Status</th>
+              <th style="padding: 10px 12px;">Admin Response</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in tickets %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; font-weight: 800;">{{ t.ticket_number }}</td>
+                <td style="padding: 12px;">{{ t.created_at[:10] }}</td>
+                <td style="padding: 12px; text-transform: capitalize;">{{ t.category }}</td>
+                <td style="padding: 12px; font-weight: 700; color: var(--fp-ink);">{{ t.subject }}</td>
+                <td style="padding: 12px;">
+                  {% if t.status == 'resolved' %}
+                    <span style="color: #10B981; font-weight: 700;">Resolved</span>
+                  {% elif t.status == 'in_progress' %}
+                    <span style="color: #3B82F6; font-weight: 700;">Under Review</span>
+                  {% else %}
+                    <span style="color: #F59E0B; font-weight: 700;">Open</span>
+                  {% endif %}
+                </td>
+                <td style="padding: 12px; color: var(--fp-muted);">{{ t.admin_reply or 'Awaiting front-desk reply' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+        No support tickets filed yet. Create a ticket if you need assistance with membership, locker, or billing questions.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Frequently Asked Questions -->
+  <div class="fp-card">
+    <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0 0 16px 0; color: var(--fp-ink);">Frequently Asked Questions</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="padding: 14px 16px; border-radius: 12px; background: #FAFAFA; border: 1px solid var(--fp-border);">
+        <div style="font-size: 0.9rem; font-weight: 800; color: var(--fp-ink);">How do payments work at Strakly?</div>
+        <div style="font-size: 0.8rem; color: var(--fp-muted); margin-top: 4px; line-height: 1.4;">
+          Strakly operates strictly on a physical cash basis. Membership plans, merchandise reservations, and personal training top-ups are paid directly to reception staff in cash.
+        </div>
+      </div>
+
+      <div style="padding: 14px 16px; border-radius: 12px; background: #FAFAFA; border: 1px solid var(--fp-border);">
+        <div style="font-size: 0.9rem; font-weight: 800; color: var(--fp-ink);">How is attendance recorded?</div>
+        <div style="font-size: 0.8rem; color: var(--fp-muted); margin-top: 4px; line-height: 1.4;">
+          Attendance is strictly recorded manually by our front-desk receptionists upon your entry to the facility. Your dashboard and calendar update automatically following check-in.
+        </div>
+      </div>
+
+      <div style="padding: 14px 16px; border-radius: 12px; background: #FAFAFA; border: 1px solid var(--fp-border);">
+        <div style="font-size: 0.9rem; font-weight: 800; color: var(--fp-ink);">How do I freeze my membership?</div>
+        <div style="font-size: 0.8rem; color: var(--fp-muted); margin-top: 4px; line-height: 1.4;">
+          Navigate to the "My Membership" module and click "Request Plan Change". Select "Membership Freeze", enter your travel or medical dates, and submit for front-desk approval.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Create Support Ticket Modal -->
+<div class="fp-modal-backdrop" id="createTicketModal">
+  <div class="fp-modal">
+    <div class="fp-modal-header">
+      <h3>New Help Desk Ticket</h3>
+      <button type="button" onclick="closeModal('createTicketModal')" style="background: none; border: none; cursor: pointer;">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+    </div>
+    <form action="{{ url_for('member.support') }}" method="POST">
+      <div class="fp-modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="fp-form-group">
+            <label class="fp-form-label">Category</label>
+            <select name="category" class="fp-form-control">
+              <option value="membership">Membership & Billing</option>
+              <option value="coaching">Coaching Staff & PT</option>
+              <option value="facility">Gym Floor & Equipment</option>
+              <option value="lockers">Lockers & Amenities</option>
+              <option value="general" selected>General Question</option>
+            </select>
+          </div>
+          <div class="fp-form-group">
+            <label class="fp-form-label">Priority</label>
+            <select name="priority" class="fp-form-control">
+              <option value="low">Low</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Subject</label>
+          <input type="text" name="subject" class="fp-form-control" placeholder="Brief summary of your question..." required>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Message Details</label>
+          <textarea name="message" class="fp-form-control" rows="4" placeholder="Detail your question or issue for the gym support staff..." required></textarea>
+        </div>
+      </div>
+
+      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('createTicketModal')">Cancel</button>
+        <button type="submit" class="fp-btn-dark">Submit Ticket</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

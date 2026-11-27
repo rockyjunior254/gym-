@@ -1,0 +1,84 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Cash Receipts & Invoices{% endblock %}
+{% block page_subtitle %}Official record of physical cash payments made at the Strakly Gym front desk{% endblock %}
+
+{% block topbar_actions %}
+  <button type="button" class="fp-btn-dark" onclick="window.print()">
+    <i data-lucide="printer" style="width: 16px; height: 16px;"></i>
+    Print Receipts Statement
+  </button>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Strict Cash Notice Card -->
+  <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1A130E 100%); color: #FFFFFF; display: flex; justify-content: space-between; align-items: center; padding: 24px 28px;">
+    <div>
+      <span style="font-size: 0.72rem; font-weight: 800; color: var(--fp-lime); text-transform: uppercase;">LIFETIME PHYSICAL CASH PAID</span>
+      <div style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-top: 4px; line-height: 1;">
+        KES {{ total_paid|int }}
+      </div>
+      <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 4px;">Verified Front-Desk Cash Transactions</div>
+    </div>
+
+    <div style="text-align: right;">
+      <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink);">STRICT CASH ONLY</span>
+      <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 6px;">All payments authenticated by reception</div>
+    </div>
+  </div>
+
+  <!-- Cash Payment Receipts Table -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Cash Receipts Log</h3>
+      <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-ink);">{{ payments|length }} TRANSACTIONS</span>
+    </div>
+
+    {% if payments %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
+              <th style="padding: 10px 12px;">Receipt #</th>
+              <th style="padding: 10px 12px;">Date Paid</th>
+              <th style="padding: 10px 12px;">Amount</th>
+              <th style="padding: 10px 12px;">Payment Method</th>
+              <th style="padding: 10px 12px;">Front-Desk Notes</th>
+              <th style="padding: 10px 12px;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in payments %}
+              <tr style="border-bottom: 1px solid var(--fp-border);">
+                <td style="padding: 12px; font-weight: 800; color: var(--fp-ink);">
+                  RCP-{{ p.id[:8].upper() }}
+                </td>
+                <td style="padding: 12px;">{{ p.payment_date or p.created_at[:10] }}</td>
+                <td style="padding: 12px; font-weight: 800; color: var(--fp-ink);">
+                  KES {{ p.amount }}
+                </td>
+                <td style="padding: 12px; color: var(--fp-muted);">
+                  Physical Cash
+                </td>
+                <td style="padding: 12px; color: var(--fp-muted);">{{ p.notes or 'Front-desk cash deposit' }}</td>
+                <td style="padding: 12px;">
+                  <span style="color: #10B981; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; gap: 4px;">
+                    <span class="fp-status-dot"></span> Verified Paid
+                  </span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 28px; color: var(--fp-muted); font-size: 0.82rem;">
+        No cash payments logged in your account yet. When you pay at reception, official receipts will be issued here.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

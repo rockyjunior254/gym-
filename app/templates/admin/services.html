@@ -1,0 +1,316 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Facility Services & Offerings | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Facility Offerings &amp; Catalog
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Facility Services &amp; Amenities
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Showcase core training disciplines, recovery zones, and coaching amenities across the public platform.
+      </p>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="openModal('addServiceModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <span>Add New Service</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Services Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;">
+  {% for s in services %}
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 0;">
+      {% if s.image_url %}
+        <div style="height: 180px; overflow: hidden; position: relative;">
+          <img src="{{ s.image_url }}" alt="{{ s.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; top: 12px; right: 12px;">
+            {% if s.is_published %}
+              <span class="badge badge-forest">Published</span>
+            {% else %}
+              <span class="badge badge-neutral">Draft</span>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div>
+              <span class="badge badge-neutral" style="font-size: 0.72rem; margin-bottom: 0.35rem;">{{ s.category.upper() if s.category else 'GENERAL' }}</span>
+              <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--ink-dark);">{{ s.name }}</h3>
+            </div>
+            {% if not s.image_url %}
+              <div>
+                {% if s.is_published %}
+                  <span class="badge badge-forest">Published</span>
+                {% else %}
+                  <span class="badge badge-neutral">Draft</span>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+
+          <p style="color: var(--ink-secondary); font-size: 0.88rem; line-height: 1.5; margin: 0 0 1rem;">
+            {{ s.description or 'No service description provided.' }}
+          </p>
+
+          {% if s.benefits %}
+            <div style="margin-bottom: 1rem; background: var(--pearl-bg); padding: 0.85rem; border-radius: 8px;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--forest-primary); text-transform: uppercase; margin-bottom: 0.35rem; letter-spacing: 0.05em;">Included Amenities:</div>
+              <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.82rem; color: var(--ink-secondary);">
+                {% for b in s.benefits %}
+                  <li>{{ b }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        <div style="border-top: 1px solid var(--border-line); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-muted);">
+          <span>Order: {{ s.sort_order or 0 }}</span>
+          <div style="display: flex; gap: 0.4rem; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-id="{{ s.id }}"
+                    data-name="{{ s.name }}"
+                    data-category="{{ s.category or 'training' }}"
+                    data-order="{{ s.sort_order or 0 }}"
+                    data-desc="{{ s.description or '' }}"
+                    data-published="{{ 'true' if s.is_published else 'false' }}"
+                    onclick="openEditServiceModal(this)">Edit</button>
+            <form method="POST" action="{{ url_for('admin.archive_service', service_id=s.id) }}" onsubmit="return confirm('Archive this service?');">
+              <button type="submit" class="btn btn-outline-rose btn-sm">Archive</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div style="grid-column: 1 / -1;">
+      <div class="empty-state">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </div>
+        <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Gym Services Found</h4>
+        <p style="margin: 0 0 1rem; font-size: 0.85rem; color: var(--ink-muted);">Define your core gym service offerings (e.g. Strength Training, Functional Fitness, Recovery Zone).</p>
+        <button class="btn btn-primary" onclick="openModal('addServiceModal')">Create First Service</button>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+
+  <!-- Trainer-Proposed Coaching Programmes (Admin Review & Publication Workflow - Part 5) -->
+  <div class="card" style="padding: 24px; border: 1px solid var(--border-line); margin-top: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">
+          Coaching Review Desk
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-ink); margin: 0;">
+          Trainer-Proposed Specialised Programmes
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0;">
+          Review specialised coaching curricula proposed by certified trainers. Approved curricula appear on the public website.
+        </p>
+      </div>
+      <span class="badge badge-neutral" style="font-size: 0.78rem;">
+        {{ programmes|length if programmes else 0 }} Proposals
+      </span>
+    </div>
+
+    {% if programmes %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+        {% for p in programmes %}
+          <div style="border: 1px solid var(--border-line); border-radius: var(--radius-sm); padding: 18px; background: var(--bg-pearl); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <span class="badge badge-neutral" style="font-size: 0.7rem;">{{ p.category or 'Coaching' }}</span>
+                {% if p.status == 'approved' and p.is_published %}
+                  <span class="badge badge-forest" style="font-size: 0.7rem;">Approved &amp; Live</span>
+                {% elif p.status == 'approved' %}
+                  <span class="badge badge-neutral" style="font-size: 0.7rem;">Approved</span>
+                {% elif p.status == 'rejected' %}
+                  <span class="badge badge-rose" style="font-size: 0.7rem;">Rejected</span>
+                {% else %}
+                  <span class="badge badge-sand" style="font-size: 0.7rem; background: #FEF3C7; color: #92400E;">Pending Review</span>
+                {% endif %}
+              </div>
+
+              <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px;">{{ p.name }}</h4>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+                Proposed by: <strong style="color: var(--text-ink);">{{ p.trainer_name or 'Coach' }}</strong>
+              </div>
+
+              <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 12px;">
+                {{ p.description[:130] }}...
+              </p>
+
+              <div style="font-size: 0.78rem; display: flex; justify-content: space-between; padding: 8px 10px; background: #fff; border-radius: 6px; border: 1px solid var(--border-line); margin-bottom: 12px;">
+                <span>{{ p.duration_weeks }} Weeks • {{ p.sessions_count }} Sessions</span>
+                <strong style="color: var(--primary-forest);">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-line); padding-top: 10px;">
+              {% if p.status != 'approved' or not p.is_published %}
+                <form action="{{ url_for('admin.approve_programme', prog_id=p.id) }}" method="POST" style="margin: 0; flex: 1;">
+                  <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; font-size: 0.78rem;">
+                    Approve &amp; Publish
+                  </button>
+                </form>
+              {% endif %}
+              {% if p.status != 'rejected' %}
+                <form action="{{ url_for('admin.reject_programme', prog_id=p.id) }}" method="POST" style="margin: 0; flex: 1;">
+                  <button type="submit" class="btn btn-outline-rose btn-sm" style="width: 100%; font-size: 0.78rem;">
+                    Reject
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem;">
+        No specialised coaching proposals pending review.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- Modal: Add New Service -->
+<div id="addServiceModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Create Gym Service</h3>
+        <p class="modal-subtitle">Define an offering displayed on public portal and website</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addServiceModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.services') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Service Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. High Performance Strength Zone" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-control">
+              <option value="training">Personal & Group Training</option>
+              <option value="facility">Gym Equipment & Facilities</option>
+              <option value="wellness">Recovery & Wellness</option>
+              <option value="coaching">Nutrition & Coaching</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="sort_order" class="form-control" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3" placeholder="Explain what athletes achieve with this facility service..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Key Benefits & Features (One per line)</label>
+          <textarea name="benefits" class="form-control" rows="3" placeholder="Olympic lifting platforms&#10;Dedicated chalk stations&#10;Certified coach on deck"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cover Image URL</label>
+          <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+          <input type="checkbox" id="is_published" name="is_published" checked style="width: 18px; height: 18px; accent-color: var(--forest-primary);">
+          <label for="is_published" style="cursor: pointer; font-size: 0.88rem; color: var(--ink-dark);">Publish immediately on public homepage and portals</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addServiceModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Service -->
+<div id="editServiceModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Gym Service</h3>
+        <p class="modal-subtitle">Update service details and publication status</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editServiceModal')">&times;</button>
+    </div>
+    <form id="editServiceForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Service Title <span style="color: var(--accent-rose);">*</span></label>
+          <input type="text" id="edit_service_name" name="name" class="form-control" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="edit_service_category" name="category" class="form-control">
+              <option value="training">Personal & Group Training</option>
+              <option value="facility">Gym Equipment & Facilities</option>
+              <option value="wellness">Recovery & Wellness</option>
+              <option value="coaching">Nutrition & Coaching</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" id="edit_service_order" name="sort_order" class="form-control" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="edit_service_desc" name="description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+          <input type="checkbox" id="edit_service_published" name="is_published" value="on" style="width: 18px; height: 18px; accent-color: var(--forest-primary);">
+          <label for="edit_service_published" style="cursor: pointer; font-size: 0.88rem; color: var(--ink-dark);">Published on public homepage and portals</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editServiceModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditServiceModal(btn) {
+  const form = document.getElementById('editServiceForm');
+  form.action = '/admin/services/update/' + btn.dataset.id;
+  document.getElementById('edit_service_name').value = btn.dataset.name || '';
+  document.getElementById('edit_service_category').value = btn.dataset.category || 'training';
+  document.getElementById('edit_service_order').value = btn.dataset.order || 0;
+  document.getElementById('edit_service_desc').value = btn.dataset.desc || '';
+  document.getElementById('edit_service_published').checked = (btn.dataset.published === 'true');
+  openModal('editServiceModal');
+}
+</script>
+{% endblock %}

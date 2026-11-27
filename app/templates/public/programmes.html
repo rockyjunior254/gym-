@@ -1,0 +1,82 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Training Programmes &amp; Coaching Curricula | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-subtitle">DISCIPLINES &amp; PROTOCOLS</span>
+      <h2 class="section-title">STRUCTURED TRAINING PROGRAMMES</h2>
+      <p>Targeted training regimens engineered for progressive overload, conditioning, and athletic longevity.</p>
+    </div>
+
+    <!-- Facility Disciplines -->
+    <h3 style="font-size: 1.35rem; margin-bottom: 1.25rem; font-family: var(--font-heading); color: #fff;">
+      FACILITY DISCIPLINES &amp; SERVICES
+    </h3>
+    <div class="grid-3" style="gap: 24px; margin-bottom: 4rem;">
+      {% for s in services %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            {% if s.image_url %}
+              <img src="{{ s.image_url }}" alt="{{ s.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+            {% endif %}
+            <span class="badge badge-lime" style="margin-bottom: 0.8rem; font-size: 0.72rem;">{{ s.category }}</span>
+            <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem;">{{ s.name }}</h3>
+            <p style="margin: 0.5rem 0 1.2rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
+              {{ s.description }}
+            </p>
+          </div>
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <a href="{{ url_for('public.contact') }}" class="btn btn-outline btn-sm" style="width: 100%; text-align: center;">INQUIRE AT FRONT DESK</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Approved Specialised Coaching Curricula (Part 5) -->
+    {% if programmes %}
+    <div style="border-top: 1px solid var(--border-color); padding-top: 3.5rem;">
+      <div class="section-header" style="text-align: left; margin-bottom: 2rem;">
+        <span class="section-subtitle">SPECIALISED PROTOCOLS</span>
+        <h2 class="section-title" style="margin-bottom: 0.5rem;">COACH-PROPOSED SPECIALISED PROGRAMMES</h2>
+        <p>Curricula designed and supervised directly by certified coaches for targeted athletic outcomes.</p>
+      </div>
+
+      <div class="grid-3" style="gap: 24px;">
+        {% for p in programmes %}
+          <div class="card card-elevated" style="display: flex; flex-direction: column; justify-content: space-between; border-color: var(--primary-lime);">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                <span class="badge badge-lime" style="font-size: 0.72rem;">{{ p.category or 'SPECIALISED' }}</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ p.duration_weeks }} WEEKS</span>
+              </div>
+
+              <h3 style="margin: 0 0 0.5rem; font-size: 1.3rem;">{{ p.name }}</h3>
+              <div style="font-size: 0.82rem; color: var(--primary-lime); font-weight: 700; margin-bottom: 0.8rem;">
+                Coach: {{ p.trainer_name }}
+              </div>
+
+              <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
+                {{ p.description }}
+              </p>
+
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">{{ p.sessions_count }} 1-on-1 Sessions</span>
+                <strong style="color: #fff; font-size: 1.1rem;">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong>
+              </div>
+            </div>
+
+            <div>
+              <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-sm" style="width: 100%; text-align: center;">ENROL &amp; PAY AT FRONT DESK</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

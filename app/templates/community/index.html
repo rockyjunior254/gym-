@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Hub | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 2rem;">
+  <div class="container">
+    <!-- Header -->
+    <div class="portal-banner" style="background-image: linear-gradient(90deg, rgba(8, 10, 9, 0.95) 0%, rgba(23, 27, 24, 0.7) 100%), url('/static/images/homepage/cta-bg.jpg');">
+      <div>
+        <span class="badge badge-lime" style="margin-bottom: 0.8rem;">SHARED COMMUNITY</span>
+        <h2>STRAKLY COMMUNITY HUB</h2>
+        <p style="margin: 0; color: var(--text-secondary); max-width: 650px;">
+          Connect with members, coaches, and staff. Share personal records, discuss training techniques, and stay motivated.
+        </p>
+      </div>
+      <div>
+        <a href="{{ url_for('community.messages') }}" class="btn btn-primary btn-sm">💬 PRIVATE MESSAGES</a>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <!-- Left Column: Community Groups & Navigation -->
+      <div style="grid-column: span 1;">
+        <div class="card card-elevated" style="margin-bottom: 1.5rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--primary-lime);">COMMUNITY GROUPS</h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem;">
+            <li>
+              <a href="{{ url_for('community.index') }}" class="portal-nav-link active" style="padding: 0.6rem 0.8rem;">
+                🔥 General Gym Community
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('community.index') }}" class="portal-nav-link" style="padding: 0.6rem 0.8rem;">
+                🏋️ Iron & Heavy Lifting
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('community.index') }}" class="portal-nav-link" style="padding: 0.6rem 0.8rem;">
+                ⚡ Conditioning & HIIT
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('community.index') }}" class="portal-nav-link" style="padding: 0.6rem 0.8rem;">
+                🥗 Nutrition & Active Recovery
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Community Guidelines -->
+        <div class="card card-elevated">
+          <h4 style="color: var(--primary-lime); margin-bottom: 0.5rem;">COMMUNITY RULES</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Respect fellow athletes, share constructive technique advice, celebrate personal records, and keep communications respectful.
+          </p>
+        </div>
+      </div>
+
+      <!-- Center & Right Column: Feed & Posts -->
+      <div style="grid-column: span 2;">
+        <!-- Create Post Card -->
+        <div class="card card-elevated" style="margin-bottom: 2rem;">
+          <h4 style="margin-bottom: 1rem; color: var(--text-white);">SHARE AN UPDATE OR PR</h4>
+          <form method="POST" action="{{ url_for('community.create_post') }}">
+            <div class="form-group">
+              <textarea name="content" class="form-control" rows="3" placeholder="Share your lift PR, workout thought, or question with the gym..." required></textarea>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Posting as: <strong>{{ current_user.full_name }}</strong></span>
+              <button type="submit" class="btn btn-primary btn-sm">PUBLISH POST</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Feed Stream -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <!-- Post 1 (Coach Marcus PR Spotlight) -->
+          <div class="card card-elevated">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <img src="{{ url_for('static', filename='images/trainers/trainer-1.jpg') }}" alt="Coach Marcus" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary-lime);">
+                <div>
+                  <strong style="display: block;">Coach James Scott</strong>
+                  <span class="badge badge-lime" style="font-size: 0.7rem;">HEAD COACH</span>
+                </div>
+              </div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">2 hours ago</span>
+            </div>
+
+            <p style="font-size: 1rem; margin-bottom: 1rem;">
+              Huge congratulations to <strong>Oliver Bennett</strong> on pulling a clean 180kg deadlift this morning! Proof that consistent progressive overload and lat engagement pay off. Keep raising the bar. 🏋️‍♂️⚡
+            </p>
+
+            <img src="{{ url_for('static', filename='images/exercises/barbell-deadlift.jpg') }}" alt="Deadlift Achievement" class="card-img-top" style="height: 280px; margin-bottom: 1rem;">
+
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.8rem; margin-bottom: 1rem;">
+              <button class="btn btn-secondary btn-sm" onclick="this.classList.toggle('btn-primary');">💪 24 Respect</button>
+              <button class="btn btn-secondary btn-sm" onclick="this.classList.toggle('btn-primary');">🔥 18 Fire</button>
+              <button class="btn btn-secondary btn-sm" onclick="this.classList.toggle('btn-primary');">👏 15 Claps</button>
+            </div>
+
+            <!-- Comments -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+              <div style="display: flex; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <img src="{{ url_for('static', filename='images/trainers/trainer-2.jpg') }}" alt="Maya" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                <div style="background: var(--bg-main); padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); flex-grow: 1;">
+                  <strong style="font-size: 0.85rem; color: var(--primary-lime);">Coach Emily Carter</strong>
+                  <p style="font-size: 0.85rem; margin: 0.2rem 0 0;">Massive lift Oliver! Form looked flawless all the way through lockout.</p>
+                </div>
+              </div>
+
+              <!-- Comment Form -->
+              <form method="POST" action="{{ url_for('community.add_comment', post_id='demo-p1') }}" style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
+                <input type="text" name="content" class="form-control" placeholder="Write a supportive comment..." style="padding: 0.4rem 0.8rem; font-size: 0.85rem;" required>
+                <button type="submit" class="btn btn-secondary btn-sm">REPLY</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Post 2 (Member Training Log) -->
+          <div class="card card-elevated">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <img src="{{ url_for('static', filename='images/homepage/hero-athlete.jpg') }}" alt="Grace" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--chart-accent);">
+                <div>
+                  <strong style="display: block;">Chloe Taylor</strong>
+                  <span class="badge badge-neutral" style="font-size: 0.7rem;">ATHLETE MEMBER</span>
+                </div>
+              </div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Yesterday at 18:40</span>
+            </div>
+
+            <p style="font-size: 1rem; margin-bottom: 1rem;">
+              Just completed the 17:30 Iron Strength class with the squad. The tempo squats were brutal but feeling stronger every week! Who's hitting the Saturday conditioning session?
+            </p>
+
+            <div style="display: flex; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.8rem;">
+              <button class="btn btn-secondary btn-sm">💪 14 Respect</button>
+              <button class="btn btn-secondary btn-sm">🔥 9 Fire</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

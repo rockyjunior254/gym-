@@ -1,0 +1,194 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Athlete Progress & Health Analytics | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      BIOMETRIC INTELLIGENCE
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      ATHLETE PROGRESS & ANALYTICS
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Track body weight trends, body composition shifts, and measurement milestones for your assigned athletes.
+    </p>
+  </div>
+
+  <div>
+    <button type="button" class="fp-btn-primary" onclick="openModal('recordProgressModal')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Log New Measurements
+    </button>
+  </div>
+</div>
+
+<!-- Athlete Selector Filter -->
+<div class="fp-card" style="padding: 14px 18px; margin-bottom: 24px;">
+  <form method="GET" action="{{ url_for('trainer.progress') }}" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 240px;">
+      <label style="font-size: 0.75rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Select Assigned Athlete</label>
+      <select name="member_id" class="form-control" onchange="this.form.submit()" style="font-size: 0.9rem; border-radius: 8px;">
+        {% for m in members %}
+          <option value="{{ m.id }}" {% if selected_member and selected_member.id == m.id %}selected{% endif %}>
+            {{ m.full_name }} ({{ m.goals }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+
+{% if selected_member %}
+  <!-- Weight Trend Visualisation -->
+  <div class="fp-card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Body Weight Trend: {{ selected_member.full_name }}</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Historical weigh-ins recorded by coaching staff</p>
+      </div>
+      <span class="fp-badge-lime">{{ progress_records|length }} Weigh-ins</span>
+    </div>
+    <div style="height: 240px; position: relative;">
+      <canvas id="weightProgressChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Historical Measurements Table -->
+  <div class="fp-card">
+    <h3 style="margin: 0 0 16px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Measurement Log History</h3>
+    {% if progress_records %}
+      <div class="table-responsive">
+        <table class="table-modern" style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--fp-border); text-align: left; color: var(--fp-muted); font-size: 0.78rem; text-transform: uppercase;">
+              <th style="padding: 10px;">Date</th>
+              <th style="padding: 10px;">Weight</th>
+              <th style="padding: 10px;">Body Fat</th>
+              <th style="padding: 10px;">Chest</th>
+              <th style="padding: 10px;">Waist</th>
+              <th style="padding: 10px;">Arms</th>
+              <th style="padding: 10px;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pr in progress_records %}
+              <tr style="border-bottom: 1px solid var(--fp-border-subtle);">
+                <td style="padding: 10px; font-weight: 700; color: var(--fp-ink);">{{ pr.record_date }}</td>
+                <td style="padding: 10px; color: var(--fp-lime-dark); font-weight: 700;">{{ pr.weight_kg }} kg</td>
+                <td style="padding: 10px;">{{ pr.body_fat_pct or '—' }}%</td>
+                <td style="padding: 10px;">{{ pr.chest_cm or '—' }} cm</td>
+                <td style="padding: 10px;">{{ pr.waist_cm or '—' }} cm</td>
+                <td style="padding: 10px;">{{ pr.arms_cm or '—' }} cm</td>
+                <td style="padding: 10px; color: var(--fp-muted); font-size: 0.82rem;">{{ pr.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color: var(--fp-muted); font-size: 0.88rem; margin: 0;">No measurement logs on file for this athlete yet.</p>
+    {% endif %}
+  </div>
+{% endif %}
+
+<!-- Modal: Record Progress -->
+<div id="recordProgressModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Record Progress Metrics</h3>
+        <p class="modal-subtitle">Log physical biometrics for an assigned athlete</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('recordProgressModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('trainer.progress') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="prog_athlete">Select Athlete *</label>
+          <select id="prog_athlete" name="member_id" class="form-control" required>
+            {% for m in members %}
+              <option value="{{ m.id }}" {% if selected_member and selected_member.id == m.id %}selected{% endif %}>{{ m.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="prog_weight">Weight (kg) *</label>
+            <input type="number" step="0.1" id="prog_weight" name="weight_kg" class="form-control" placeholder="78.5" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prog_fat">Body Fat %</label>
+            <input type="number" step="0.1" id="prog_fat" name="body_fat_pct" class="form-control" placeholder="14.2">
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="prog_chest">Chest (cm)</label>
+            <input type="number" step="0.1" id="prog_chest" name="chest_cm" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prog_waist">Waist (cm)</label>
+            <input type="number" step="0.1" id="prog_waist" name="waist_cm" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prog_arms">Arms (cm)</label>
+            <input type="number" step="0.1" id="prog_arms" name="arms_cm" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prog_notes">Coaching Observations / Cues</label>
+          <textarea id="prog_notes" name="notes" class="form-control" rows="2" placeholder="Fasted weigh-in, hydration optimal..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('recordProgressModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Save Biometrics</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById('weightProgressChart');
+  if (ctx) {
+    const dates = [{% for pr in progress_records|reverse %}'{{ pr.record_date }}',{% endfor %}];
+    const weights = [{% for pr in progress_records|reverse %}{{ pr.weight_kg or 0 }},{% endfor %}];
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dates.length ? dates : ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Weight (kg)',
+          data: weights.length ? weights : [80.5, 79.8, 79.2, 78.5],
+          borderColor: '#B8E92C',
+          backgroundColor: 'rgba(184, 233, 44, 0.1)',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointBackgroundColor: '#2F6B4F'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: false },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

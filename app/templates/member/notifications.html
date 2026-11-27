@@ -1,0 +1,81 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Notifications & Announcements{% endblock %}
+{% block page_subtitle %}Official gym updates, class schedule changes, and account alerts{% endblock %}
+
+{% block topbar_actions %}
+  <form action="{{ url_for('member.mark_notifications_read') }}" method="POST" style="margin: 0;">
+    <button type="submit" class="fp-btn-dark">
+      <i data-lucide="check-check" style="width: 16px; height: 16px;"></i>
+      Mark All as Read
+    </button>
+  </form>
+{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Club Announcements Banner -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Club Announcements</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Official notices from Strakly Gym Administration</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink);">OFFICIAL</span>
+    </div>
+
+    {% if announcements %}
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        {% for a in announcements %}
+          <div style="padding: 16px; border-radius: 12px; border: 1px solid var(--fp-border); background: #FAFAFA;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ a.title }}</span>
+              <span style="font-size: 0.72rem; color: var(--fp-muted);">{{ a.created_at[:10] if a.created_at else '' }}</span>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0; line-height: 1.4;">
+              {{ a.content }}
+            </p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
+        No active club announcements at this time.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Account Notifications -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">My Account Activity Alerts</h3>
+      <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-ink);">{{ notifications|length }} NOTIFICATIONS</span>
+    </div>
+
+    {% if notifications %}
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for n in notifications %}
+          <div style="padding: 12px 16px; border-radius: 12px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: #F3F4F6; display: flex; align-items: center; justify-content: center; color: var(--fp-ink);">
+                <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--fp-ink);">{{ n.title or 'Account Notification' }}</div>
+                <div style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 2px;">{{ n.message or n.content }}</div>
+              </div>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--fp-muted);">{{ n.created_at[:10] if n.created_at else '' }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
+        You're completely caught up! No unread alerts.
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

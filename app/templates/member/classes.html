@@ -1,0 +1,98 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Classes & Bookings{% endblock %}
+{% block page_subtitle %}Explore instructor-led group training, view live capacity, and reserve your workout spots{% endblock %}
+
+{% block member_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Active Bookings Banner -->
+  {% if my_bookings %}
+    <div class="fp-card" style="border-left: 4px solid var(--fp-lime);">
+      <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0 0 14px 0; color: var(--fp-ink);">My Reserved Classes</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for b in my_bookings %}
+          {% if b.booking_status == 'confirmed' %}
+            <div style="padding: 12px 16px; background: #FAFAFA; border-radius: 12px; border: 1px solid var(--fp-border); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ b.fitness_class.name }}</span>
+                <span class="fp-brand-badge" style="margin-left: 8px;">CONFIRMED</span>
+                <div style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 2px;">
+                  {{ b.fitness_class.date }} at {{ b.fitness_class.start_time }} &bull; {{ b.fitness_class.room or 'Main Studio' }}
+                </div>
+              </div>
+              <form action="{{ url_for('member.cancel_class', booking_id=b.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="fp-btn-outline" style="color: var(--fp-coral); border-color: rgba(218, 40, 28, 0.3); font-size: 0.75rem;">
+                  Cancel Spot
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Classes Catalogue -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Available Fitness Classes</h3>
+        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">High-energy studio sessions led by certified group fitness instructors</p>
+      </div>
+      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">LIVE SCHEDULE</span>
+    </div>
+
+    {% if classes %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px;">
+        {% for c in classes %}
+          <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink);">
+                  {{ c.category or 'Studio Class' }}
+                </span>
+                <span style="font-size: 0.72rem; color: var(--fp-muted); font-weight: 600;">
+                  Max: {{ c.capacity or 20 }} spots
+                </span>
+              </div>
+
+              <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ c.name }}</h4>
+              <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 14px 0; line-height: 1.4;">
+                {{ c.description or 'High-intensity conditioning, endurance, and mobility work.' }}
+              </p>
+
+              <div style="background: #FAFAFA; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--fp-border); font-size: 0.75rem; color: var(--fp-ink); margin-bottom: 16px;">
+                <div><strong>Date & Time:</strong> {{ c.date }} at {{ c.start_time }}</div>
+                <div style="margin-top: 2px;"><strong>Studio / Location:</strong> {{ c.room or 'Main Floor Studio' }}</div>
+                {% if c.trainer %}
+                  <div style="margin-top: 2px;"><strong>Coach:</strong> {{ c.trainer.full_name }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if c.id in booked_class_ids %}
+              <button type="button" class="fp-btn-outline" style="width: 100%; justify-content: center; background: #ECFDF5; color: #065F46; border-color: #A7F3D0;" disabled>
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i> Spot Reserved
+              </button>
+            {% else %}
+              <form action="{{ url_for('member.book_class', class_id=c.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="fp-btn-dark" style="width: 100%; justify-content: center;">
+                  Reserve Class Slot
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 48px 16px;">
+        <i data-lucide="calendar" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">No Active Classes Scheduled</h3>
+        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">The instructor team will post the updated class timetable shortly.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

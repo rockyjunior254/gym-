@@ -1,0 +1,79 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Athlete Profile & Fitness Identity{% endblock %}
+{% block page_subtitle %}Manage your personal information, emergency contacts, and training preferences{% endblock %}
+
+{% block member_content %}
+<div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Identity Card -->
+  <div class="fp-card" style="display: flex; align-items: center; gap: 24px; padding: 28px;">
+    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; flex-shrink: 0;">
+      {% if current_user.avatar_url %}
+        <img src="{{ current_user.avatar_url }}" alt="{{ current_user.full_name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+      {% else %}
+        {{ current_user.full_name[:2].upper() if current_user.full_name else 'ME' }}
+      {% endif %}
+    </div>
+    <div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0; color: var(--fp-ink);">{{ current_user.full_name }}</h2>
+        <span class="fp-brand-badge">ATHLETE</span>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--fp-muted); margin: 4px 0 8px 0;">{{ current_user.email }}</p>
+      <div style="display: flex; gap: 16px; font-size: 0.78rem; color: var(--fp-ink);">
+        <span><strong>Phone:</strong> {{ current_user.phone or 'Not Provided' }}</span>
+        <span>&bull;</span>
+        <span><strong>Member Since:</strong> {{ member.created_at[:10] if member and member.created_at else '2024' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Edit Form -->
+  <div class="fp-card">
+    <div style="border-bottom: 1px solid var(--fp-border); padding-bottom: 16px; margin-bottom: 20px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Personal & Emergency Details</h3>
+      <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Keep your contact information accurate for health and gym safety</p>
+    </div>
+
+    <form action="{{ url_for('member.profile') }}" method="POST">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Full Name</label>
+          <input type="text" name="full_name" class="fp-form-control" value="{{ current_user.full_name }}" required>
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Phone Number</label>
+          <input type="tel" name="phone" class="fp-form-control" value="{{ current_user.phone or '' }}" placeholder="+254 700 000 000">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px;">
+        <div class="fp-form-group">
+          <label class="fp-form-label">Emergency Contact Name</label>
+          <input type="text" name="emergency_contact_name" class="fp-form-control" value="{{ member.emergency_contact_name or '' }}" placeholder="Next of Kin / Relative">
+        </div>
+
+        <div class="fp-form-group">
+          <label class="fp-form-label">Emergency Contact Phone</label>
+          <input type="tel" name="emergency_contact_phone" class="fp-form-control" value="{{ member.emergency_contact_phone or '' }}" placeholder="+254 700 000 000">
+        </div>
+      </div>
+
+      <div class="fp-form-group" style="margin-top: 8px;">
+        <label class="fp-form-label">Primary Fitness Goals & Medical Conditions</label>
+        <textarea name="fitness_goals" class="fp-form-control" rows="4" placeholder="Describe your primary fitness targets (e.g. hypertrophy, fat loss, athletic conditioning) and any past injuries or medical considerations for coaches...">{{ member.fitness_goals or '' }}</textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+        <button type="submit" class="fp-btn-dark">
+          <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+          Save Profile Changes
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

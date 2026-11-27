@@ -1,0 +1,65 @@
+{% extends 'member/layout.html' %}
+
+{% block page_title %}Account Preferences & Settings{% endblock %}
+{% block page_subtitle %}Manage notifications, coach data sharing, and platform privacy preferences{% endblock %}
+
+{% block member_content %}
+<div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+  <div class="fp-card">
+    <div style="border-bottom: 1px solid var(--fp-border); padding-bottom: 16px; margin-bottom: 20px;">
+      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Athlete Preferences</h3>
+      <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Control how you receive alerts and what data your coach can access</p>
+    </div>
+
+    <form action="{{ url_for('member.settings') }}" method="POST">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        
+        <!-- Setting 1: Email Notifications -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+          <div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Email Notifications</div>
+            <div style="font-size: 0.78rem; color: var(--fp-muted);">Receive membership renewal reminders and receipt confirmations via email.</div>
+          </div>
+          <input type="checkbox" name="notify_email" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('notify_email') %}checked{% endif %}>
+        </div>
+
+        <!-- Setting 2: Class Reminders -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+          <div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Class & PT Booking Reminders</div>
+            <div style="font-size: 0.78rem; color: var(--fp-muted);">Receive notifications before your booked fitness classes and 1-on-1 PT sessions.</div>
+          </div>
+          <input type="checkbox" name="notify_class_reminders" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('notify_class_reminders') %}checked{% endif %}>
+        </div>
+
+        <!-- Setting 3: Share Progress with Coach -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+          <div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Share Progress Studio with Coach</div>
+            <div style="font-size: 0.78rem; color: var(--fp-muted);">Allows your assigned certified trainer to view your body measurements, PRs, and workout logs.</div>
+          </div>
+          <input type="checkbox" name="share_progress_with_coach" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('share_progress_with_coach') %}checked{% endif %}>
+        </div>
+
+        <!-- Setting 4: Public Leaderboards -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+          <div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Challenge Leaderboard Visibility</div>
+            <div style="font-size: 0.78rem; color: var(--fp-muted);">Show your name and milestone scores on club-wide challenge leaderboards.</div>
+          </div>
+          <input type="checkbox" name="public_leaderboard" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('public_leaderboard') %}checked{% endif %}>
+        </div>
+
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+        <button type="submit" class="fp-btn-dark">
+          Save Settings
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

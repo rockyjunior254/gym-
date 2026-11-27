@@ -1,0 +1,207 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Workout Planner & Routine Builder | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      PROGRAMMING ARCHITECTURE
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      WORKOUT PLANNER & ROUTINES
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Author structured workout programs with weekly training splits, exercise selections, and progressive overload targets.
+    </p>
+  </div>
+
+  <div>
+    <button type="button" class="fp-btn-primary" onclick="openModal('createPlanModal')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Create Training Plan
+    </button>
+  </div>
+</div>
+
+<!-- Plans Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 32px;">
+  {% for p in plans %}
+    <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <span class="fp-badge-slate" style="font-size: 0.72rem;">{{ p.days_per_week }} DAYS / WEEK</span>
+          <span class="{% if p.status == 'active' %}fp-badge-lime{% else %}fp-badge-slate{% endif %}">{{ p.status|upper }}</span>
+        </div>
+
+        <h3 style="margin: 0 0 6px; font-size: 1.15rem; font-weight: 700; color: var(--fp-ink);">{{ p.title }}</h3>
+        
+        <div style="font-size: 0.82rem; color: var(--fp-muted); margin-bottom: 12px;">
+          Assigned to: <strong style="color: var(--fp-ink);">{{ p.profiles.full_name if p.profiles else 'Athlete' }}</strong>
+        </div>
+
+        <div style="background: #F8FAFC; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.82rem;">
+          <div style="margin-bottom: 4px;"><span style="color: var(--fp-muted);">Goal:</span> <strong>{{ p.goal or 'Strength Progression' }}</strong></div>
+          {% if p.notes %}
+            <div style="color: var(--fp-muted); font-size: 0.78rem;">Notes: {{ p.notes }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--fp-border-subtle); padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.75rem; color: var(--fp-muted);">{{ p.created_at[:10] if p.created_at else 'Recent' }}</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px;"
+                  data-id="{{ p.id }}"
+                  data-title="{{ p.title }}"
+                  data-goal="{{ p.goal or '' }}"
+                  data-days="{{ p.days_per_week }}"
+                  data-status="{{ p.status }}"
+                  data-notes="{{ p.notes or '' }}"
+                  onclick="openEditPlanModal(this)">Edit</button>
+          <form method="POST" action="{{ url_for('trainer.delete_plan', plan_id=p.id) }}" onsubmit="return confirm('Archive/Delete this plan?');" style="display:inline;">
+            <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px; color: var(--fp-coral);">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div style="grid-column: 1 / -1;">
+      <div class="fp-card" style="text-align: center; padding: 48px 20px;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: #F8FAFC; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--fp-muted);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h3 style="margin: 0 0 4px; font-size: 1.1rem; color: var(--fp-ink);">No Training Plans Authored</h3>
+        <p style="margin: 0 0 16px; font-size: 0.85rem; color: var(--fp-muted);">Create your first personalized workout split and assign it to an athlete on your roster.</p>
+        <button type="button" class="fp-btn-primary" onclick="openModal('createPlanModal')">Create Training Plan</button>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Modal: Create Plan -->
+<div id="createPlanModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Create Training Program</h3>
+        <p class="modal-subtitle">Design a custom workout plan for an assigned athlete</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('createPlanModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('trainer.plans') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="plan_athlete">Select Athlete *</label>
+          <select id="plan_athlete" name="member_id" class="form-control" required>
+            <option value="">-- Choose Assigned Athlete --</option>
+            {% for m in members %}
+              <option value="{{ m.id }}">{{ m.full_name }} ({{ m.goals }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="plan_title">Plan Title *</label>
+          <input type="text" id="plan_title" name="title" class="form-control" placeholder="e.g. 12-Week Hypertrophy & Power Phase" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="plan_goal">Primary Objective</label>
+            <input type="text" id="plan_goal" name="goal" class="form-control" placeholder="e.g. Strength, Fat Loss">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="plan_days">Training Frequency</label>
+            <select id="plan_days" name="days_per_week" class="form-control">
+              <option value="2">2 Days / Week</option>
+              <option value="3" selected>3 Days / Week</option>
+              <option value="4">4 Days / Week</option>
+              <option value="5">5 Days / Week</option>
+              <option value="6">6 Days / Week</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="plan_notes">Coaching Directives / Notes</label>
+          <textarea id="plan_notes" name="notes" class="form-control" rows="3" placeholder="Rest protocols, warmup recommendations, tempo cues..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('createPlanModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Publish Plan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Plan -->
+<div id="editPlanModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Training Program</h3>
+        <p class="modal-subtitle">Update program parameters and status</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editPlanModal')">&times;</button>
+    </div>
+    <form id="editPlanForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="edit_title">Plan Title *</label>
+          <input type="text" id="edit_title" name="title" class="form-control" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_goal">Primary Objective</label>
+            <input type="text" id="edit_goal" name="goal" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_days">Training Frequency</label>
+            <select id="edit_days" name="days_per_week" class="form-control">
+              <option value="2">2 Days / Week</option>
+              <option value="3">3 Days / Week</option>
+              <option value="4">4 Days / Week</option>
+              <option value="5">5 Days / Week</option>
+              <option value="6">6 Days / Week</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_status">Plan Status</label>
+          <select id="edit_status" name="status" class="form-control">
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit_notes">Coaching Directives</label>
+          <textarea id="edit_notes" name="notes" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="fp-btn-outline" onclick="closeModal('editPlanModal')">Cancel</button>
+        <button type="submit" class="fp-btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditPlanModal(btn) {
+  const form = document.getElementById('editPlanForm');
+  form.action = '/trainer/plans/edit/' + btn.dataset.id;
+  document.getElementById('edit_title').value = btn.dataset.title || '';
+  document.getElementById('edit_goal').value = btn.dataset.goal || '';
+  document.getElementById('edit_days').value = btn.dataset.days || 3;
+  document.getElementById('edit_status').value = btn.dataset.status || 'active';
+  document.getElementById('edit_notes').value = btn.dataset.notes || '';
+  openModal('editPlanModal');
+}
+</script>
+{% endblock %}

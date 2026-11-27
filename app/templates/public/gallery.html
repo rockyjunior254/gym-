@@ -1,0 +1,71 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Facility Gallery | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 5rem;">
+  <div class="container">
+    <div class="section-header" style="text-align: center; max-width: 800px; margin: 0 auto 4rem;">
+      <span class="section-subtitle">VISUAL TOUR</span>
+      <h1 class="section-title" style="font-size: clamp(2.4rem, 5vw, 3.6rem);">THE TRAINING ARENA</h1>
+      <p style="font-size: 1.1rem; color: #94A3B8;">High-resolution views of our barbell lifting platforms, Olympic power cages, sprint conditioning turf, and recovery amenities.</p>
+    </div>
+
+    <div class="grid-3" style="gap: 24px;">
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/facility-1.jpg') }}" alt="Free Weights Area" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">FREE WEIGHTS</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">MAIN FREE WEIGHTS ARENA</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Full dumbbell racks from 2.5kg to 50kg, incline benches and cable stations.</p>
+        </div>
+      </div>
+
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/facility-2.jpg') }}" alt="Squat and Power Cages" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">POWER RACKS</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">POWER CAGE STATIONS</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Heavy-duty commercial cages with spotter arms and calibrated competition plates.</p>
+        </div>
+      </div>
+
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/facility-3.jpg') }}" alt="Sprint Turf" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">CONDITIONING</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">CONDITIONING TURF TRACK</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">High-density turf track for sled pushes, battle ropes, and dynamic interval sprints.</p>
+        </div>
+      </div>
+
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/facility-4.jpg') }}" alt="Cardio Zone" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">AEROBIC LOFT</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">CARDIO LOFT</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Curved non-motorized treadmills, Concept2 rowers, and air resistance bikes.</p>
+        </div>
+      </div>
+
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/hero-athlete.jpg') }}" alt="Barbell Lifting Deck" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">COMPETITION PLATFORM</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">OLYMPIC DEADLIFT DECKS</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Reinforced bamboo and rubber Olympic platforms engineered for heavy barbell drops.</p>
+        </div>
+      </div>
+
+      <div class="bento-card" style="padding: 0; overflow: hidden;">
+        <img src="{{ url_for('static', filename='images/homepage/about-athlete.jpg') }}" alt="Athletic Coaching Floor" style="width: 100%; height: 280px; object-fit: cover;">
+        <div style="padding: 1.5rem;">
+          <span class="badge badge-lime" style="margin-bottom: 0.5rem; display: inline-block;">COACHING ZONE</span>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.4rem;">1:1 ATHLETE ASSESSMENT SUITE</h3>
+          <p style="font-size: 0.88rem; margin: 0; color: #94A3B8;">Dedicated biometric evaluation space for body composition and kinetic mobility testing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

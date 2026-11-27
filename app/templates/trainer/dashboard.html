@@ -1,0 +1,265 @@
+{% extends 'trainer/layout.html' %}
+
+{% block title %}Coach Dashboard | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block trainer_content %}
+<!-- Welcome & Quick Action Header -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      COACHING OPERATIONS • ATHLETE OVERSIGHT
+    </div>
+    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
+      WELCOME, COACH {{ trainer_name|upper }}
+    </h1>
+    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
+      Here is your coaching performance, today's athlete schedule, and pending training check-ins.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <a href="{{ url_for('trainer.sessions') }}" class="fp-btn-dark">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Schedule Session
+    </a>
+    <a href="{{ url_for('trainer.progress') }}" class="fp-btn-outline">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      Log Progress
+    </a>
+  </div>
+</div>
+
+<!-- 6 Authoritative KPI Metrics -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">My Athletes</div>
+      <div class="fp-kpi-val">{{ kpis.my_athletes }}</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Assigned roster</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(184, 233, 44, 0.2); display: flex; align-items: center; justify-content: center; color: var(--fp-lime-dark);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+    </div>
+  </div>
+
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">Active Plans</div>
+      <div class="fp-kpi-val">{{ kpis.active_plans }}</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Programs authored</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #475569;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+    </div>
+  </div>
+
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">Today's Sessions</div>
+      <div class="fp-kpi-val" style="color: var(--fp-lime-dark);">{{ kpis.today_sessions }}</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Confirmed on deck</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(184, 233, 44, 0.2); display: flex; align-items: center; justify-content: center; color: var(--fp-lime-dark);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    </div>
+  </div>
+
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">Completed Sessions</div>
+      <div class="fp-kpi-val">{{ kpis.completed_sessions }}</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Delivered to date</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #475569;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+    </div>
+  </div>
+
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">Pending Reviews</div>
+      <div class="fp-kpi-val" style="color: var(--fp-coral);">{{ kpis.pending_reviews }}</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Check-ins awaiting reply</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 94, 126, 0.12); display: flex; align-items: center; justify-content: center; color: var(--fp-coral);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+  </div>
+
+  <div class="fp-kpi">
+    <div>
+      <div class="fp-kpi-label">Adherence Rate</div>
+      <div class="fp-kpi-val">{{ kpis.workout_adherence }}%</div>
+      <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Athlete consistency</div>
+    </div>
+    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(184, 233, 44, 0.2); display: flex; align-items: center; justify-content: center; color: var(--fp-lime-dark);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row: Weekly Coaching Activity & Workout Completion -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;">
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Weekly Coaching Volume</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Total athlete workouts and sessions delivered across the week</p>
+      </div>
+      <span class="fp-badge-lime">Active Week</span>
+    </div>
+    <div style="height: 240px; position: relative;">
+      <canvas id="weeklyActivityChart"></canvas>
+    </div>
+  </div>
+
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Plan Completion</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Completed vs missed</p>
+      </div>
+      <span class="fp-badge-slate">91% Adherence</span>
+    </div>
+    <div style="height: 200px; position: relative;">
+      <canvas id="planCompletionChart"></canvas>
+    </div>
+    <div style="display: flex; justify-content: space-around; margin-top: 12px; font-size: 0.78rem; color: var(--fp-muted);">
+      <div><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#B8E92C; margin-right:4px;"></span>Completed: 91%</div>
+      <div><span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#FF5E7E; margin-right:4px;"></span>Outstanding: 9%</div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Layout: Sessions & Athlete Attention -->
+<div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px;">
+  <!-- Today's Sessions & Upcoming -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Coaching Schedule</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Today's confirmed 1-on-1 sessions on deck</p>
+      </div>
+      <a href="{{ url_for('trainer.sessions') }}" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px;">View All</a>
+    </div>
+
+    {% if today_sessions %}
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for s in today_sessions %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-size: 0.85rem; font-weight: 800; color: var(--fp-lime-dark); background: #FFFFFF; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--fp-border);">
+                {{ s.start_time[:5] if s.start_time else '10:00' }}
+              </div>
+              <div>
+                <strong style="font-size: 0.92rem; color: var(--fp-ink); display: block;">
+                  {{ s.profiles.full_name if s.profiles else 'Athlete' }}
+                </strong>
+                <span style="font-size: 0.78rem; color: var(--fp-muted);">Focus: {{ s.focus_area or 'General Strength' }}</span>
+              </div>
+            </div>
+            <div>
+              <span class="fp-badge-lime">{{ s.status|upper }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 32px 16px; background: #F8FAFC; border-radius: 12px; border: 1px dashed var(--fp-border);">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--fp-muted); margin-bottom: 8px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <p style="margin: 0; font-size: 0.88rem; font-weight: 600; color: var(--fp-ink);">No coaching sessions booked for today.</p>
+        <p style="margin: 4px 0 12px; font-size: 0.8rem; color: var(--fp-muted);">Check upcoming dates or book a session with an assigned athlete.</p>
+        <a href="{{ url_for('trainer.sessions') }}" class="fp-btn-primary" style="font-size: 0.78rem;">Book Training Session</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Athlete Attention & Check-ins -->
+  <div class="fp-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Athlete Attention</h3>
+        <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Pending check-ins and athlete updates</p>
+      </div>
+      <span class="fp-badge-coral">{{ checkins|length }} Pending</span>
+    </div>
+
+    {% if checkins %}
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for ch in checkins %}
+          <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 12px 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 0.88rem; color: var(--fp-ink);">{{ ch.profiles.full_name if ch.profiles else 'Athlete' }}</strong>
+              <span class="fp-badge-coral" style="font-size: 0.7rem;">Needs Feedback</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 6px;">{{ ch.athlete_notes or 'Weekly check-in logged.' }}</p>
+            <a href="{{ url_for('trainer.feedback') }}" style="font-size: 0.78rem; font-weight: 700; color: var(--fp-lime-dark); text-decoration: none;">Reply to Check-in &rarr;</a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 32px 16px; background: #F8FAFC; border-radius: 12px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--fp-muted); margin-bottom: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <p style="margin: 0; font-size: 0.88rem; font-weight: 600; color: var(--fp-ink);">All check-ins reviewed!</p>
+        <p style="margin: 4px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Your assigned athletes are on track with their training plans.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Weekly Activity Chart
+  const actCtx = document.getElementById('weeklyActivityChart');
+  if (actCtx) {
+    new Chart(actCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ chart_labels|tojson }},
+        datasets: [{
+          label: 'Athletes Trained',
+          data: {{ chart_activity|tojson }},
+          backgroundColor: '#B8E92C',
+          borderRadius: 6,
+          maxBarThickness: 32
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // 2. Plan Completion Doughnut
+  const compCtx = document.getElementById('planCompletionChart');
+  if (compCtx) {
+    new Chart(compCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Outstanding'],
+        datasets: [{
+          data: [91, 9],
+          backgroundColor: ['#B8E92C', '#FF5E7E'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '72%',
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

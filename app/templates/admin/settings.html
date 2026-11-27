@@ -1,0 +1,85 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Facility Brand & Contact Settings | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header & Action Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Facility Configuration
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Facility Settings &amp; Contact
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Configure official facility branding, contact telephone, physical premises address, and public-facing metadata.
+      </p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 720px) 320px; gap: 20px; align-items: start;">
+    <!-- Settings Form -->
+    <div class="card" style="padding: 24px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-line); padding-bottom: 0.85rem;">
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--forest-dark);">Facility Identity & Metadata</h3>
+      <span class="badge badge-forest">System Settings</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.settings') }}">
+      <div class="form-group">
+        <label class="form-label" for="gym_name">Facility Brand Name <span style="color: var(--accent-rose);">*</span></label>
+        <input type="text" id="gym_name" name="gym_name" class="form-control" value="{{ settings.gym_name or 'Strakly Fitness Facility' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="tagline">Official Tagline / Slogan</label>
+        <input type="text" id="tagline" name="tagline" class="form-control" value="{{ settings.tagline or 'TRAIN HARD. STAY STRONG. OWN YOUR PROGRESS.' }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="address">Physical Facility Address <span style="color: var(--accent-rose);">*</span></label>
+        <input type="text" id="address" name="address" class="form-control" value="{{ settings.address or 'Strakly Athletic Facility, Wing B, Nairobi' }}" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label" for="phone">Official Telephone <span style="color: var(--accent-rose);">*</span></label>
+          <input type="tel" id="phone" name="phone" class="form-control" value="{{ settings.phone or '+254 700 123 456' }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Official Email Address <span style="color: var(--accent-rose);">*</span></label>
+          <input type="email" id="email" name="email" class="form-control" value="{{ settings.email or 'info@strakly.com' }}" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        Save Platform Settings
+      </button>
+    </form>
+  </div>
+
+  <!-- Facility Overview Sidebar -->
+  <div>
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <h4 style="margin: 0 0 0.75rem; font-size: 1rem; font-weight: 700; color: var(--forest-dark);">Facility Operating Rules</h4>
+      <div style="font-size: 0.82rem; color: var(--ink-secondary); line-height: 1.6;">
+        <p style="margin: 0 0 0.5rem;"><strong>Payment Policy:</strong> 100% physical cash collection. Serialized receipts issued on the spot.</p>
+        <p style="margin: 0 0 0.5rem;"><strong>Attendance:</strong> Receptionist manual roster verification against active memberships.</p>
+        <p style="margin: 0;"><strong>Auditability:</strong> Append-only security logging for every sensitive operation.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin: 0 0 0.5rem; font-size: 0.95rem; font-weight: 700; color: var(--ink-dark);">Database Persisted</h4>
+      <p style="font-size: 0.82rem; color: var(--ink-muted); margin: 0; line-height: 1.45;">
+        Platform settings are stored in the <code>platform_settings</code> Supabase table and automatically synchronize across both member and admin portals.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
