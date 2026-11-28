@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       COMMUNITY ENGAGEMENT
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -29,7 +29,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Recent Club Posts</h3>
-      <span class="fp-badge-lime">{{ posts|length }} Posts</span>
+      <span class="badge-pink">{{ posts|length }} Posts</span>
     </div>
 
     {% if posts %}
@@ -37,7 +37,7 @@
         {% for post in posts %}
           <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 12px; padding: 16px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">
                 {{ post.author.full_name[:2].upper() if post.author else 'ME' }}
               </div>
               <div>

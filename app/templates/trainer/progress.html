@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       BIOMETRIC INTELLIGENCE
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -48,7 +48,7 @@
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Body Weight Trend: {{ selected_member.full_name }}</h3>
         <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Historical weigh-ins recorded by coaching staff</p>
       </div>
-      <span class="fp-badge-lime">{{ progress_records|length }} Weigh-ins</span>
+      <span class="badge-pink">{{ progress_records|length }} Weigh-ins</span>
     </div>
     <div style="height: 240px; position: relative;">
       <canvas id="weightProgressChart"></canvas>
@@ -76,7 +76,7 @@
             {% for pr in progress_records %}
               <tr style="border-bottom: 1px solid var(--fp-border-subtle);">
                 <td style="padding: 10px; font-weight: 700; color: var(--fp-ink);">{{ pr.record_date }}</td>
-                <td style="padding: 10px; color: var(--fp-lime-dark); font-weight: 700;">{{ pr.weight_kg }} kg</td>
+                <td style="padding: 10px; color: var(--secondary-plum); font-weight: 700;">{{ pr.weight_kg }} kg</td>
                 <td style="padding: 10px;">{{ pr.body_fat_pct or '—' }}%</td>
                 <td style="padding: 10px;">{{ pr.chest_cm or '—' }} cm</td>
                 <td style="padding: 10px;">{{ pr.waist_cm or '—' }} cm</td>
@@ -170,12 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
         datasets: [{
           label: 'Weight (kg)',
           data: weights.length ? weights : [80.5, 79.8, 79.2, 78.5],
-          borderColor: '#B8E92C',
+          borderColor: '#E7549C',
           backgroundColor: 'rgba(184, 233, 44, 0.1)',
           tension: 0.3,
           fill: true,
           pointRadius: 4,
-          pointBackgroundColor: '#2F6B4F'
+          pointBackgroundColor: '#E7549C'
         }]
       },
       options: {

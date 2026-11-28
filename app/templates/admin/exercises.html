@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Training Architecture
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -31,7 +31,7 @@
     <div class="card" style="padding: 20px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Add Movement</h3>
-        <span class="badge badge-forest" style="font-size: 10.5px;">Library</span>
+        <span class="badge badge-pink" style="font-size: 10.5px;">Library</span>
       </div>
 
       <form method="POST" action="{{ url_for('admin.exercises') }}">
@@ -87,7 +87,7 @@
           <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Movement Directory</h3>
           <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Standardized exercises referenced across athlete training plans</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">{{ exercises|length }} Movements</span>
+        <span class="badge badge-pink" style="font-size: 11px;">{{ exercises|length }} Movements</span>
       </div>
 
       {% if exercises %}
@@ -96,7 +96,7 @@
             <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span class="badge badge-forest" style="font-size: 10.5px;">{{ ex.target_muscle_group }}</span>
+                  <span class="badge badge-pink" style="font-size: 10.5px;">{{ ex.target_muscle_group }}</span>
                   <span class="badge badge-neutral" style="font-size: 10.5px;">{{ (ex.difficulty or 'BEGINNER')|upper }}</span>
                 </div>
                 <h4 style="margin: 0 0 6px; font-size: 1rem; font-weight: 700; color: var(--text-ink);">{{ ex.name }}</h4>

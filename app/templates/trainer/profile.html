@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       PUBLIC SHOWCASE & CREDENTIALS
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -18,20 +18,20 @@
 
   <div style="display: flex; align-items: center; gap: 8px;">
     {% if coach.profile_status == 'approved' and coach.is_published %}
-      <span class="fp-badge-lime" style="padding: 6px 12px; font-size: 0.82rem;">LIVE ON HOMEPAGE</span>
+      <span class="badge-pink" style="padding: 6px 12px; font-size: 0.82rem;">LIVE ON HOMEPAGE</span>
     {% elif coach.profile_status == 'pending_approval' %}
-      <span class="fp-badge-coral" style="padding: 6px 12px; font-size: 0.82rem;">PENDING ADMIN REVIEW</span>
+      <span class="badge-danger" style="padding: 6px 12px; font-size: 0.82rem;">PENDING ADMIN REVIEW</span>
     {% elif coach.profile_status == 'rejected' %}
-      <span class="fp-badge-coral" style="padding: 6px 12px; font-size: 0.82rem;">REJECTED • REVISE AND RESUBMIT</span>
+      <span class="badge-danger" style="padding: 6px 12px; font-size: 0.82rem;">REJECTED • REVISE AND RESUBMIT</span>
     {% else %}
-      <span class="fp-badge-slate" style="padding: 6px 12px; font-size: 0.82rem;">DRAFT</span>
+      <span class="badge-neutral" style="padding: 6px 12px; font-size: 0.82rem;">DRAFT</span>
     {% endif %}
   </div>
 </div>
 
 {% if coach.rejection_reason %}
-  <div style="background: rgba(255, 94, 126, 0.1); border-left: 4px solid var(--fp-coral); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.85rem; color: var(--fp-ink);">
-    <strong style="color: var(--fp-coral); display: block; margin-bottom: 2px;">Admin Revision Request:</strong>
+  <div style="background: rgba(255, 94, 126, 0.1); border-left: 4px solid var(--color-danger); padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 0.85rem; color: var(--fp-ink);">
+    <strong style="color: var(--color-danger); display: block; margin-bottom: 2px;">Admin Revision Request:</strong>
     {{ coach.rejection_reason }}
   </div>
 {% endif %}
@@ -42,7 +42,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 12px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Edit Public Credentials</h3>
-      <span class="fp-badge-slate">Profile Editor</span>
+      <span class="badge-neutral">Profile Editor</span>
     </div>
 
     <form method="POST" action="{{ url_for('trainer.profile') }}">
@@ -104,7 +104,7 @@
     <div class="fp-card" style="padding: 0; overflow: hidden; border-radius: 16px; background: #FFFFFF; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
       <div style="height: 280px; position: relative; overflow: hidden; background: #1E293B;">
         <img id="previewAvatar" src="{{ coach.avatar_url or url_for('static', filename='images/trainers/trainer-1.jpg') }}" alt="Coach" style="width: 100%; height: 100%; object-fit: cover;">
-        <div style="position: absolute; bottom: 12px; left: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); color: #B8E92C; font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase;">
+        <div style="position: absolute; bottom: 12px; left: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); color: #E7549C; font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase;">
           CERTIFIED COACH
         </div>
       </div>
@@ -113,7 +113,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
           <div>
             <h3 id="previewName" style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #0F172A;">{{ coach.full_name }}</h3>
-            <div id="previewSpecs" style="color: #2F6B4F; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-top: 2px;">
+            <div id="previewSpecs" style="color: #E7549C; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-top: 2px;">
               {{ coach.specialisations|join(' • ') if coach.specialisations else 'Strength & Conditioning' }}
             </div>
           </div>
@@ -125,7 +125,7 @@
 
         <div style="border-top: 1px solid #E2E8F0; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: #94A3B8;">
           <span id="previewExp">{{ coach.experience_years or 3 }} Years Experience</span>
-          <span style="color: #2F6B4F; font-weight: 700;">Verified Staff</span>
+          <span style="color: #E7549C; font-weight: 700;">Verified Staff</span>
         </div>
       </div>
     </div>

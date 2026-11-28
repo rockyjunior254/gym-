@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       1-ON-1 COACHING
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -31,7 +31,7 @@
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Coaching Sessions Roster</h3>
       <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">History and upcoming personal training sessions</p>
     </div>
-    <span class="fp-badge-lime">{{ sessions|length }} Total Sessions</span>
+    <span class="badge-pink">{{ sessions|length }} Total Sessions</span>
   </div>
 
   {% if sessions %}
@@ -60,13 +60,13 @@
                 <div style="font-size: 0.78rem; color: var(--fp-muted);">{{ s.profiles.email if s.profiles else '' }}</div>
               </td>
               <td style="padding: 12px 10px;">
-                <span class="fp-badge-slate">{{ s.focus_area or 'General Fitness' }}</span>
+                <span class="badge-neutral">{{ s.focus_area or 'General Fitness' }}</span>
                 {% if s.notes %}
                   <div style="font-size: 0.78rem; color: var(--fp-muted); margin-top: 4px;">{{ s.notes }}</div>
                 {% endif %}
               </td>
               <td style="padding: 12px 10px;">
-                <span class="{% if s.status == 'completed' %}fp-badge-slate{% elif s.status == 'cancelled' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+                <span class="{% if s.status == 'completed' %}badge-neutral{% elif s.status == 'cancelled' %}badge-danger{% else %}badge-pink{% endif %}">
                   {{ s.status|upper }}
                 </span>
               </td>
@@ -76,7 +76,7 @@
                     <form method="POST" action="{{ url_for('trainer.complete_session', session_id=s.id) }}" style="display:inline;">
                       <button type="submit" class="fp-btn-primary" style="font-size: 0.75rem; padding: 4px 8px;">Complete</button>
                     </form>
-                    <button type="button" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 8px; color: var(--fp-coral);" onclick="openCancelModal('{{ s.id }}')">Cancel</button>
+                    <button type="button" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 8px; color: var(--color-danger);" onclick="openCancelModal('{{ s.id }}')">Cancel</button>
                   {% else %}
                     <span style="font-size: 0.78rem; color: var(--fp-muted);">Archived</span>
                   {% endif %}
@@ -151,7 +151,7 @@
   <div class="modal-box">
     <div class="modal-header">
       <div>
-        <h3 class="modal-title" style="color: var(--fp-coral);">Cancel Coaching Session</h3>
+        <h3 class="modal-title" style="color: var(--color-danger);">Cancel Coaching Session</h3>
         <p class="modal-subtitle">State reason for session cancellation</p>
       </div>
       <button type="button" class="modal-close" onclick="closeModal('cancelModal')">&times;</button>
@@ -165,7 +165,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="fp-btn-outline" onclick="closeModal('cancelModal')">Close</button>
-        <button type="submit" class="fp-btn-primary" style="background: var(--fp-coral); color: #fff;">Confirm Cancellation</button>
+        <button type="submit" class="fp-btn-primary" style="background: var(--color-danger); color: #fff;">Confirm Cancellation</button>
       </div>
     </form>
   </div>

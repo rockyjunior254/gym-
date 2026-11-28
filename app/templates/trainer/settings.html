@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       PREFERENCES & SECURITY
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -21,7 +21,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 12px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Account Identity</h3>
-      <span class="fp-badge-lime">Trainer Role</span>
+      <span class="badge-pink">Trainer Role</span>
     </div>
 
     <form method="POST" action="{{ url_for('trainer.settings') }}">
@@ -53,7 +53,7 @@
       <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 10px;">
         You are authenticated with the <strong>Trainer</strong> role. Your access permissions allow scheduling sessions, managing assigned athletes, and authoring workout plans.
       </p>
-      <span class="fp-badge-slate">Strict Front-Desk Cash Facility</span>
+      <span class="badge-neutral">Strict Front-Desk Cash Facility</span>
     </div>
 
     <div class="fp-card">

@@ -25,11 +25,11 @@
     <div style="flex: 1; min-width: 250px;">
       <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
         <h2 style="margin: 0; font-size: 2.2rem;">{{ detail.profile.full_name }}</h2>
-        <span class="badge badge-lime">{{ detail.member_details.member_number if detail.member_details else 'UNASSIGNED' }}</span>
+        <span class="badge badge-pink">{{ detail.member_details.member_number if detail.member_details else 'UNASSIGNED' }}</span>
         {% if detail.profile.is_archived %}
           <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger); border: 1px solid var(--color-danger);">ARCHIVED</span>
         {% elif detail.profile.is_active %}
-          <span class="badge badge-lime">ACTIVE</span>
+          <span class="badge badge-pink">ACTIVE</span>
         {% else %}
           <span class="badge" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b;">INACTIVE</span>
         {% endif %}
@@ -75,7 +75,7 @@
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.8rem;">
           Valid until: <strong>{{ detail.active_subscription.end_date }}</strong>
         </p>
-        <span class="badge badge-lime">VALID & UNRESTRICTED</span>
+        <span class="badge badge-pink">VALID & UNRESTRICTED</span>
       {% else %}
         <div style="padding: 1rem; background: rgba(239, 68, 68, 0.08); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
           <p style="color: var(--color-danger); margin: 0; font-size: 0.9rem; font-weight: 600;">No Active Subscription</p>
@@ -195,7 +195,7 @@
                 <td><strong>{{ sub.membership_plans.name if sub.membership_plans else 'Membership' }}</strong></td>
                 <td>
                   {% if sub.status == 'active' %}
-                    <span class="badge badge-lime">ACTIVE</span>
+                    <span class="badge badge-pink">ACTIVE</span>
                   {% elif sub.status == 'pending' %}
                     <span class="badge badge-warning">PENDING CASH</span>
                   {% elif sub.status == 'expired' %}
@@ -265,7 +265,7 @@
                 <td>{{ pay.payment_date[:16] if pay.payment_date else 'N/A' }}</td>
                 <td>
                   {% if pay.status == 'completed' %}
-                    <span class="badge badge-lime">PAID IN CASH</span>
+                    <span class="badge badge-pink">PAID IN CASH</span>
                   {% elif pay.status == 'reversed' %}
                     <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger);">REVERSED</span>
                   {% else %}
@@ -315,7 +315,7 @@
                 <td><strong>{{ att.check_in_time[:16] if att.check_in_time else 'N/A' }}</strong></td>
                 <td>
                   {% if att.status == 'verified' %}
-                    <span class="badge badge-lime">VERIFIED ENTRY</span>
+                    <span class="badge badge-pink">VERIFIED ENTRY</span>
                   {% elif att.status == 'denied' %}
                     <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: var(--color-danger);">DENIED</span>
                   {% else %}
@@ -350,7 +350,7 @@
           <div class="card" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
               <h4 style="margin: 0;">{{ plan.title }}</h4>
-              <span class="badge badge-lime">{{ plan.difficulty_level or 'All Levels' }}</span>
+              <span class="badge badge-pink">{{ plan.difficulty_level or 'All Levels' }}</span>
             </div>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">{{ plan.description or 'Custom coaching plan.' }}</p>
             <div style="font-size: 0.8rem; color: var(--text-muted);">

@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       CALENDAR & TIME SLOTS
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -29,7 +29,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Weekly Hours</h3>
-      <span class="fp-badge-lime">Availability</span>
+      <span class="badge-pink">Availability</span>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -47,9 +47,9 @@
           </div>
           <div>
             {% if day.is_available %}
-              <span class="fp-badge-lime" style="font-size: 0.7rem;">ACTIVE</span>
+              <span class="badge-pink" style="font-size: 0.7rem;">ACTIVE</span>
             {% else %}
-              <span class="fp-badge-slate" style="font-size: 0.7rem;">OFF</span>
+              <span class="badge-neutral" style="font-size: 0.7rem;">OFF</span>
             {% endif %}
           </div>
         </div>
@@ -64,7 +64,7 @@
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Confirmed Sessions & Classes</h3>
         <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Upcoming athlete commitments on the gym floor</p>
       </div>
-      <span class="fp-badge-slate">{{ sessions|length }} Bookings</span>
+      <span class="badge-neutral">{{ sessions|length }} Bookings</span>
     </div>
 
     {% if sessions %}
@@ -86,7 +86,7 @@
               </div>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="{% if s.status == 'completed' %}fp-badge-slate{% elif s.status == 'cancelled' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+              <span class="{% if s.status == 'completed' %}badge-neutral{% elif s.status == 'cancelled' %}badge-danger{% else %}badge-pink{% endif %}">
                 {{ s.status|upper }}
               </span>
               {% if s.status == 'confirmed' or s.status == 'requested' %}
@@ -143,7 +143,7 @@
         </div>
 
         <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
-          <input type="checkbox" id="avail_check" name="is_available" checked style="width: 18px; height: 18px; accent-color: var(--fp-lime-dark);">
+          <input type="checkbox" id="avail_check" name="is_available" checked style="width: 18px; height: 18px; accent-color: var(--secondary-plum);">
           <label for="avail_check" style="cursor: pointer; font-size: 0.88rem; color: var(--fp-ink);">Available for 1-on-1 athlete bookings on this day</label>
         </div>
 

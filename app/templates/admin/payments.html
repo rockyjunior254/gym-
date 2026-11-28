@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Financial Transactions &bull; Counter Collections
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -27,10 +27,10 @@
   </div>
 
   <!-- Cash Policy Summary Banner -->
-  <div class="card" style="padding: 14px 18px; border-left: 4px solid var(--primary-forest);">
+  <div class="card" style="padding: 14px 18px; border-left: 4px solid var(--primary-pink);">
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
         </div>
         <div>
@@ -39,7 +39,7 @@
         </div>
       </div>
       <div style="display: flex; gap: 6px;">
-        <span class="badge badge-forest" style="font-size: 11px;">Counter Cash</span>
+        <span class="badge badge-pink" style="font-size: 11px;">Counter Cash</span>
         <span class="badge badge-neutral" style="font-size: 11px;">Audited Ledger</span>
       </div>
     </div>
@@ -52,12 +52,12 @@
       <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
         {{ payments|length }}
       </div>
-      <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">Recorded receipts</span>
+      <span style="font-size: 12px; color: var(--primary-pink); font-weight: 600;">Recorded receipts</span>
     </div>
 
     <div class="card" style="padding: 18px;">
       <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">CASH REVENUE TODAY</span>
-      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-pink); margin: 4px 0 2px 0;">
         KES {{ "{:,.0f}".format(today_cash if today_cash is defined else 0) }}
       </div>
       <span style="font-size: 12px; color: var(--text-muted);">Front-desk takings</span>
@@ -86,7 +86,7 @@
     <div class="card" style="padding: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
         <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Record Cash Received</h3>
-        <span class="badge badge-forest" style="font-size: 10.5px;">Front Desk</span>
+        <span class="badge badge-pink" style="font-size: 10.5px;">Front Desk</span>
       </div>
 
       <form method="POST" action="{{ url_for('admin.payments') }}">
@@ -137,7 +137,7 @@
           <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Transaction Register</h3>
           <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Physical cash payments verified and issued by desk staff</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">{{ payments|length }} Collections</span>
+        <span class="badge badge-pink" style="font-size: 11px;">{{ payments|length }} Collections</span>
       </div>
 
       <div style="overflow-x: auto;">
@@ -155,7 +155,7 @@
           <tbody>
             {% for p in payments %}
               <tr style="border-bottom: 1px solid var(--border-line);">
-                <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-forest);">
+                <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-pink);">
                   {{ p.receipt_number }}
                 </td>
                 <td style="padding: 10px 12px;">
@@ -216,7 +216,7 @@
     <!-- Printable Receipt Card -->
     <div id="printableReceiptArea" style="background: #FFFFFF; border: 1px solid var(--border-line); border-radius: 12px; padding: 20px; font-family: var(--font-body); margin-bottom: 1rem;">
       <div style="text-align: center; border-bottom: 1px dashed var(--border-line); padding-bottom: 12px; margin-bottom: 14px;">
-        <h4 style="margin: 0; font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-forest);">{{ gym_settings.gym_name|upper }}</h4>
+        <h4 style="margin: 0; font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; color: var(--primary-pink);">{{ gym_settings.gym_name|upper }}</h4>
         <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">OFFICIAL COUNTER CASH RECEIPT &bull; PHYSICAL RECORD</div>
         <div id="modalRcpNumber" style="font-weight: 800; font-size: 1.1rem; color: var(--text-ink); margin-top: 6px;"></div>
       </div>
@@ -232,7 +232,7 @@
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--text-muted);">Payment Tender:</span>
-          <span style="color: var(--primary-forest); font-weight: 700;">Physical Cash</span>
+          <span style="color: var(--primary-pink); font-weight: 700;">Physical Cash</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--text-muted);">Attendant:</span>
@@ -240,7 +240,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-line); padding-top: 10px; margin-top: 6px;">
           <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-ink);">Total Paid:</span>
-          <span id="modalRcpAmount" style="font-size: 1.25rem; font-weight: 800; color: var(--primary-forest);"></span>
+          <span id="modalRcpAmount" style="font-size: 1.25rem; font-weight: 800; color: var(--primary-pink);"></span>
         </div>
       </div>
 

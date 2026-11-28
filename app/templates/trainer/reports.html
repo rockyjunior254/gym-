@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       EXECUTIVE SUMMARY
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -54,7 +54,7 @@
   <div class="fp-kpi">
     <div>
       <div class="fp-kpi-label">Delivery Rate</div>
-      <div class="fp-kpi-val" style="color: var(--fp-lime-dark);">94%</div>
+      <div class="fp-kpi-val" style="color: var(--secondary-plum);">94%</div>
       <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Session completion</div>
     </div>
   </div>
@@ -67,7 +67,7 @@
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Session Delivery Log</h3>
       <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Live database records for coaching session compliance</p>
     </div>
-    <span class="fp-badge-lime">{{ sessions|length }} Records</span>
+    <span class="badge-pink">{{ sessions|length }} Records</span>
   </div>
 
   {% if sessions %}
@@ -93,7 +93,7 @@
               </td>
               <td style="padding: 10px;">{{ s.focus_area or 'General' }}</td>
               <td style="padding: 10px;">
-                <span class="{% if s.status == 'completed' %}fp-badge-slate{% elif s.status == 'cancelled' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+                <span class="{% if s.status == 'completed' %}badge-neutral{% elif s.status == 'cancelled' %}badge-danger{% else %}badge-pink{% endif %}">
                   {{ s.status|upper }}
                 </span>
               </td>

@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Identity &bull; Access Control
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -32,7 +32,7 @@
       <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Registered Accounts Directory</h3>
       <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Staff and member identities configured in Supabase Auth</p>
     </div>
-    <span class="badge badge-forest">{{ users|length }} Accounts</span>
+    <span class="badge badge-pink">{{ users|length }} Accounts</span>
   </div>
 
   {% if users %}
@@ -60,7 +60,7 @@
                   <div>
                     <strong style="color: var(--ink-dark);">{{ u.full_name }}</strong>
                     {% if u.id == session.user.id %}
-                      <span class="badge badge-forest" style="font-size: 0.68rem; margin-left: 0.35rem;">YOU</span>
+                      <span class="badge badge-pink" style="font-size: 0.68rem; margin-left: 0.35rem;">YOU</span>
                     {% endif %}
                   </div>
                 </div>
@@ -68,7 +68,7 @@
               <td style="color: var(--ink-secondary); font-size: 0.85rem;">{{ u.email }}</td>
               <td>
                 {% if u.role == 'admin' %}
-                  <span class="badge badge-forest">Administrator</span>
+                  <span class="badge badge-pink">Administrator</span>
                 {% elif u.role == 'trainer' %}
                   <span class="badge badge-neutral">Trainer</span>
                 {% else %}
@@ -77,7 +77,7 @@
               </td>
               <td>
                 {% if u.is_active %}
-                  <span class="badge badge-forest">Active</span>
+                  <span class="badge badge-pink">Active</span>
                 {% else %}
                   <span class="badge badge-rose">Suspended</span>
                 {% endif %}

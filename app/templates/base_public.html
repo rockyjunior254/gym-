@@ -15,41 +15,49 @@
 <body class="public-body" style="min-height: 100vh; display: flex; flex-direction: column;">
   <!-- Public Top Navigation -->
   <header class="navbar public-nav">
-    <a href="{{ url_for('public.index') }}" class="nav-brand" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-      <div style="width: 38px; height: 38px; border-radius: 8px; background: #C3E716; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.25rem; color: #0A0D0B;">
-        ⚡
-      </div>
-      <span style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em;">
-        STRAKLY <span style="color: #C3E716;">ATHLETICS</span>
-      </span>
-    </a>
+    <div class="public-nav-container">
+      <!-- Left: Logo & Brand Name -->
+      <a href="{{ url_for('public.index') }}" class="nav-brand" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0;">
+        <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--gradient-pink); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.15rem; color: #FFFFFF; box-shadow: 0 4px 12px rgba(231,84,156,0.35);">
+          ⚡
+        </div>
+        <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--text-ink); letter-spacing: -0.02em;">
+          STRAKLY <span style="color: var(--primary-pink);">ATHLETICS</span>
+        </span>
+      </a>
 
-    <ul class="nav-links">
-      <li><a href="{{ url_for('public.index') }}" class="nav-link {% if request.endpoint == 'public.index' %}active{% endif %}">Home</a></li>
-      <li><a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}">About</a></li>
-      <li><a href="{{ url_for('public.programmes') }}" class="nav-link {% if request.endpoint == 'public.programmes' %}active{% endif %}">Programmes</a></li>
-      <li><a href="{{ url_for('public.classes') }}" class="nav-link {% if request.endpoint == 'public.classes' %}active{% endif %}">Classes</a></li>
-      <li><a href="{{ url_for('public.trainers') }}" class="nav-link {% if request.endpoint == 'public.trainers' %}active{% endif %}">Coaches</a></li>
-      <li><a href="{{ url_for('public.memberships') }}" class="nav-link {% if request.endpoint == 'public.memberships' %}active{% endif %}">Pricing</a></li>
-      <li><a href="{{ url_for('public.gallery') }}" class="nav-link {% if request.endpoint == 'public.gallery' %}active{% endif %}">Gallery</a></li>
-      <li><a href="{{ url_for('public.contact') }}" class="nav-link {% if request.endpoint == 'public.contact' %}active{% endif %}">Contact</a></li>
-    </ul>
+      <!-- Center / Right: Clean Horizontal Navigation Links (7 items requested) -->
+      <nav class="nav-links-wrap" id="publicNavLinksWrap">
+        <ul class="nav-links">
+          <li><a href="{{ url_for('public.about') }}" class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}">About</a></li>
+          <li><a href="{{ url_for('public.programmes') }}" class="nav-link {% if request.endpoint == 'public.programmes' %}active{% endif %}">Programmes</a></li>
+          <li><a href="{{ url_for('public.classes') }}" class="nav-link {% if request.endpoint == 'public.classes' %}active{% endif %}">Classes</a></li>
+          <li><a href="{{ url_for('public.trainers') }}" class="nav-link {% if request.endpoint == 'public.trainers' %}active{% endif %}">Coaches</a></li>
+          <li><a href="{{ url_for('public.memberships') }}" class="nav-link {% if request.endpoint == 'public.memberships' %}active{% endif %}">Pricing</a></li>
+          <li><a href="{{ url_for('public.gallery') }}" class="nav-link {% if request.endpoint == 'public.gallery' %}active{% endif %}">Gallery</a></li>
+          <li><a href="{{ url_for('public.contact') }}" class="nav-link {% if request.endpoint == 'public.contact' %}active{% endif %}">Contact</a></li>
+        </ul>
+      </nav>
 
-    <div class="nav-actions">
-      {% if current_user %}
-        {% if current_user.role == 'admin' %}
-          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-neon btn-sm" style="padding: 8px 16px; font-size: 0.8rem;">Admin Portal</a>
-        {% elif current_user.role == 'trainer' %}
-          <a href="{{ url_for('trainer.dashboard') }}" class="btn btn-neon btn-sm" style="padding: 8px 16px; font-size: 0.8rem;">Coach Portal</a>
+      <!-- Right: Authentication Actions & Mobile Toggle -->
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+        {% if current_user %}
+          {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-sm">Admin Portal</a>
+          {% elif current_user.role == 'trainer' %}
+            <a href="{{ url_for('trainer.dashboard') }}" class="btn btn-primary btn-sm">Coach Portal</a>
+          {% else %}
+            <a href="{{ url_for('member.dashboard') }}" class="btn btn-primary btn-sm">Athlete Portal</a>
+          {% endif %}
+          <a href="{{ url_for('public.logout') }}" class="btn btn-secondary btn-sm">Sign Out</a>
         {% else %}
-          <a href="{{ url_for('member.dashboard') }}" class="btn btn-neon btn-sm" style="padding: 8px 16px; font-size: 0.8rem;">Athlete Portal</a>
+          <a href="{{ url_for('public.login') }}" class="btn btn-secondary btn-sm">Login</a>
+          <a href="{{ url_for('public.register') }}" class="btn btn-primary btn-sm">Join Facility</a>
         {% endif %}
-        <a href="{{ url_for('public.logout') }}" class="btn btn-glass btn-sm" style="padding: 8px 14px; font-size: 0.8rem;">Sign Out</a>
-      {% else %}
-        <a href="{{ url_for('public.login') }}" class="btn btn-glass btn-sm" style="padding: 8px 16px; font-size: 0.8rem;">Login</a>
-        <a href="{{ url_for('public.register') }}" class="btn btn-neon btn-sm" style="padding: 8px 18px; font-size: 0.82rem;">Join Facility</a>
-      {% endif %}
-      <button class="nav-toggle" id="publicNavToggle" aria-label="Toggle navigation">&#9776;</button>
+        <button class="nav-toggle" id="publicNavToggle" aria-label="Toggle navigation">
+          <i data-lucide="menu" style="width: 22px; height: 22px;"></i>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -71,17 +79,17 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Public Marketing Footer (Rendered ONLY on public marketing pages) -->
+  <!-- Public Marketing Footer (Pink-Led Carbon Obsidian & Rose Accents) -->
   <footer class="public-footer">
     <div class="container">
       <div class="grid-4" style="margin-bottom: 3rem;">
         <div>
           <div style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.8rem;">
-            STRAKLY <span style="color: #C3E716;">ATHLETICS</span>
+            STRAKLY <span style="color: var(--primary-pink);">ATHLETICS</span>
           </div>
-          <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #94A3B8;">{{ gym_settings.tagline }}</p>
-          <p style="font-size: 0.85rem; color: #64748B;">
-            Single facility athletic training center. Olympic barbell platforms, strength conditioning zones, and expert coaching staff.
+          <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #CDB7C5;">{{ gym_settings.tagline }}</p>
+          <p style="font-size: 0.85rem; color: #9B8293;">
+            Single facility athletic performance center. Olympic barbell platforms, strength conditioning zones, and expert coaching staff.
           </p>
         </div>
 
@@ -98,27 +106,36 @@
 
         <div>
           <h4>Operating Hours</h4>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;"><strong style="color: #FFFFFF;">Mon - Fri:</strong> 05:30 AM – 10:00 PM</p>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;"><strong style="color: #FFFFFF;">Saturday:</strong> 06:00 AM – 08:00 PM</p>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;"><strong style="color: #FFFFFF;">Sunday:</strong> 08:00 AM – 04:00 PM</p>
-          <div style="display: inline-block; background: rgba(195, 231, 22, 0.1); border: 1px solid rgba(195, 231, 22, 0.3); border-radius: 6px; padding: 4px 10px; margin-top: 0.6rem;">
-            <span style="font-size: 0.78rem; color: #C3E716; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Strict Cash-Only Facility</span>
-          </div>
+          <p style="font-size: 0.85rem; margin-bottom: 0.6rem; color: #CDB7C5;">
+            <strong style="color: #FFFFFF;">Monday – Friday:</strong><br>05:30 AM – 10:00 PM
+          </p>
+          <p style="font-size: 0.85rem; margin-bottom: 0.6rem; color: #CDB7C5;">
+            <strong style="color: #FFFFFF;">Saturday:</strong><br>06:30 AM – 08:00 PM
+          </p>
+          <p style="font-size: 0.85rem; color: #CDB7C5;">
+            <strong style="color: #FFFFFF;">Sunday &amp; Holidays:</strong><br>08:00 AM – 05:00 PM
+          </p>
         </div>
 
         <div>
-          <h4>Contact & Location</h4>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;">{{ gym_settings.address }}</p>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;">📞 {{ gym_settings.phone }}</p>
-          <p style="font-size: 0.85rem; margin-bottom: 0.4rem; color: #94A3B8;">✉️ {{ gym_settings.email }}</p>
+          <h4>Physical Location</h4>
+          <p style="font-size: 0.85rem; color: #CDB7C5; margin-bottom: 0.8rem;">
+            {{ gym_settings.gym_name }} Facility<br>
+            Nairobi Athletic District<br>
+            Cashier Front Desk, Ground Floor
+          </p>
+          <div style="font-size: 0.8rem; color: var(--primary-pink); font-weight: 700; text-transform: uppercase;">
+            ✓ In-Person Reception Payments
+          </div>
         </div>
       </div>
 
-      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.85rem; color: #64748B;">
-        <div>&copy; 2026 {{ gym_settings.gym_name }}. All rights reserved.</div>
+      <div style="border-top: 1px solid rgba(231, 84, 156, 0.15); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.82rem; color: #9B8293;">
+        <div>&copy; 2026 {{ gym_settings.gym_name }}. All rights reserved. Professional Athletic Infrastructure.</div>
         <div style="display: flex; gap: 1.5rem;">
-          <a href="{{ url_for('public.login') }}" style="color: #94A3B8;">Staff Login</a>
-          <a href="{{ url_for('public.register') }}" style="color: #C3E716; font-weight: 600;">Join Community</a>
+          <a href="{{ url_for('public.contact') }}">Contact Desk</a>
+          <a href="{{ url_for('public.memberships') }}">Cash Tiers</a>
+          <a href="{{ url_for('public.login') }}">Portal Access</a>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@
 
   <!-- Active Bookings Banner -->
   {% if my_bookings %}
-    <div class="fp-card" style="border-left: 4px solid var(--fp-lime);">
+    <div class="fp-card" style="border-left: 4px solid var(--primary-pink);">
       <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0 0 14px 0; color: var(--fp-ink);">My Reserved Classes</h3>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         {% for b in my_bookings %}
@@ -22,7 +22,7 @@
                 </div>
               </div>
               <form action="{{ url_for('member.cancel_class', booking_id=b.id) }}" method="POST" style="margin: 0;">
-                <button type="submit" class="fp-btn-outline" style="color: var(--fp-coral); border-color: rgba(218, 40, 28, 0.3); font-size: 0.75rem;">
+                <button type="submit" class="fp-btn-outline" style="color: var(--color-danger); border-color: rgba(218, 40, 28, 0.3); font-size: 0.75rem;">
                   Cancel Spot
                 </button>
               </form>
@@ -49,7 +49,7 @@
           <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                <span class="fp-brand-badge" style="background: var(--fp-lime); color: var(--fp-ink);">
+                <span class="fp-brand-badge" style="background: var(--primary-pink); color: var(--fp-ink);">
                   {{ c.category or 'Studio Class' }}
                 </span>
                 <span style="font-size: 0.72rem; color: var(--fp-muted); font-weight: 600;">

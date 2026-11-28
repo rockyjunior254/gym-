@@ -6,7 +6,7 @@
 <!-- Welcome & Quick Action Header -->
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       CURRICULUM MANAGEMENT • ADMIN APPROVAL WORKFLOW
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -35,7 +35,7 @@
 
   <div class="fp-card" style="padding: 18px 20px;">
     <div class="fp-kpi-label">Approved &amp; Live</div>
-    <div class="fp-kpi-val" style="color: var(--fp-lime-dark);">
+    <div class="fp-kpi-val" style="color: var(--secondary-plum);">
       {{ programmes|selectattr('status', 'equalto', 'approved')|list|length }}
     </div>
     <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">On public website</div>
@@ -43,7 +43,7 @@
 
   <div class="fp-card" style="padding: 18px 20px;">
     <div class="fp-kpi-label">Pending Admin Review</div>
-    <div class="fp-kpi-val" style="color: var(--fp-coral);">
+    <div class="fp-kpi-val" style="color: var(--color-danger);">
       {{ programmes|selectattr('status', 'equalto', 'pending')|list|length }}
     </div>
     <div style="font-size: 0.74rem; color: var(--fp-muted); margin-top: 2px;">Awaiting verification</div>
@@ -62,15 +62,15 @@
     <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px;">
-          <span class="fp-badge-slate" style="font-size: 0.72rem;">{{ p.category or 'Coaching Protocol' }}</span>
+          <span class="badge-neutral" style="font-size: 0.72rem;">{{ p.category or 'Coaching Protocol' }}</span>
           {% if p.status == 'approved' and p.is_published %}
-            <span class="fp-badge-lime" style="font-size: 0.72rem;">Live on Website</span>
+            <span class="badge-pink" style="font-size: 0.72rem;">Live on Website</span>
           {% elif p.status == 'approved' %}
-            <span class="fp-badge-slate" style="font-size: 0.72rem;">Approved (Offline)</span>
+            <span class="badge-neutral" style="font-size: 0.72rem;">Approved (Offline)</span>
           {% elif p.status == 'pending' %}
-            <span class="fp-badge-slate" style="font-size: 0.72rem; color: #B45309; background: #FEF3C7;">Pending Admin</span>
+            <span class="badge-neutral" style="font-size: 0.72rem; color: #B45309; background: #FEF3C7;">Pending Admin</span>
           {% else %}
-            <span class="fp-badge-slate" style="font-size: 0.72rem; color: var(--fp-coral);">Rejected</span>
+            <span class="badge-neutral" style="font-size: 0.72rem; color: var(--color-danger);">Rejected</span>
           {% endif %}
         </div>
 
@@ -78,7 +78,7 @@
           {{ p.name }}
         </h3>
         
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); margin-bottom: 10px;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); margin-bottom: 10px;">
           Objective: {{ p.objective or 'Athletic Development' }}
         </div>
 
@@ -90,7 +90,7 @@
           <div><span style="color: var(--fp-muted);">Duration:</span> <strong>{{ p.duration_weeks }} Weeks</strong></div>
           <div><span style="color: var(--fp-muted);">Sessions:</span> <strong>{{ p.sessions_count }} 1:1</strong></div>
           <div><span style="color: var(--fp-muted);">Audience:</span> <strong>{{ p.target_audience or 'All Lifters' }}</strong></div>
-          <div><span style="color: var(--fp-muted);">Fee:</span> <strong style="color: var(--fp-lime-dark);">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong></div>
+          <div><span style="color: var(--fp-muted);">Fee:</span> <strong style="color: var(--secondary-plum);">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong></div>
         </div>
 
         {% if p.admin_notes %}
@@ -116,7 +116,7 @@
         </button>
 
         <form method="POST" action="{{ url_for('trainer.delete_programme', programme_id=p.id) }}" onsubmit="return confirm('Remove this programme proposal?');" style="display:inline;">
-          <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px; color: var(--fp-coral);">Delete</button>
+          <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px; color: var(--color-danger);">Delete</button>
         </form>
       </div>
     </div>

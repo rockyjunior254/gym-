@@ -12,13 +12,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   {% block extra_head %}{% endblock %}
 </head>
-<body style="overflow: hidden; height: 100vh;">
+<body style="overflow: hidden; height: 100vh; background-color: var(--bg-main);">
   <!-- Flash Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="flash-container">
         {% for category, message in messages %}
           <div class="flash-message flash-{{ category }}">
+            <i data-lucide="info" style="width: 16px; height: 16px; color: var(--primary-pink);"></i>
             <span>{{ message }}</span>
           </div>
         {% endfor %}

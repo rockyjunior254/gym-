@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Facility Access Verification
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -19,7 +19,7 @@
       </p>
     </div>
     <div>
-      <span class="badge badge-forest" style="padding: 6px 12px; font-size: 12px; font-weight: 600;">
+      <span class="badge badge-pink" style="padding: 6px 12px; font-size: 12px; font-weight: 600;">
         <i data-lucide="check-circle" style="width: 14px; height: 14px; margin-right: 4px; display: inline-block; vertical-align: -2px;"></i>
         {{ attendance|length }} Verified Today
       </span>
@@ -27,10 +27,10 @@
   </div>
 
   <!-- Manual Verification Notice -->
-  <div class="card" style="padding: 14px 18px; border-left: 4px solid var(--primary-forest);">
+  <div class="card" style="padding: 14px 18px; border-left: 4px solid var(--primary-pink);">
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <i data-lucide="user-check" style="width: 16px; height: 16px;"></i>
         </div>
         <div>
@@ -39,7 +39,7 @@
         </div>
       </div>
       <div style="display: flex; gap: 6px;">
-        <span class="badge badge-forest" style="font-size: 11px;">Manual Check-In</span>
+        <span class="badge badge-pink" style="font-size: 11px;">Manual Check-In</span>
         <span class="badge badge-neutral" style="font-size: 11px;">Desk Audited</span>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <div class="card" style="padding: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-line);">
         <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Record Member Entry</h3>
-        <span class="badge badge-forest" style="font-size: 10.5px;">Desk Station</span>
+        <span class="badge badge-pink" style="font-size: 10.5px;">Desk Station</span>
       </div>
 
       <form method="POST" action="{{ url_for('admin.attendance') }}">
@@ -92,7 +92,7 @@
           <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Today's Facility Check-Ins</h3>
           <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Real-time register of verified entries through reception</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">{{ attendance|length }} Present Today</span>
+        <span class="badge badge-pink" style="font-size: 11px;">{{ attendance|length }} Present Today</span>
       </div>
 
       <div style="overflow-x: auto;">
@@ -118,7 +118,7 @@
                   <span style="font-size: 11.5px; color: var(--text-muted);">{{ a.profiles.email if a.profiles else '' }}</span>
                 </td>
                 <td style="padding: 10px 12px;">
-                  <span class="badge badge-forest" style="font-size: 10.5px;">Verified Entry</span>
+                  <span class="badge badge-pink" style="font-size: 10.5px;">Verified Entry</span>
                 </td>
                 <td style="padding: 10px 12px; font-size: 12px; color: var(--text-muted);">
                   {{ a.recorder.full_name if a.recorder else 'Desk Staff' }}

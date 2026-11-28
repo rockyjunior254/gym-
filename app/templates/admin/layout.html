@@ -4,18 +4,20 @@
 <!-- Mobile Sidebar Backdrop -->
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-<div class="app-shell">
-  <!-- Fixed 232px Sidebar -->
+<div class="app-shell" id="appShell">
+  <!-- Collapsible Pink-Led Admin Sidebar -->
   <aside class="app-sidebar" id="appSidebar">
     <!-- Sidebar Header & Brand -->
     <div class="sidebar-header">
       <a href="{{ url_for('admin.dashboard') }}" class="sidebar-brand">
-        <img src="{{ url_for('static', filename='images/placeholders/gym-logo.svg') }}" alt="{{ gym_settings.gym_name }}" class="sidebar-brand-img">
+        <div style="width: 34px; height: 34px; border-radius: 9px; background: var(--gradient-pink); display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(231,84,156,0.35);">
+          ⚡
+        </div>
         <div class="sidebar-brand-name">
-          STRAKLY
+          STRAKLY <span style="font-size: 0.72rem; font-weight: 700; color: var(--secondary-plum); background: var(--primary-pink-soft); padding: 2px 6px; border-radius: 4px; margin-left: 4px; border: 1px solid var(--border-active);">ADMIN</span>
         </div>
       </a>
-      <button type="button" class="btn btn-outline btn-sm" id="sidebarCollapseToggle" title="Collapse Sidebar" style="width: 32px; height: 32px; padding: 0; border: none;">
+      <button type="button" class="sidebar-collapse-btn" id="sidebarCollapseToggle" title="Toggle Sidebar">
         <i data-lucide="chevron-left" style="width: 18px; height: 18px;"></i>
       </button>
     </div>
@@ -27,7 +29,7 @@
       <ul class="sidebar-nav">
         <li>
           <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" data-tooltip="Dashboard">
-            <span class="sidebar-icon"><i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="layout-dashboard"></i></span>
             <span class="nav-label">Dashboard</span>
           </a>
         </li>
@@ -38,31 +40,31 @@
       <ul class="sidebar-nav">
         <li>
           <a href="{{ url_for('admin.members') }}" class="sidebar-link {% if 'admin.members' in request.endpoint %}active{% endif %}" data-tooltip="Members">
-            <span class="sidebar-icon"><i data-lucide="users" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="users"></i></span>
             <span class="nav-label">Athletes</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.plans') }}" class="sidebar-link {% if request.endpoint == 'admin.plans' %}active{% endif %}" data-tooltip="Plans & Packages">
-            <span class="sidebar-icon"><i data-lucide="credit-card" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="credit-card"></i></span>
             <span class="nav-label">Plans & Tiers</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.subscriptions') }}" class="sidebar-link {% if request.endpoint == 'admin.subscriptions' %}active{% endif %}" data-tooltip="Subscriptions & Renewals">
-            <span class="sidebar-icon"><i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="refresh-cw"></i></span>
             <span class="nav-label">Subscriptions</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.payments') }}" class="sidebar-link {% if request.endpoint == 'admin.payments' %}active{% endif %}" data-tooltip="Cash Payments & Receipts">
-            <span class="sidebar-icon"><i data-lucide="banknote" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="banknote"></i></span>
             <span class="nav-label">Cash Payments</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.attendance') }}" class="sidebar-link {% if request.endpoint == 'admin.attendance' %}active{% endif %}" data-tooltip="Manual Attendance">
-            <span class="sidebar-icon"><i data-lucide="clipboard-check" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="clipboard-check"></i></span>
             <span class="nav-label">Attendance</span>
           </a>
         </li>
@@ -73,31 +75,31 @@
       <ul class="sidebar-nav">
         <li>
           <a href="{{ url_for('admin.trainers') }}" class="sidebar-link {% if request.endpoint == 'admin.trainers' %}active{% endif %}" data-tooltip="Trainers & Assignments">
-            <span class="sidebar-icon"><i data-lucide="award" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="award"></i></span>
             <span class="nav-label">Coaching Staff</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.classes') }}" class="sidebar-link {% if request.endpoint == 'admin.classes' %}active{% endif %}" data-tooltip="Classes & Bookings">
-            <span class="sidebar-icon"><i data-lucide="calendar" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="calendar"></i></span>
             <span class="nav-label">Class Schedule</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.exercises') }}" class="sidebar-link {% if request.endpoint == 'admin.exercises' %}active{% endif %}" data-tooltip="Workout & Exercises">
-            <span class="sidebar-icon"><i data-lucide="dumbbell" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="dumbbell"></i></span>
             <span class="nav-label">Movement Library</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.services') }}" class="sidebar-link {% if request.endpoint == 'admin.services' %}active{% endif %}" data-tooltip="Gym Services">
-            <span class="sidebar-icon"><i data-lucide="zap" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="zap"></i></span>
             <span class="nav-label">Facility Services</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.equipment') }}" class="sidebar-link {% if request.endpoint == 'admin.equipment' %}active{% endif %}" data-tooltip="Equipment & Maintenance">
-            <span class="sidebar-icon"><i data-lucide="settings-2" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="settings-2"></i></span>
             <span class="nav-label">Assets & Gear</span>
           </a>
         </li>
@@ -108,19 +110,19 @@
       <ul class="sidebar-nav">
         <li>
           <a href="{{ url_for('admin.community') }}" class="sidebar-link {% if request.endpoint == 'admin.community' %}active{% endif %}" data-tooltip="Community Hub">
-            <span class="sidebar-icon"><i data-lucide="message-square" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="message-square"></i></span>
             <span class="nav-label">Community Hub</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.announcements') }}" class="sidebar-link {% if request.endpoint == 'admin.announcements' %}active{% endif %}" data-tooltip="Announcements">
-            <span class="sidebar-icon"><i data-lucide="megaphone" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="megaphone"></i></span>
             <span class="nav-label">Announcements</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.notifications') }}" class="sidebar-link {% if request.endpoint == 'admin.notifications' %}active{% endif %}" data-tooltip="Notifications">
-            <span class="sidebar-icon"><i data-lucide="bell" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="bell"></i></span>
             <span class="nav-label">Notifications</span>
           </a>
         </li>
@@ -131,25 +133,25 @@
       <ul class="sidebar-nav">
         <li>
           <a href="{{ url_for('admin.reports') }}" class="sidebar-link {% if request.endpoint == 'admin.reports' %}active{% endif %}" data-tooltip="Reports & Export">
-            <span class="sidebar-icon"><i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
             <span class="nav-label">Operational Reports</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.audit_logs') }}" class="sidebar-link {% if request.endpoint == 'admin.audit_logs' %}active{% endif %}" data-tooltip="Audit Logs">
-            <span class="sidebar-icon"><i data-lucide="shield-check" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
             <span class="nav-label">Audit Logs</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.users') }}" class="sidebar-link {% if request.endpoint == 'admin.users' %}active{% endif %}" data-tooltip="User Accounts">
-            <span class="sidebar-icon"><i data-lucide="user-cog" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="user-cog"></i></span>
             <span class="nav-label">User Accounts</span>
           </a>
         </li>
         <li>
           <a href="{{ url_for('admin.settings') }}" class="sidebar-link {% if request.endpoint == 'admin.settings' %}active{% endif %}" data-tooltip="Facility Settings">
-            <span class="sidebar-icon"><i data-lucide="sliders" style="width: 18px; height: 18px;"></i></span>
+            <span class="sidebar-icon"><i data-lucide="sliders"></i></span>
             <span class="nav-label">Facility Settings</span>
           </a>
         </li>
@@ -183,22 +185,22 @@
         </a>
 
         <!-- User Profile Pill -->
-        <div style="display: flex; align-items: center; gap: 8px; padding-left: 8px; border-left: 1px solid var(--border-line);">
-          <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--bg-blush); border: 1.5px solid var(--primary-forest); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--primary-forest);">
+        <div class="user-profile-pill">
+          <div class="user-avatar-circle">
             {{ current_user.full_name[:2].upper() if current_user and current_user.full_name else 'AD' }}
           </div>
-          <div style="font-size: 13px; font-weight: 600; color: var(--text-ink); line-height: 1.2;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-ink); line-height: 1.2;">
             {{ current_user.full_name if current_user else 'Admin' }}
-            <span style="display: block; font-size: 11px; font-weight: 400; color: var(--text-muted);">Administrator</span>
+            <span style="display: block; font-size: 11px; font-weight: 500; color: var(--text-secondary);">Administrator</span>
           </div>
-          <a href="{{ url_for('public.logout') }}" class="btn btn-outline btn-sm" style="margin-left: 8px; padding: 0 10px;" title="Sign Out">
-            <i data-lucide="log-out" style="width: 15px; height: 15px;"></i>
+          <a href="{{ url_for('public.logout') }}" class="btn btn-outline btn-sm" style="margin-left: 6px; padding: 0 8px; border: none;" title="Sign Out">
+            <i data-lucide="log-out" style="width: 15px; height: 15px; color: var(--color-danger);"></i>
           </a>
         </div>
       </div>
     </header>
 
-    <!-- Main Content Container (Max width 1280px, strictly no footer) -->
+    <!-- Main Content Container (Strictly no footer) -->
     <main class="app-content">
       {% block admin_content %}{% endblock %}
     </main>

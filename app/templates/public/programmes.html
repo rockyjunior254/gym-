@@ -22,7 +22,7 @@
             {% if s.image_url %}
               <img src="{{ s.image_url }}" alt="{{ s.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
             {% endif %}
-            <span class="badge badge-lime" style="margin-bottom: 0.8rem; font-size: 0.72rem;">{{ s.category }}</span>
+            <span class="badge badge-pink" style="margin-bottom: 0.8rem; font-size: 0.72rem;">{{ s.category }}</span>
             <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem;">{{ s.name }}</h3>
             <p style="margin: 0.5rem 0 1.2rem; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5;">
               {{ s.description }}
@@ -46,15 +46,15 @@
 
       <div class="grid-3" style="gap: 24px;">
         {% for p in programmes %}
-          <div class="card card-elevated" style="display: flex; flex-direction: column; justify-content: space-between; border-color: var(--primary-lime);">
+          <div class="card card-elevated" style="display: flex; flex-direction: column; justify-content: space-between; border-color: var(--primary-pink);">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                <span class="badge badge-lime" style="font-size: 0.72rem;">{{ p.category or 'SPECIALISED' }}</span>
+                <span class="badge badge-pink" style="font-size: 0.72rem;">{{ p.category or 'SPECIALISED' }}</span>
                 <span style="font-size: 0.8rem; color: var(--text-muted);">{{ p.duration_weeks }} WEEKS</span>
               </div>
 
               <h3 style="margin: 0 0 0.5rem; font-size: 1.3rem;">{{ p.name }}</h3>
-              <div style="font-size: 0.82rem; color: var(--primary-lime); font-weight: 700; margin-bottom: 0.8rem;">
+              <div style="font-size: 0.82rem; color: var(--primary-pink); font-weight: 700; margin-bottom: 0.8rem;">
                 Coach: {{ p.trainer_name }}
               </div>
 
@@ -62,7 +62,7 @@
                 {{ p.description }}
               </p>
 
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
                 <span style="font-size: 0.8rem; color: var(--text-muted);">{{ p.sessions_count }} 1-on-1 Sessions</span>
                 <strong style="color: #fff; font-size: 1.1rem;">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong>
               </div>

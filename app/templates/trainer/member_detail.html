@@ -10,7 +10,7 @@
   </a>
   <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
     <div style="display: flex; align-items: center; gap: 14px;">
-      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 700; overflow: hidden; flex-shrink: 0;">
         {% if athlete.avatar_url %}
           <img src="{{ athlete.avatar_url }}" alt="{{ athlete.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
         {% else %}
@@ -97,7 +97,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 6px;">
           <span style="color: var(--fp-muted);">Fitness Objectives:</span>
-          <strong style="color: var(--fp-lime-dark);">{{ details.fitness_goals or 'General strength & conditioning' }}</strong>
+          <strong style="color: var(--secondary-plum);">{{ details.fitness_goals or 'General strength & conditioning' }}</strong>
         </div>
         <div style="display: flex; justify-content: space-between;">
           <span style="color: var(--fp-muted);">Emergency Contact:</span>
@@ -112,8 +112,8 @@
         {{ details.notes or 'No specific administrative restrictions recorded. Standard progressive overload and movement mechanics review.' }}
       </div>
       <div style="display: flex; gap: 8px;">
-        <span class="fp-badge-lime">1-on-1 Coached</span>
-        <span class="fp-badge-slate">Strict Cash Verified</span>
+        <span class="badge-pink">1-on-1 Coached</span>
+        <span class="badge-neutral">Strict Cash Verified</span>
       </div>
     </div>
   </div>
@@ -134,7 +134,7 @@
             <div>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 <strong style="font-size: 0.95rem; color: var(--fp-ink);">{{ p.title }}</strong>
-                <span class="fp-badge-lime">{{ p.status|upper }}</span>
+                <span class="badge-pink">{{ p.status|upper }}</span>
               </div>
               <p style="margin: 0; font-size: 0.82rem; color: var(--fp-muted);">Goal: {{ p.goal or 'Strength' }} • {{ p.days_per_week }} Days/Week</p>
             </div>
@@ -203,7 +203,7 @@
               <strong style="font-size: 0.9rem; color: var(--fp-ink);">{{ s.session_date }} at {{ s.start_time[:5] }}</strong>
               <div style="font-size: 0.8rem; color: var(--fp-muted);">Focus: {{ s.focus_area or 'General Fitness' }}</div>
             </div>
-            <span class="fp-badge-lime">{{ s.status|upper }}</span>
+            <span class="badge-pink">{{ s.status|upper }}</span>
           </div>
         {% endfor %}
       </div>
@@ -227,7 +227,7 @@
           <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
               <strong style="color: var(--fp-ink); font-size: 0.92rem;">Evaluation: {{ ass.assessment_date }}</strong>
-              <span class="fp-badge-slate">Next Review: {{ ass.next_review_date or 'TBD' }}</span>
+              <span class="badge-neutral">Next Review: {{ ass.next_review_date or 'TBD' }}</span>
             </div>
             <p style="margin: 0 0 6px; font-size: 0.84rem; color: var(--fp-muted);">Objectives: {{ ass.fitness_objectives or 'Standard strength baseline' }}</p>
             <p style="margin: 0; font-size: 0.84rem; color: var(--fp-ink);">Recommendations: {{ ass.recommendations or 'Continue progressive overload.' }}</p>
@@ -250,11 +250,11 @@
           <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
               <strong style="color: var(--fp-ink); font-size: 0.9rem;">Date: {{ ch.checkin_date }}</strong>
-              <span class="{% if ch.status == 'pending' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">{{ ch.status|upper }}</span>
+              <span class="{% if ch.status == 'pending' %}badge-danger{% else %}badge-pink{% endif %}">{{ ch.status|upper }}</span>
             </div>
             <p style="margin: 0 0 6px; font-size: 0.84rem; color: var(--fp-muted);">Athlete Notes: {{ ch.athlete_notes or 'Weekly check-in submitted.' }}</p>
             {% if ch.trainer_feedback %}
-              <div style="background: #FFFFFF; border-left: 3px solid var(--fp-lime-dark); padding: 8px 12px; font-size: 0.82rem; color: var(--fp-ink);">
+              <div style="background: #FFFFFF; border-left: 3px solid var(--secondary-plum); padding: 8px 12px; font-size: 0.82rem; color: var(--fp-ink);">
                 <strong>Coach Feedback:</strong> {{ ch.trainer_feedback }}
               </div>
             {% endif %}

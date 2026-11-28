@@ -90,7 +90,7 @@
           <p style="margin-top: 0.8rem; font-size: 0.9rem;">Elite training facility equipped with competition grade free weights, turf conditioning zones, and expert athletic coaching.</p>
         </div>
         <div>
-          <h4 style="margin-bottom: 1.2rem; color: var(--primary-lime);">Quick Links</h4>
+          <h4 style="margin-bottom: 1.2rem; color: var(--primary-pink);">Quick Links</h4>
           <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem;">
             <li><a href="{{ url_for('public.about') }}" class="nav-link">About Facility</a></li>
             <li><a href="{{ url_for('public.programmes') }}" class="nav-link">Programmes</a></li>
@@ -100,7 +100,7 @@
           </ul>
         </div>
         <div>
-          <h4 style="margin-bottom: 1.2rem; color: var(--primary-lime);">Facility Hours</h4>
+          <h4 style="margin-bottom: 1.2rem; color: var(--primary-pink);">Facility Hours</h4>
           {% if gym_settings.opening_hours is mapping %}
             <p style="font-size: 0.9rem; margin-bottom: 0.4rem;"><strong>Mon - Fri:</strong> {{ gym_settings.opening_hours.get('weekdays', '05:00 AM - 10:00 PM') }}</p>
             <p style="font-size: 0.9rem; margin-bottom: 0.4rem;"><strong>Saturday:</strong> {{ gym_settings.opening_hours.get('saturdays', '06:00 AM - 09:00 PM') }}</p>
@@ -111,11 +111,11 @@
           {% endif %}
         </div>
         <div>
-          <h4 style="margin-bottom: 1.2rem; color: var(--primary-lime);">Location & Contact</h4>
+          <h4 style="margin-bottom: 1.2rem; color: var(--primary-pink);">Location & Contact</h4>
           <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📍 {{ gym_settings.address }}</p>
           <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">📞 {{ gym_settings.phone }}</p>
           <p style="font-size: 0.9rem; margin-bottom: 1rem;">✉️ {{ gym_settings.email }}</p>
-          <span class="badge badge-lime">CASH PAYMENTS ONLY AT FRONT DESK</span>
+          <span class="badge badge-pink">CASH PAYMENTS ONLY AT FRONT DESK</span>
         </div>
       </div>
       <div style="text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 2rem;">

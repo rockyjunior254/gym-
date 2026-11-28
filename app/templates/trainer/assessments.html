@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       DIAGNOSTIC & PERFORMANCE
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -30,7 +30,7 @@
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Fitness Evaluations Register</h3>
       <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Structured coaching assessments and performance history</p>
     </div>
-    <span class="fp-badge-lime">{{ assessments|length }} Records</span>
+    <span class="badge-pink">{{ assessments|length }} Records</span>
   </div>
 
   {% if assessments %}
@@ -43,7 +43,7 @@
                 <strong style="color: var(--fp-ink); font-size: 1rem; display: block;">{{ ass.profiles.full_name if ass.profiles else 'Athlete' }}</strong>
                 <span style="font-size: 0.78rem; color: var(--fp-muted);">Assessed: {{ ass.assessment_date }}</span>
               </div>
-              <span class="fp-badge-slate">Review: {{ ass.next_review_date or 'Next Phase' }}</span>
+              <span class="badge-neutral">Review: {{ ass.next_review_date or 'Next Phase' }}</span>
             </div>
 
             <div style="background: #FFFFFF; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 0.82rem;">

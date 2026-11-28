@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       BULLETINS & INBOX
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -26,7 +26,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Facility Bulletins</h3>
-      <span class="fp-badge-slate">{{ announcements|length }} Bulletins</span>
+      <span class="badge-neutral">{{ announcements|length }} Bulletins</span>
     </div>
 
     {% if announcements %}
@@ -35,7 +35,7 @@
           <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 10px; padding: 14px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
               <strong style="color: var(--fp-ink); font-size: 0.92rem;">{{ a.title }}</strong>
-              <span class="fp-badge-slate" style="font-size: 0.7rem;">{{ a.created_at[:10] if a.created_at else 'Recent' }}</span>
+              <span class="badge-neutral" style="font-size: 0.7rem;">{{ a.created_at[:10] if a.created_at else 'Recent' }}</span>
             </div>
             <p style="margin: 0; font-size: 0.84rem; color: var(--fp-muted); line-height: 1.45;">{{ a.content }}</p>
           </div>
@@ -50,7 +50,7 @@
   <div class="fp-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 10px;">
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Notifications Dispatch</h3>
-      <span class="fp-badge-lime">{{ notifications|length }} Alerts</span>
+      <span class="badge-pink">{{ notifications|length }} Alerts</span>
     </div>
 
     {% if notifications %}
@@ -61,7 +61,7 @@
               <strong style="font-size: 0.88rem; color: var(--fp-ink); display: block;">{{ n.title }}</strong>
               <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">{{ n.message }}</p>
             </div>
-            <span class="{% if n.is_read %}fp-badge-slate{% else %}fp-badge-lime{% endif %}" style="font-size: 0.7rem;">
+            <span class="{% if n.is_read %}badge-neutral{% else %}badge-pink{% endif %}" style="font-size: 0.7rem;">
               {{ 'READ' if n.is_read else 'NEW' }}
             </span>
           </div>

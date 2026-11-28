@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       PROGRAMMING ARCHITECTURE
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -30,8 +30,8 @@
     <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-          <span class="fp-badge-slate" style="font-size: 0.72rem;">{{ p.days_per_week }} DAYS / WEEK</span>
-          <span class="{% if p.status == 'active' %}fp-badge-lime{% else %}fp-badge-slate{% endif %}">{{ p.status|upper }}</span>
+          <span class="badge-neutral" style="font-size: 0.72rem;">{{ p.days_per_week }} DAYS / WEEK</span>
+          <span class="{% if p.status == 'active' %}badge-pink{% else %}badge-neutral{% endif %}">{{ p.status|upper }}</span>
         </div>
 
         <h3 style="margin: 0 0 6px; font-size: 1.15rem; font-weight: 700; color: var(--fp-ink);">{{ p.title }}</h3>
@@ -60,7 +60,7 @@
                   data-notes="{{ p.notes or '' }}"
                   onclick="openEditPlanModal(this)">Edit</button>
           <form method="POST" action="{{ url_for('trainer.delete_plan', plan_id=p.id) }}" onsubmit="return confirm('Archive/Delete this plan?');" style="display:inline;">
-            <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px; color: var(--fp-coral);">Delete</button>
+            <button type="submit" class="fp-btn-outline" style="font-size: 0.75rem; padding: 4px 10px; color: var(--color-danger);">Delete</button>
           </form>
         </div>
       </div>

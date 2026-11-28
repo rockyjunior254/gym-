@@ -17,7 +17,7 @@
   <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #201712 100%); color: #FFFFFF; padding: 32px; border-radius: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
       <div>
-        <span style="font-size: 0.72rem; font-weight: 800; color: var(--fp-lime); text-transform: uppercase; letter-spacing: 0.08em;">CURRENT MEMBERSHIP PLAN</span>
+        <span style="font-size: 0.72rem; font-weight: 800; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em;">CURRENT MEMBERSHIP PLAN</span>
         <h2 style="font-size: 2rem; font-weight: 800; margin: 8px 0 4px 0; letter-spacing: -0.02em;">
           {{ active_sub.plan_name if active_sub else 'No Active Subscription' }}
         </h2>
@@ -31,7 +31,7 @@
       </div>
 
       <div style="text-align: right;">
-        <div style="font-size: 2.2rem; font-weight: 800; color: var(--fp-lime); line-height: 1;">
+        <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary-pink); line-height: 1;">
           {{ days_remaining }}
         </div>
         <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 700; text-transform: uppercase; margin-top: 4px;">Days Remaining</div>
@@ -112,7 +112,7 @@
                   {% if r.status == 'approved' %}
                     <span style="color: #10B981; font-weight: 700;">Approved</span>
                   {% elif r.status == 'rejected' %}
-                    <span style="color: var(--fp-coral); font-weight: 700;">Declined</span>
+                    <span style="color: var(--color-danger); font-weight: 700;">Declined</span>
                   {% else %}
                     <span style="color: #F59E0B; font-weight: 700;">Pending Desk Review</span>
                   {% endif %}

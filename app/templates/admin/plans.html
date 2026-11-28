@@ -8,7 +8,7 @@
   <!-- Page Header & Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Tier Configuration
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -33,12 +33,12 @@
       <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
         {{ plans|length }}
       </div>
-      <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">Configured tiers</span>
+      <span style="font-size: 12px; color: var(--primary-pink); font-weight: 600;">Configured tiers</span>
     </div>
 
     <div class="card" style="padding: 18px;">
       <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE TIERS</span>
-      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+      <div style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--primary-pink); margin: 4px 0 2px 0;">
         {{ plans|selectattr('is_active')|list|length }}
       </div>
       <span style="font-size: 12px; color: var(--text-muted);">Available for enrollment</span>
@@ -67,13 +67,13 @@
       <div class="card" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <span class="badge badge-forest" style="font-size: 11px; text-transform: uppercase;">
+            <span class="badge badge-pink" style="font-size: 11px; text-transform: uppercase;">
               {{ p.duration_days }} DAYS &bull; {{ p.duration_type|capitalize }}
             </span>
             {% if p.is_archived %}
               <span class="badge" style="background: var(--color-danger-tint); color: var(--color-danger); font-size: 10px;">Archived</span>
             {% elif p.is_active %}
-              <span class="badge badge-forest" style="font-size: 10px;">Active</span>
+              <span class="badge badge-pink" style="font-size: 10px;">Active</span>
             {% else %}
               <span class="badge" style="background: #E5E7EB; color: #4B5563; font-size: 10px;">Inactive</span>
             {% endif %}
@@ -83,7 +83,7 @@
             {{ p.name }}
           </h3>
 
-          <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-forest); margin-bottom: 10px;">
+          <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-pink); margin-bottom: 10px;">
             KES {{ "{:,.0f}".format(p.price|float) }}
           </div>
 
@@ -97,7 +97,7 @@
               <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
                 {% for b in p.benefits[:4] %}
                   <li style="font-size: 12px; color: var(--text-ink); display: flex; align-items: center; gap: 6px;">
-                    <i data-lucide="check" style="width: 13px; height: 13px; color: var(--primary-forest);"></i>
+                    <i data-lucide="check" style="width: 13px; height: 13px; color: var(--primary-pink);"></i>
                     <span>{{ b }}</span>
                   </li>
                 {% endfor %}
@@ -238,7 +238,7 @@
       </div>
 
       <div class="form-group" style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.75rem;">
-        <input type="checkbox" id="edit_plan_is_active" name="is_active" value="true" style="width: 16px; height: 16px; accent-color: var(--primary-forest);">
+        <input type="checkbox" id="edit_plan_is_active" name="is_active" value="true" style="width: 16px; height: 16px; accent-color: var(--primary-pink);">
         <label for="edit_plan_is_active" style="cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-ink);">Active for Enrollment</label>
       </div>
 

@@ -599,9 +599,21 @@ class GymRepository:
             return []
         try:
             res = db_service.get_table('profiles').select('*, trainer_details!trainer_details_id_fkey(*)').eq('role', 'trainer').order('created_at', desc=True).execute()
+            trainers = res.data or []
+            for t in trainers:
+                td = t.get('trainer_details')
+                if isinstance(td, list) and td:
+                    td = td[0]
+                    t['trainer_details'] = td
+                elif not isinstance(td, dict):
+                    td = {}
+                    t['trainer_details'] = td
+                t['bio'] = t.get('bio') or td.get('bio') or 'Dedicated athletic coach at Strakly Gym committed to member results.'
+                t['specialisations'] = t.get('specialisations') or td.get('specialisations') or ['Strength & Conditioning']
+                t['certifications'] = t.get('certifications') or td.get('certifications') or 'Certified Coach'
             if not include_archived:
-                return [t for t in res.data if not t.get('is_archived', False)]
-            return res.data
+                return [t for t in trainers if not t.get('is_archived', False)]
+            return trainers
         except Exception as e:
             logger.error(f"Error fetching trainers with explicit relationship: {e}")
             try:
@@ -610,7 +622,11 @@ class GymRepository:
                 trainers = res.data or []
                 for t in trainers:
                     det = db_service.get_table('trainer_details').select('*').eq('id', t['id']).execute()
-                    t['trainer_details'] = det.data[0] if det.data else {}
+                    td = det.data[0] if det.data else {}
+                    t['trainer_details'] = td
+                    t['bio'] = t.get('bio') or td.get('bio') or 'Dedicated athletic coach at Strakly Gym committed to member results.'
+                    t['specialisations'] = t.get('specialisations') or td.get('specialisations') or ['Strength & Conditioning']
+                    t['certifications'] = t.get('certifications') or td.get('certifications') or 'Certified Coach'
                 if not include_archived:
                     return [t for t in trainers if not t.get('is_archived', False)]
                 return trainers

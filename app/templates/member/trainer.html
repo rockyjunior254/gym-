@@ -21,7 +21,7 @@
   <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
     <!-- Coach Card -->
     <div class="fp-card" style="display: flex; align-items: center; gap: 24px;">
-      <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; flex-shrink: 0;">
+      <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 800; flex-shrink: 0;">
         {% if coach and coach.trainer and coach.trainer.avatar_url %}
           <img src="{{ coach.trainer.avatar_url }}" alt="{{ coach.trainer.full_name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
         {% else %}
@@ -62,7 +62,7 @@
     <!-- PT Session Wallet Card -->
     <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1A130E 100%); color: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <span style="font-size: 0.72rem; font-weight: 800; color: var(--fp-lime); text-transform: uppercase;">1-ON-1 PT WALLET</span>
+        <span style="font-size: 0.72rem; font-weight: 800; color: var(--primary-pink); text-transform: uppercase;">1-ON-1 PT WALLET</span>
         <div style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF; margin-top: 6px; line-height: 1;">
           {{ pt_wallet.sessions_remaining or 0 }}
         </div>
@@ -71,7 +71,7 @@
 
       <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
         <span style="color: #9CA3AF;">Used: {{ pt_wallet.sessions_used or 0 }}</span>
-        <span style="color: var(--fp-lime); font-weight: 700;">Top up at front desk</span>
+        <span style="color: var(--primary-pink); font-weight: 700;">Top up at front desk</span>
       </div>
     </div>
   </div>
@@ -110,7 +110,7 @@
                   {% elif s.status == 'completed' %}
                     <span style="color: var(--fp-muted); font-weight: 600;">Completed</span>
                   {% elif s.status == 'cancelled' %}
-                    <span style="color: var(--fp-coral); font-weight: 700;">Cancelled</span>
+                    <span style="color: var(--color-danger); font-weight: 700;">Cancelled</span>
                   {% else %}
                     <span style="color: #F59E0B; font-weight: 700;">Requested</span>
                   {% endif %}
@@ -139,7 +139,7 @@
         <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FAFAFA; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-              <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800;">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800;">
                 {{ t.full_name[:2].upper() }}
               </div>
               <div>

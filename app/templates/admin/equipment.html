@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Facility Assets &amp; Inventory
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -31,7 +31,7 @@
     <div class="card" style="padding: 20px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Register New Asset</h3>
-        <span class="badge badge-forest" style="font-size: 10.5px;">Inventory</span>
+        <span class="badge badge-pink" style="font-size: 10.5px;">Inventory</span>
       </div>
 
       <form method="POST" action="{{ url_for('admin.equipment') }}">
@@ -87,7 +87,7 @@
           <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Facility Asset Inventory</h3>
           <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Operational machinery and condition status</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">{{ equipment|length }} Registered Assets</span>
+        <span class="badge badge-pink" style="font-size: 11px;">{{ equipment|length }} Registered Assets</span>
       </div>
 
       <div style="overflow-x: auto;">
@@ -117,7 +117,7 @@
               <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ eq.location or 'Main Floor' }}</td>
               <td>
                 {% if eq.condition == 'excellent' or eq.condition == 'good' %}
-                  <span class="badge badge-forest">{{ eq.condition|upper }}</span>
+                  <span class="badge badge-pink">{{ eq.condition|upper }}</span>
                 {% elif eq.condition == 'needs_service' or eq.condition == 'needs_maintenance' %}
                   <span class="badge badge-rose">Needs Service</span>
                 {% else %}
@@ -126,7 +126,7 @@
               </td>
               <td>
                 {% if eq.is_available %}
-                  <span class="badge badge-forest">Available</span>
+                  <span class="badge badge-pink">Available</span>
                 {% else %}
                   <span class="badge badge-rose">Out of Service</span>
                 {% endif %}
@@ -163,7 +163,7 @@
       <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Maintenance & Servicing History</h3>
       <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Repair records, routine checkups, and servicing expenditures</p>
     </div>
-    <span class="badge badge-forest">{{ maintenance_logs|length }} Service Events</span>
+    <span class="badge badge-pink">{{ maintenance_logs|length }} Service Events</span>
   </div>
 
   {% if maintenance_logs %}
@@ -193,7 +193,7 @@
               <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ log.profiles.full_name if log.profiles else 'Staff' }}</td>
               <td><span style="font-weight: 700; color: var(--forest-primary);">KES {{ "{:,.2f}".format(log.cost or 0) }}</span></td>
               <td>
-                <span class="badge {% if log.status == 'resolved' %}badge-forest{% else %}badge-warning{% endif %}">
+                <span class="badge {% if log.status == 'resolved' %}badge-pink{% else %}badge-warning{% endif %}">
                   {{ log.status|upper }}
                 </span>
               </td>

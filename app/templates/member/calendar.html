@@ -37,7 +37,7 @@
                 {% if ev.type == 'class' %}
                   background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);
                 {% elif ev.type == 'pt' %}
-                  background: rgba(218, 40, 28, 0.12); color: var(--fp-coral);
+                  background: rgba(218, 40, 28, 0.12); color: var(--color-danger);
                 {% else %}
                   background: #E5E7EB; color: var(--fp-ink);
                 {% endif %}">
@@ -54,8 +54,8 @@
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ ev.title }}</span>
                   <span class="fp-brand-badge" style="
-                    {% if ev.type == 'class' %}background: var(--fp-lime); color: var(--fp-ink);
-                    {% elif ev.type == 'pt' %}background: var(--fp-coral); color: #FFFFFF;
+                    {% if ev.type == 'class' %}background: var(--primary-pink); color: var(--fp-ink);
+                    {% elif ev.type == 'pt' %}background: var(--color-danger); color: #FFFFFF;
                     {% else %}background: #E5E7EB; color: var(--fp-ink);{% endif %}">
                     {{ ev.badge }}
                   </span>

@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Facility Offerings &amp; Catalog
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -35,7 +35,7 @@
           <img src="{{ s.image_url }}" alt="{{ s.name }}" style="width: 100%; height: 100%; object-fit: cover;">
           <div style="position: absolute; top: 12px; right: 12px;">
             {% if s.is_published %}
-              <span class="badge badge-forest">Published</span>
+              <span class="badge badge-pink">Published</span>
             {% else %}
               <span class="badge badge-neutral">Draft</span>
             {% endif %}
@@ -53,7 +53,7 @@
             {% if not s.image_url %}
               <div>
                 {% if s.is_published %}
-                  <span class="badge badge-forest">Published</span>
+                  <span class="badge badge-pink">Published</span>
                 {% else %}
                   <span class="badge badge-neutral">Draft</span>
                 {% endif %}
@@ -113,7 +113,7 @@
   <div class="card" style="padding: 24px; border: 1px solid var(--border-line); margin-top: 12px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
       <div>
-        <div style="font-size: 0.72rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px;">
           Coaching Review Desk
         </div>
         <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-ink); margin: 0;">
@@ -136,7 +136,7 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                 <span class="badge badge-neutral" style="font-size: 0.7rem;">{{ p.category or 'Coaching' }}</span>
                 {% if p.status == 'approved' and p.is_published %}
-                  <span class="badge badge-forest" style="font-size: 0.7rem;">Approved &amp; Live</span>
+                  <span class="badge badge-pink" style="font-size: 0.7rem;">Approved &amp; Live</span>
                 {% elif p.status == 'approved' %}
                   <span class="badge badge-neutral" style="font-size: 0.7rem;">Approved</span>
                 {% elif p.status == 'rejected' %}
@@ -157,7 +157,7 @@
 
               <div style="font-size: 0.78rem; display: flex; justify-content: space-between; padding: 8px 10px; background: #fff; border-radius: 6px; border: 1px solid var(--border-line); margin-bottom: 12px;">
                 <span>{{ p.duration_weeks }} Weeks • {{ p.sessions_count }} Sessions</span>
-                <strong style="color: var(--primary-forest);">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong>
+                <strong style="color: var(--primary-pink);">KES {{ "{:,.0f}".format(p.proposed_price|float) if p.proposed_price else '0' }}</strong>
               </div>
             </div>
 

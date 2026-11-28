@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       ACCOUNTABILITY & RECOVERY
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -29,7 +29,7 @@
       <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Athlete Submissions Queue</h3>
       <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--fp-muted);">Structured check-ins submitted by assigned athletes</p>
     </div>
-    <span class="fp-badge-lime">{{ checkins|length }} Submissions</span>
+    <span class="badge-pink">{{ checkins|length }} Submissions</span>
   </div>
 
   {% if checkins %}
@@ -38,7 +38,7 @@
         <div style="background: #F8FAFC; border: 1px solid var(--fp-border-subtle); border-radius: 12px; padding: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
                 {{ ch.profiles.full_name[:2].upper() if ch.profiles else 'AT' }}
               </div>
               <div>
@@ -48,7 +48,7 @@
             </div>
 
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="{% if ch.status == 'pending' %}fp-badge-coral{% else %}fp-badge-lime{% endif %}">
+              <span class="{% if ch.status == 'pending' %}badge-danger{% else %}badge-pink{% endif %}">
                 {{ ch.status|upper }}
               </span>
               {% if ch.status == 'pending' %}
@@ -71,7 +71,7 @@
             </div>
             <div>
               <span style="color: var(--fp-muted);">Nutrition Adherence:</span>
-              <span class="fp-badge-slate">{{ ch.nutrition_adherence or 'On Track' }}</span>
+              <span class="badge-neutral">{{ ch.nutrition_adherence or 'On Track' }}</span>
             </div>
           </div>
 
@@ -80,8 +80,8 @@
           </p>
 
           {% if ch.trainer_feedback %}
-            <div style="background: rgba(184, 233, 44, 0.1); border-left: 3px solid var(--fp-lime-dark); padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.82rem; color: var(--fp-ink);">
-              <strong style="color: var(--fp-lime-dark);">Coach Feedback:</strong> {{ ch.trainer_feedback }}
+            <div style="background: rgba(184, 233, 44, 0.1); border-left: 3px solid var(--secondary-plum); padding: 10px 12px; border-radius: 0 8px 8px 0; font-size: 0.82rem; color: var(--fp-ink);">
+              <strong style="color: var(--secondary-plum);">Coach Feedback:</strong> {{ ch.trainer_feedback }}
               <div style="font-size: 0.72rem; color: var(--fp-muted); margin-top: 4px;">Delivered: {{ ch.feedback_date[:16] if ch.feedback_date else 'Recent' }}</div>
             </div>
           {% endif %}

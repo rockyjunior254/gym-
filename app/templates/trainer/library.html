@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       EXERCISE CATALOGUE
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -16,7 +16,7 @@
     </p>
   </div>
 
-  <span class="fp-badge-lime" style="font-size: 0.82rem; padding: 6px 12px;">
+  <span class="badge-pink" style="font-size: 0.82rem; padding: 6px 12px;">
     {{ exercises|length }} Movements Available
   </span>
 </div>
@@ -56,8 +56,8 @@
     <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="fp-badge-lime" style="font-size: 0.72rem;">{{ ex.target_muscle_group }}</span>
-          <span class="fp-badge-slate" style="font-size: 0.72rem;">{{ (ex.difficulty or 'INTERMEDIATE')|upper }}</span>
+          <span class="badge-pink" style="font-size: 0.72rem;">{{ ex.target_muscle_group }}</span>
+          <span class="badge-neutral" style="font-size: 0.72rem;">{{ (ex.difficulty or 'INTERMEDIATE')|upper }}</span>
         </div>
 
         <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">{{ ex.name }}</h3>
@@ -94,7 +94,7 @@
     </div>
     <div class="modal-body" style="font-size: 0.88rem;">
       <div style="margin-bottom: 12px;">
-        <span class="fp-badge-slate" id="exModalDiff"></span>
+        <span class="badge-neutral" id="exModalDiff"></span>
       </div>
       <div style="margin-bottom: 12px;">
         <strong style="color: var(--fp-ink); display: block; margin-bottom: 4px;">Required Equipment:</strong>

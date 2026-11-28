@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Dispatch Center
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -32,7 +32,7 @@
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Notification Dispatch Log</h3>
         <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">History of alerts dispatched to user inboxes</p>
       </div>
-      <span class="badge badge-forest" style="font-size: 11px;">{{ notifications|length }} Dispatched</span>
+      <span class="badge badge-pink" style="font-size: 11px;">{{ notifications|length }} Dispatched</span>
     </div>
 
   {% if notifications %}
@@ -61,7 +61,7 @@
                 {% if n.user_id %}
                   <strong style="color: var(--ink-dark);">{{ n.recipient.full_name if n.recipient else n.user_id[:8] }}</strong>
                 {% else %}
-                  <span class="badge badge-forest">Facility Broadcast</span>
+                  <span class="badge badge-pink">Facility Broadcast</span>
                 {% endif %}
               </td>
               <td>
@@ -72,7 +72,7 @@
                 {% if n.is_read %}
                   <span class="badge badge-neutral">Read</span>
                 {% else %}
-                  <span class="badge badge-forest">Sent</span>
+                  <span class="badge badge-pink">Sent</span>
                 {% endif %}
               </td>
               <td style="text-align: right;">

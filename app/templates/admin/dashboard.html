@@ -8,7 +8,7 @@
   <!-- Enterprise Header & Quick Actions -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Operations &amp; Intelligence
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -53,9 +53,9 @@
         <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 2px 0;">
           {{ total_members }}
         </div>
-        <span style="font-size: 12px; color: var(--primary-forest); font-weight: 600;">+{{ new_registrations }} this cycle</span>
+        <span style="font-size: 12px; color: var(--primary-pink); font-weight: 600;">+{{ new_registrations }} this cycle</span>
       </div>
-      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center;">
         <i data-lucide="users" style="width: 20px; height: 20px;"></i>
       </div>
     </div>
@@ -64,12 +64,12 @@
     <div class="card" style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
       <div>
         <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em;">ACTIVE SUBSCRIPTIONS</span>
-        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-forest); margin: 4px 0 2px 0;">
+        <div style="font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: var(--primary-pink); margin: 4px 0 2px 0;">
           {{ active_subscriptions }}
         </div>
         <span style="font-size: 12px; color: var(--text-muted);">{{ expired_subscriptions }} expired / inactive</span>
       </div>
-      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center;">
         <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
       </div>
     </div>
@@ -97,7 +97,7 @@
         </div>
         <span style="font-size: 12px; color: var(--text-muted);">Front-desk check-ins</span>
       </div>
-      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center;">
+      <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center;">
         <i data-lucide="clipboard-check" style="width: 20px; height: 20px;"></i>
       </div>
     </div>
@@ -106,7 +106,7 @@
   <!-- Secondary 4 Metrics Bar -->
   <div class="grid-4">
     <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
-      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
         <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
       </div>
       <div>
@@ -136,7 +136,7 @@
     </div>
 
     <div class="card" style="padding: 14px 18px; display: flex; align-items: center; gap: 12px;">
-      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-forest); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+      <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-forest-tint); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
         <i data-lucide="award" style="width: 16px; height: 16px;"></i>
       </div>
       <div>
@@ -173,13 +173,16 @@
   <!-- Second Row — Analytics Panels: Revenue Trends & Status Distribution -->
   <div class="grid-2">
     <!-- Cash Collection Trends -->
-    <div class="card" style="padding: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <div>
-          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Cash Revenue Trends (KES)</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Physical counter cash collections across cycles</p>
+    <div class="card" style="padding: 24px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3>Cash Revenue Trends (KES)</h3>
+          <p>Physical counter cash collections across cycles</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">Counter Cash</span>
+        <div class="chart-card-actions">
+          <div id="palette_control_cashCollectionChart"></div>
+          <span class="badge badge-pink" style="font-size: 11px;">Counter Cash</span>
+        </div>
       </div>
       <div style="height: 260px; position: relative;">
         <canvas id="cashCollectionChart"></canvas>
@@ -187,13 +190,16 @@
     </div>
 
     <!-- Membership Status Distribution -->
-    <div class="card" style="padding: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <div>
-          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Subscription Status Breakdown</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Active vs expired member allocations</p>
+    <div class="card" style="padding: 24px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3>Subscription Status Breakdown</h3>
+          <p>Active vs expired member allocations</p>
         </div>
-        <span class="badge badge-neutral" style="font-size: 11px;">Enrollment</span>
+        <div class="chart-card-actions">
+          <div id="palette_control_subscriptionStatusChart"></div>
+          <span class="badge badge-neutral" style="font-size: 11px;">Enrollment</span>
+        </div>
       </div>
       <div style="height: 260px; position: relative;">
         <canvas id="subscriptionStatusChart"></canvas>
@@ -204,13 +210,16 @@
   <!-- Third Row — Attendance & Package Distribution -->
   <div class="grid-2">
     <!-- Attendance Overview -->
-    <div class="card" style="padding: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <div>
-          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Attendance Activity</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Daily front-desk check-in entries</p>
+    <div class="card" style="padding: 24px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3>Attendance Activity</h3>
+          <p>Daily front-desk check-in entries</p>
         </div>
-        <span class="badge badge-forest" style="font-size: 11px;">Front Desk</span>
+        <div class="chart-card-actions">
+          <div id="palette_control_attendanceActivityChart"></div>
+          <span class="badge badge-pink" style="font-size: 11px;">Front Desk</span>
+        </div>
       </div>
       <div style="height: 260px; position: relative;">
         <canvas id="attendanceActivityChart"></canvas>
@@ -218,13 +227,16 @@
     </div>
 
     <!-- Package Distribution -->
-    <div class="card" style="padding: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-        <div>
-          <h3 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--text-ink);">Popular Membership Packages</h3>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 2px 0 0 0;">Active subscription plan allocation</p>
+    <div class="card" style="padding: 24px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3>Popular Membership Packages</h3>
+          <p>Active subscription plan allocation</p>
         </div>
-        <span class="badge badge-rose" style="font-size: 11px;">Package Tiers</span>
+        <div class="chart-card-actions">
+          <div id="palette_control_planPopularityChart"></div>
+          <span class="badge badge-rose" style="font-size: 11px;">Package Tiers</span>
+        </div>
       </div>
       <div style="height: 260px; position: relative;">
         <canvas id="planPopularityChart"></canvas>
@@ -258,7 +270,7 @@
             <tbody>
               {% for p in recent_payments[:5] %}
                 <tr style="border-bottom: 1px solid var(--border-line);">
-                  <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-forest);">{{ p.receipt_number }}</td>
+                  <td style="padding: 10px 12px; font-weight: 700; color: var(--primary-pink);">{{ p.receipt_number }}</td>
                   <td style="padding: 10px 12px; font-weight: 600;">{{ p.profiles.full_name if p.profiles else 'Member' }}</td>
                   <td style="padding: 10px 12px; font-weight: 700; color: var(--text-ink);">KES {{ "{:,.0f}".format(p.amount) }}</td>
                   <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">{{ p.payment_date[:10] if p.payment_date else 'Recent' }}</td>
@@ -302,7 +314,7 @@
                   <td style="padding: 10px 12px; font-weight: 600; color: var(--text-muted);">{{ a.check_in_time[11:16] if a.check_in_time else '—' }}</td>
                   <td style="padding: 10px 12px; font-weight: 700;">{{ a.profiles.full_name if a.profiles else 'Member' }}</td>
                   <td style="padding: 10px 12px;">
-                    <span class="badge badge-forest" style="font-size: 10.5px;">Verified</span>
+                    <span class="badge badge-pink" style="font-size: 10.5px;">Verified</span>
                   </td>
                   <td style="padding: 10px 12px; font-size: 12px; color: var(--text-muted);">{{ a.recorder.full_name if a.recorder else 'Desk Staff' }}</td>
                 </tr>
@@ -321,20 +333,28 @@
 
 </div>
 
-<!-- Chart.js Live Rendering Script (Strakly Pearl, Forest, Rose Light Palette) -->
+<!-- Chart.js Live Rendering Script with Custom Palette Engine -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const chartAnalytics = {{ chart_analytics|tojson if chart_analytics else '{}' }};
   
-  // Strakly Brand Chart Palette
-  const forestPrimary = '#2F6B4F';
-  const roseAccent = '#B64A6E';
-  const sageColor = '#7FA893';
-  const amberWarning = '#E0A030';
+  // Render Individual Palette Control Buttons
+  const chartIds = [
+    'cashCollectionChart',
+    'subscriptionStatusChart',
+    'attendanceActivityChart',
+    'planPopularityChart'
+  ];
   
-  const textMuted = '#566860';
-  const gridBorder = '#E9DFDB';
+  chartIds.forEach(id => {
+    const container = document.getElementById(`palette_control_${id}`);
+    if (container && typeof renderChartPaletteControl === 'function') {
+      container.innerHTML = renderChartPaletteControl(id);
+    }
+  });
+
+  if (window.lucide) lucide.createIcons();
 
   // 1. Cash Collection Chart
   const ctxRevenue = document.getElementById('cashCollectionChart');
@@ -342,20 +362,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const revLabels = chartAnalytics.revenue_trend ? chartAnalytics.revenue_trend.map(d => d.date) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const revValues = chartAnalytics.revenue_trend ? chartAnalytics.revenue_trend.map(d => d.amount) : [0, 0, 0, 0, 0, 0, 0];
 
-    new Chart(ctxRevenue, {
+    const revChart = new Chart(ctxRevenue, {
       type: 'line',
       data: {
         labels: revLabels,
         datasets: [{
           label: 'Cash Collections (KES)',
           data: revValues,
-          borderColor: forestPrimary,
-          backgroundColor: 'rgba(47, 107, 79, 0.08)',
-          borderWidth: 2,
+          borderColor: '#E7549C',
+          backgroundColor: 'rgba(231, 84, 156, 0.12)',
+          borderWidth: 2.5,
           fill: true,
-          tension: 0.35,
-          pointBackgroundColor: forestPrimary,
-          pointRadius: 3
+          tension: 0.38,
+          pointBackgroundColor: '#E7549C',
+          pointBorderColor: '#FFFFFF',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }]
       },
       options: {
@@ -370,36 +393,39 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         },
         scales: {
-          x: { grid: { color: gridBorder }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } } },
-          y: { grid: { color: gridBorder }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true }
+          x: { grid: { color: '#F9ECF3' }, ticks: { color: '#826B7A', font: { family: "'General Sans', sans-serif", size: 11.5 } } },
+          y: { grid: { color: '#F9ECF3' }, ticks: { color: '#826B7A', font: { family: "'General Sans', sans-serif", size: 11.5 } }, beginAtZero: true }
         }
       }
     });
+    registerCustomChart('cashCollectionChart', revChart);
   }
 
   // 2. Subscription Status Doughnut Chart
   const ctxStatus = document.getElementById('subscriptionStatusChart');
   if (ctxStatus) {
     const statusData = chartAnalytics.subscription_status || { active: {{ active_subscriptions }}, pending: {{ pending_subscriptions|length }}, expired: {{ expired_subscriptions }} };
-    new Chart(ctxStatus, {
+    const statusChart = new Chart(ctxStatus, {
       type: 'doughnut',
       data: {
         labels: ['Active', 'Pending Cash', 'Expired'],
         datasets: [{
           data: [statusData.active || 0, statusData.pending || 0, statusData.expired || 0],
-          backgroundColor: [forestPrimary, amberWarning, '#C0B7B3'],
-          borderWidth: 0
+          backgroundColor: ['#E7549C', '#C58A38', '#A78BDA'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'bottom', labels: { color: '#1E2B25', font: { family: "'Inter', sans-serif", size: 11 }, padding: 12 } }
+          legend: { position: 'bottom', labels: { color: '#3D2938', font: { family: "'General Sans', sans-serif", size: 12 }, padding: 14 } }
         },
-        cutout: '72%'
+        cutout: '70%'
       }
     });
+    registerCustomChart('subscriptionStatusChart', statusChart);
   }
 
   // 3. Attendance Activity Chart
@@ -408,15 +434,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const attLabels = chartAnalytics.attendance_activity ? chartAnalytics.attendance_activity.map(d => d.date) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const attValues = chartAnalytics.attendance_activity ? chartAnalytics.attendance_activity.map(d => d.count) : [0, 0, 0, 0, 0, 0, 0];
 
-    new Chart(ctxAttendance, {
+    const attChart = new Chart(ctxAttendance, {
       type: 'bar',
       data: {
         labels: attLabels,
         datasets: [{
           label: 'Daily Check-ins',
           data: attValues,
-          backgroundColor: sageColor,
-          borderRadius: 4
+          backgroundColor: '#B58AE8',
+          borderRadius: 6
         }]
       },
       options: {
@@ -424,11 +450,12 @@ document.addEventListener('DOMContentLoaded', function() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: textMuted, font: { family: "'Inter', sans-serif", size: 11 } } },
-          y: { grid: { color: gridBorder }, ticks: { color: textMuted, stepSize: 1, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true }
+          x: { grid: { display: false }, ticks: { color: '#826B7A', font: { family: "'General Sans', sans-serif", size: 11.5 } } },
+          y: { grid: { color: '#F9ECF3' }, ticks: { color: '#826B7A', stepSize: 1, font: { family: "'General Sans', sans-serif", size: 11.5 } }, beginAtZero: true }
         }
       }
     });
+    registerCustomChart('attendanceActivityChart', attChart);
   }
 
   // 4. Plan Popularity Horizontal Bar
@@ -437,15 +464,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const planLabels = chartAnalytics.package_distribution ? chartAnalytics.package_distribution.map(d => d.name) : ['Monthly Gold', 'Annual Elite', 'Daily Pass'];
     const planValues = chartAnalytics.package_distribution ? chartAnalytics.package_distribution.map(d => d.count) : [0, 0, 0];
 
-    new Chart(ctxPlans, {
+    const planChart = new Chart(ctxPlans, {
       type: 'bar',
       data: {
         labels: planLabels,
         datasets: [{
           label: 'Active Subscriptions',
           data: planValues,
-          backgroundColor: roseAccent,
-          borderRadius: 4
+          backgroundColor: '#E7549C',
+          borderRadius: 6
         }]
       },
       options: {
@@ -454,11 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { color: gridBorder }, ticks: { color: textMuted, stepSize: 1, font: { family: "'Inter', sans-serif", size: 11 } }, beginAtZero: true },
-          y: { grid: { display: false }, ticks: { color: '#1E2B25', font: { family: "'Inter', sans-serif", size: 11 } } }
+          x: { grid: { color: '#F9ECF3' }, ticks: { color: '#826B7A', stepSize: 1, font: { family: "'General Sans', sans-serif", size: 11.5 } }, beginAtZero: true },
+          y: { grid: { display: false }, ticks: { color: '#3D2938', font: { family: "'General Sans', sans-serif", size: 11.5 } } }
         }
       }
     });
+    registerCustomChart('planPopularityChart', planChart);
   }
 });
 </script>

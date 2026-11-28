@@ -5,7 +5,7 @@
 {% block trainer_content %}
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--fp-lime-dark); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
       COACHING ROSTER
     </div>
     <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
@@ -17,7 +17,7 @@
   </div>
 
   <div style="display: flex; gap: 10px; align-items: center;">
-    <span class="fp-badge-lime" style="font-size: 0.82rem; padding: 6px 12px;">
+    <span class="badge-pink" style="font-size: 0.82rem; padding: 6px 12px;">
       {{ members|length }} Athletes Assigned
     </span>
   </div>
@@ -40,7 +40,7 @@
       <div class="fp-card athlete-card" data-name="{{ m.full_name|lower }}" data-goal="{{ m.goals|lower }}" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--fp-ink); color: var(--fp-lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; overflow: hidden; flex-shrink: 0;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--fp-ink); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; overflow: hidden; flex-shrink: 0;">
               {% if m.avatar_url %}
                 <img src="{{ m.avatar_url }}" alt="{{ m.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
               {% else %}
@@ -60,11 +60,11 @@
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
               <span style="color: var(--fp-muted);">Tier:</span>
-              <span class="fp-badge-slate">{{ m.plan_name }}</span>
+              <span class="badge-neutral">{{ m.plan_name }}</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
               <span style="color: var(--fp-muted);">Consistency:</span>
-              <span class="fp-badge-lime">{{ m.adherence }}% Adherence</span>
+              <span class="badge-pink">{{ m.adherence }}% Adherence</span>
             </div>
           </div>
         </div>

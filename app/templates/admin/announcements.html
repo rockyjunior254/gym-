@@ -8,7 +8,7 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-forest); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Communication Center
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
@@ -34,7 +34,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
           <span class="badge badge-neutral" style="font-size: 0.72rem;">AUDIENCE: {{ a.target_audience.upper() if a.target_audience else 'ALL' }}</span>
           {% if a.is_published %}
-            <span class="badge badge-forest">Live</span>
+            <span class="badge badge-pink">Live</span>
           {% else %}
             <span class="badge badge-neutral">Draft</span>
           {% endif %}
