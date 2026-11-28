@@ -1,0 +1,165 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Central Media &amp; Image Library | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Page Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        DIGITAL ASSETS &bull; PICTORIAL REPOSITORY
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Media &amp; Visual Asset Library
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Upload, preview, organize, and replace photographs and illustrations across Admin, Trainer, and Member portals.
+      </p>
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="openModal('uploadMediaModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+      <i data-lucide="upload-cloud" style="width: 16px; height: 16px;"></i>
+      <span>Upload Asset</span>
+    </button>
+  </div>
+
+  <!-- Filter & Category Toolbar -->
+  <div class="card" style="padding: 16px 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        {% set categories = [
+          ('all', 'All Assets'),
+          ('exercises', 'Exercise Guides'),
+          ('equipment', 'Gym Equipment'),
+          ('products', 'Pro Shop Gear'),
+          ('services', 'Facility Services'),
+          ('trainers', 'Coach Profiles'),
+          ('programmes', 'Programmes'),
+          ('classes', 'Classes')
+        ] %}
+        {% for cat_id, cat_name in categories %}
+          <a href="{{ url_for('admin.media', category=cat_id) }}" 
+             class="btn btn-sm {% if selected_category == cat_id %}btn-primary{% else %}btn-secondary{% endif %}"
+             style="font-size: 0.8rem; padding: 5px 12px;">
+            {{ cat_name }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <span class="badge badge-plum" style="font-size: 11px;">
+        {{ items|length }} Assets Available
+      </span>
+    </div>
+  </div>
+
+  <!-- Media Items Grid -->
+  {% if items %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px;">
+      {% for item in items %}
+        <div class="card" style="border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-line);">
+          <div>
+            <!-- Image Frame -->
+            <div style="height: 160px; background: var(--bg-pearl); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <img src="{{ item.url }}" alt="{{ item.name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='/static/images/placeholders/gym-logo.svg'; this.style.objectFit='contain';">
+              <span class="badge badge-plum" style="position: absolute; top: 8px; left: 8px; font-size: 10px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                {{ item.category }}
+              </span>
+            </div>
+
+            <!-- Details -->
+            <div style="padding: 12px 14px 6px 14px;">
+              <h4 style="font-family: var(--font-heading); font-size: 0.95rem; font-weight: 700; color: var(--text-ink); margin: 0 0 4px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ item.name }}">
+                {{ item.name }}
+              </h4>
+              <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                <span>{{ item.size_kb }} KB</span>
+                <span>{{ item.created_at[:10] }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="border-top: 1px solid var(--border-line); padding: 8px 14px; display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.75rem;" onclick="copyToClipboard('{{ item.url }}')">
+              Copy URL
+            </button>
+            <form method="POST" action="{{ url_for('admin.media') }}" onsubmit="return confirm('Remove this image asset?');" style="display: inline;">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="file_url" value="{{ item.url }}">
+              <button type="submit" class="btn btn-outline-rose btn-sm" style="padding: 3px 8px; font-size: 0.75rem;">Delete</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 48px 16px;">
+      <i data-lucide="image" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.5;"></i>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">No Media Assets</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0;">Upload photographs or exercise graphics to populate this category.</p>
+      <button type="button" class="btn btn-primary" onclick="openModal('uploadMediaModal')">Upload Asset</button>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- Upload Media Modal -->
+<div id="uploadMediaModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Upload Digital Asset</h3>
+        <p class="modal-subtitle">Add high resolution photographs or demonstration media</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('uploadMediaModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.media') }}" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="upload">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="media_file">Select Image File <span style="color: var(--primary-plum);">*</span></label>
+          <input type="file" id="media_file" name="file" class="form-control" accept="image/*" required>
+          <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px; display: block;">
+            Supported formats: WEBP, PNG, JPG, JPEG, GIF, SVG (Max recommended: 5MB)
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="media_cat">Target Category</label>
+          <select id="media_cat" name="category" class="form-control">
+            <option value="exercises">Exercise Guides &amp; Mechanics</option>
+            <option value="equipment">Gym Equipment Assets</option>
+            <option value="products">Pro Shop Merchandise</option>
+            <option value="services">Facility Services &amp; Amenities</option>
+            <option value="trainers">Coaching Staff Avatars</option>
+            <option value="programmes">Athletic Programmes</option>
+            <option value="classes">Class Schedules</option>
+            <option value="homepage">Homepage Hero &amp; Gallery</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="media_alt">Alternative / Description Text</label>
+          <input type="text" id="media_alt" name="alt_text" class="form-control" placeholder="e.g. Barbell Incline Bench Press Demonstration">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('uploadMediaModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Upload &amp; Optimize</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Image path copied: ' + text);
+  }).catch(() => {
+    prompt('Copy image URL:', text);
+  });
+}
+</script>
+{% endblock %}

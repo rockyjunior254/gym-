@@ -952,6 +952,96 @@ def equipment():
     return render_template('admin/equipment.html', equipment=equipment_list, maintenance_logs=maintenance_logs)
 
 # =============================================================================
+# 11B. PRO SHOP & MERCHANDISE MANAGEMENT
+# =============================================================================
+@admin_bp.route('/store', methods=['GET', 'POST'])
+def store():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'create':
+            name = request.form.get('name', '').strip()
+            category = request.form.get('category', 'Apparel')
+            price = float(request.form.get('price', 0))
+            stock = int(request.form.get('stock_quantity', 10))
+            description = request.form.get('description', '').strip()
+            image_url = request.form.get('image_url', '').strip()
+            sku = request.form.get('sku', '').strip()
+
+            try:
+                GymRepository.create_store_product(name, category, price, description, stock, image_url, sku)
+                log_audit(session['user']['id'], 'admin', 'STORE_PRODUCT_CREATE', 'store_products', None, {'name': name, 'price': price})
+                flash(f"Product '{name}' added to Pro Shop catalogue.", 'success')
+            except Exception as e:
+                flash(f"Error adding product: {str(e)}", 'danger')
+
+        elif action == 'edit':
+            product_id = request.form.get('product_id')
+            updates = {
+                'name': request.form.get('name', '').strip(),
+                'category': request.form.get('category', 'Apparel'),
+                'price': float(request.form.get('price', 0)),
+                'stock_quantity': int(request.form.get('stock_quantity', 0)),
+                'description': request.form.get('description', '').strip(),
+                'image_url': request.form.get('image_url', '').strip(),
+                'sku': request.form.get('sku', '').strip()
+            }
+            try:
+                GymRepository.update_store_product(product_id, updates)
+                log_audit(session['user']['id'], 'admin', 'STORE_PRODUCT_EDIT', 'store_products', product_id, updates)
+                flash(f"Product '{updates['name']}' updated.", 'success')
+            except Exception as e:
+                flash(f"Error updating product: {str(e)}", 'danger')
+
+        elif action == 'archive':
+            product_id = request.form.get('product_id')
+            try:
+                GymRepository.archive_store_product(product_id)
+                log_audit(session['user']['id'], 'admin', 'STORE_PRODUCT_ARCHIVE', 'store_products', product_id)
+                flash('Product archived from active store view.', 'info')
+            except Exception as e:
+                flash(f"Error archiving product: {str(e)}", 'danger')
+
+        return redirect(url_for('admin.store'))
+
+    category_filter = request.args.get('category', '')
+    products_list = GymRepository.get_store_products(category=category_filter or None, include_archived=False)
+    return render_template('admin/store.html', products=products_list, selected_category=category_filter)
+
+# =============================================================================
+# 11C. CENTRAL MEDIA LIBRARY (PICTORIAL ASSET MANAGEMENT)
+# =============================================================================
+@admin_bp.route('/media', methods=['GET', 'POST'])
+def media():
+    from app.services.media_service import MediaService
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'upload':
+            file = request.files.get('file')
+            category = request.form.get('category', 'exercises')
+            alt_text = request.form.get('alt_text', '')
+            try:
+                rec = MediaService.save_media_file(file, category, alt_text)
+                log_audit(session['user']['id'], 'admin', 'MEDIA_UPLOAD', 'media_library', rec['id'], {'filename': rec['filename']})
+                flash(f"Image '{rec['filename']}' uploaded to {rec['category']}.", 'success')
+            except Exception as e:
+                flash(f"Upload failed: {str(e)}", 'danger')
+
+        elif action == 'delete':
+            file_url = request.form.get('file_url')
+            if MediaService.delete_media(file_url):
+                log_audit(session['user']['id'], 'admin', 'MEDIA_DELETE', 'media_library', None, {'url': file_url})
+                flash("Asset removed from media directory.", 'info')
+            else:
+                flash("Could not delete asset.", 'warning')
+
+        return redirect(url_for('admin.media'))
+
+    cat_filter = request.args.get('category', 'all')
+    media_items = MediaService.list_media(cat_filter)
+    return render_template('admin/media.html', items=media_items, selected_category=cat_filter)
+
+# =============================================================================
 # 12. COMMUNITY HUB MANAGEMENT
 # =============================================================================
 @admin_bp.route('/community')
@@ -1186,13 +1276,18 @@ def reports():
 
         return Response(output.getvalue(), mimetype='text/csv', headers={'Content-Disposition': f"attachment; filename=strakly_gym_{report_type}_report.csv"})
 
+    kpis = GymRepository.get_admin_dashboard_kpis()
+    chart_analytics = GymRepository.get_admin_chart_analytics()
+
     return render_template('admin/reports.html',
                            report_type=report_type,
                            headers=headers,
                            data=data,
                            total_val=total_val,
                            start_date=start_date,
-                           end_date=end_date)
+                           end_date=end_date,
+                           kpis=kpis,
+                           chart_analytics=chart_analytics)
 
 # =============================================================================
 # 15. AUDIT LOGS (APPEND-ONLY SECURITY TRAIL)
@@ -1234,9 +1329,9 @@ def delete_user(user_id):
         flash('Cannot delete your own active session account.', 'danger')
         return redirect(url_for('admin.users'))
     try:
-        GymRepository.delete_user_account(user_id)
-        log_audit(session['user']['id'], 'admin', 'USER_DELETE', 'profiles', user_id)
-        flash('User account deactivated and archived safely. Historical financial and training records preserved.', 'info')
+        GymRepository.delete_user_account(user_id, permanent=True)
+        log_audit(session['user']['id'], 'admin', 'USER_PERMANENT_DELETE', 'profiles', user_id)
+        flash('User account permanently deleted. Historical financial receipts preserved.', 'success')
     except Exception as e:
         flash(f"Error deleting user: {str(e)}", 'danger')
     return redirect(url_for('admin.users'))
@@ -1287,6 +1382,26 @@ def edit_user(user_id):
         flash(f"User account '{full_name}' updated successfully.", 'success')
     except Exception as e:
         flash(f"Error updating user account: {str(e)}", 'danger')
+    return redirect(url_for('admin.users'))
+
+@admin_bp.route('/users/reset-password/<user_id>', methods=['POST'])
+def reset_user_password(user_id):
+    admin_id = session.get('user', {}).get('id')
+    new_password = request.form.get('new_password', '').strip()
+    reset_action = request.form.get('reset_action', 'temporary') # 'temporary' or 'email'
+
+    try:
+        if reset_action == 'email' or not new_password:
+            GymRepository.admin_reset_user_password(admin_id, user_id, None)
+            log_audit(admin_id, 'admin', 'ADMIN_PASSWORD_RESET_EMAIL_DISPATCHED', 'auth.users', user_id)
+            flash('Password reset email dispatched to the user successfully.', 'success')
+        else:
+            GymRepository.admin_reset_user_password(admin_id, user_id, new_password)
+            log_audit(admin_id, 'admin', 'ADMIN_PASSWORD_DIRECT_UPDATE', 'auth.users', user_id)
+            flash('User password updated securely. User must use this new credential on next sign-in.', 'success')
+    except Exception as e:
+        flash(f"Error resetting user password: {str(e)}", 'danger')
+
     return redirect(url_for('admin.users'))
 
 # =============================================================================

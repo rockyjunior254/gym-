@@ -9,6 +9,10 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'strakly-gym-production-secret-2026')
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+    # Initialize Caching Engine
+    from app.services.cache import init_cache
+    init_cache(app)
+
     # Register Blueprints
     from app.routes.public import public_bp
     from app.routes.admin import admin_bp

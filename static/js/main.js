@@ -1,44 +1,44 @@
 /* ==========================================================================
    STRAKLY ATHLETICS & GYM MANAGEMENT SYSTEM — CLIENT INTERACTION SCRIPT
-   Master Presentation: Pink Design System, Collapsible Sidebars, Chart Color Engine
+   Master Presentation: Lavender & Plum Design System, Collapsible Sidebars, Chart Color Engine
    ========================================================================== */
 
-// 1. Coordinated Chart Color Palettes (Mandatory Design Requirement)
+// 1. Coordinated Chart Color Palettes (Official Lavender/Plum Specification)
 window.CHART_PALETTES = {
-  rose_garden: {
-    id: 'rose_garden',
-    name: 'Rose Garden',
-    colors: ['#E7549C', '#B58AE8', '#F2A65A', '#E76F77', '#7C9E8B', '#68465F'],
-    primary: '#E7549C',
-    bg: 'rgba(231, 84, 156, 0.12)'
+  lavender: {
+    id: 'lavender',
+    name: 'Lavender',
+    colors: ['#9677CE', '#B8A2E5', '#D9CCF0', '#C2AFE8', '#E9DFF7'],
+    primary: '#9677CE',
+    bg: 'rgba(150, 119, 206, 0.14)'
   },
-  berry_bloom: {
-    id: 'berry_bloom',
-    name: 'Berry Bloom',
-    colors: ['#D9468F', '#9D72C7', '#F08A72', '#E6B85C', '#7DAA9B', '#4A2A44'],
-    primary: '#D9468F',
-    bg: 'rgba(217, 70, 143, 0.12)'
+  plum: {
+    id: 'plum',
+    name: 'Plum',
+    colors: ['#56365F', '#684A78', '#86669A', '#A78BBA', '#C9B8D8'],
+    primary: '#684A78',
+    bg: 'rgba(104, 74, 120, 0.14)'
   },
-  soft_pastel: {
-    id: 'soft_pastel',
-    name: 'Soft Pastel',
-    colors: ['#F08EB6', '#B7A0E8', '#F5BE7B', '#A6C9B8', '#D99AB6', '#8C6F96'],
-    primary: '#F08EB6',
-    bg: 'rgba(240, 142, 182, 0.15)'
+  orchid: {
+    id: 'orchid',
+    name: 'Orchid',
+    colors: ['#8D62BC', '#B18BD8', '#D0B3EA', '#A98ACF', '#6E4D95'],
+    primary: '#8D62BC',
+    bg: 'rgba(141, 98, 188, 0.14)'
   },
-  elegant_plum: {
-    id: 'elegant_plum',
-    name: 'Elegant Plum',
-    colors: ['#804E74', '#B879A3', '#DCA6C9', '#A98BD4', '#E9BD9C', '#57334F'],
-    primary: '#804E74',
-    bg: 'rgba(128, 78, 116, 0.12)'
+  amethyst: {
+    id: 'amethyst',
+    name: 'Amethyst',
+    colors: ['#7653B4', '#9876CF', '#B39BE2', '#D0BDEC', '#563B81'],
+    primary: '#7653B4',
+    bg: 'rgba(118, 83, 180, 0.14)'
   },
-  warm_sunset: {
-    id: 'warm_sunset',
-    name: 'Warm Sunset',
-    colors: ['#E76F51', '#F4A261', '#E9C46A', '#D65A89', '#9B72AA', '#7A3E5C'],
-    primary: '#E76F51',
-    bg: 'rgba(231, 111, 81, 0.12)'
+  soft_neutral: {
+    id: 'soft_neutral',
+    name: 'Soft Neutral',
+    colors: ['#7F718D', '#A79BAF', '#C4B8CA', '#8D82A4', '#D9CEDF'],
+    primary: '#7F718D',
+    bg: 'rgba(127, 113, 141, 0.14)'
   }
 };
 
@@ -186,7 +186,7 @@ if (typeof Chart !== 'undefined') {
  */
 function registerCustomChart(chartId, chartInstance) {
   window.ChartRegistry[chartId] = chartInstance;
-  const savedPaletteKey = localStorage.getItem(`chart_palette_${chartId}`) || 'rose_garden';
+  const savedPaletteKey = localStorage.getItem(`chart_palette_${chartId}`) || 'lavender';
   applyPaletteToChart(chartId, savedPaletteKey, false);
 }
 
@@ -220,7 +220,7 @@ function setChartPalette(chartId, paletteKey) {
  */
 function resetChartPalette(chartId) {
   localStorage.removeItem(`chart_palette_${chartId}`);
-  applyPaletteToChart(chartId, 'rose_garden', true);
+  applyPaletteToChart(chartId, 'lavender', true);
   const popover = document.getElementById(`palette_popover_${chartId}`);
   if (popover) popover.classList.remove('show');
 }
@@ -231,7 +231,7 @@ function resetChartPalette(chartId) {
 function applyPaletteToChart(chartId, paletteKey, animate) {
   const chart = window.ChartRegistry[chartId];
   if (!chart) return;
-  const palette = window.CHART_PALETTES[paletteKey] || window.CHART_PALETTES.rose_garden;
+  const palette = window.CHART_PALETTES[paletteKey] || window.CHART_PALETTES.lavender;
 
   // Update UI active indicator if present
   const popover = document.getElementById(`palette_popover_${chartId}`);
@@ -276,8 +276,8 @@ function applyPaletteToChart(chartId, paletteKey, animate) {
  * Generate standard HTML Palette Dropdown component for any chart card
  */
 function renderChartPaletteControl(chartId, currentPalette) {
-  const currentKey = currentPalette || localStorage.getItem(`chart_palette_${chartId}`) || 'rose_garden';
-  const curPal = window.CHART_PALETTES[currentKey] || window.CHART_PALETTES.rose_garden;
+  const currentKey = currentPalette || localStorage.getItem(`chart_palette_${chartId}`) || 'lavender';
+  const curPal = window.CHART_PALETTES[currentKey] || window.CHART_PALETTES.lavender;
 
   let optionsHtml = '';
   Object.keys(window.CHART_PALETTES).forEach(key => {

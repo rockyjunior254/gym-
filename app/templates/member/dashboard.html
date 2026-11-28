@@ -1,16 +1,16 @@
 {% extends 'member/layout.html' %}
 
 {% block page_title %}Athlete Dashboard{% endblock %}
-{% block page_subtitle %}Welcome back, {{ current_user.full_name or 'Champion' }}! Ready to conquer today's goals?{% endblock %}
+{% block page_subtitle %}Welcome back, {{ current_user.full_name or 'Champion' }}! Ready to conquer today's training milestones?{% endblock %}
 
 {% block topbar_actions %}
-  <a href="{{ url_for('member.workouts') }}" class="fp-btn-lime">
-    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-    Log Session
+  <a href="{{ url_for('member.workouts') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+    <i data-lucide="plus" style="width: 15px; height: 15px;"></i>
+    <span>Log Session</span>
   </a>
-  <a href="{{ url_for('member.classes') }}" class="fp-btn-dark">
-    <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
-    Book Class
+  <a href="{{ url_for('member.classes') }}" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+    <i data-lucide="calendar" style="width: 15px; height: 15px;"></i>
+    <span>Book Class</span>
   </a>
 {% endblock %}
 
@@ -19,43 +19,43 @@
 
   <!-- Hero Highlight Row: Daily Target Progress + Quick Stats -->
   <div style="display: grid; grid-template-columns: 360px 1fr; gap: 20px;">
-    <!-- FitPulse Circular Daily Target Card -->
-    <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1E1611 100%); color: #FFFFFF; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
-      <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: rgba(195, 231, 22, 0.08); border-radius: 50%;"></div>
+    <!-- Circular Daily Target Card -->
+    <div class="card" style="background: linear-gradient(135deg, var(--primary-plum-dark) 0%, var(--primary-plum) 100%); color: #FFFFFF; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; border-radius: 16px;">
+      <div style="position: absolute; right: -20px; top: -20px; width: 140px; height: 140px; background: rgba(150, 119, 206, 0.15); border-radius: 50%;"></div>
       
       <div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <span style="font-size: 0.75rem; font-weight: 800; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.06em;">Daily Training Goal</span>
-          <span style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">Today</span>
+          <span style="font-size: 0.72rem; font-weight: 800; color: var(--primary-lavender-light); text-transform: uppercase; letter-spacing: 0.08em;">Daily Training Goal</span>
+          <span style="background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">Today</span>
         </div>
-        <h2 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em;">Workout Discipline</h2>
-        <p style="font-size: 0.8rem; color: #9CA3AF; margin: 0;">Target: 60 mins intense training or active recovery.</p>
+        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.02em;">Workout Discipline</h2>
+        <p style="font-size: 0.82rem; color: rgba(255,255,255,0.85); margin: 0;">Target: 60 mins intense training or active recovery.</p>
       </div>
 
       <!-- Circular Metric & Streak Visual -->
       <div style="display: flex; align-items: center; gap: 24px; margin: 24px 0;">
         <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
           <svg style="width: 96px; height: 96px; transform: rotate(-90deg);">
-            <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.12)" stroke-width="8" fill="transparent"/>
-            <circle cx="48" cy="48" r="40" stroke="var(--primary-pink)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" fill="transparent"/>
+            <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.15)" stroke-width="8" fill="transparent"/>
+            <circle cx="48" cy="48" r="40" stroke="var(--primary-lavender-light)" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" fill="transparent"/>
           </svg>
           <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <span style="font-size: 1.35rem; font-weight: 800; color: #FFFFFF; line-height: 1;">75%</span>
-            <span style="font-size: 0.62rem; color: var(--primary-pink); font-weight: 700; text-transform: uppercase;">Done</span>
+            <span style="font-size: 0.62rem; color: var(--primary-lavender-light); font-weight: 700; text-transform: uppercase;">Done</span>
           </div>
         </div>
 
         <div>
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(218, 40, 28, 0.2); display: flex; align-items: center; justify-content: center; color: var(--color-danger);">
+            <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
               <i data-lucide="flame" style="width: 16px; height: 16px;"></i>
             </div>
             <div>
-              <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 600;">ACTIVE STREAK</div>
-              <div style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF;">{{ streak }} Days Strong</div>
+              <div style="font-size: 0.72rem; color: rgba(255,255,255,0.75); font-weight: 600;">ACTIVE STREAK</div>
+              <div style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF;">{{ streak }} Days Strong</div>
             </div>
           </div>
-          <div style="font-size: 0.75rem; color: #D1D5DB;">Front-desk verified attendance</div>
+          <div style="font-size: 0.75rem; color: rgba(255,255,255,0.8);">Front-desk verified attendance</div>
         </div>
       </div>
 

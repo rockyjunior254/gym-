@@ -3,71 +3,158 @@
 {% block title %}Direct Messages | {{ gym_settings.gym_name }}{% endblock %}
 
 {% block content %}
-<section class="section" style="padding-top: 2rem;">
+<section class="section" style="padding-top: 2rem; background: var(--bg-main); min-height: 85vh;">
   <div class="container">
-    <div class="portal-banner">
-      <div>
-        <span class="badge badge-pink" style="margin-bottom: 0.8rem;">PRIVATE MESSAGING</span>
-        <h2>ATHLETE & COACH CONVERSATIONS</h2>
-        <p style="margin: 0; color: var(--text-secondary); max-width: 600px;">
-          Private 1-on-1 direct messaging between members and assigned trainers.
-        </p>
+
+    <!-- Banner Header -->
+    <div class="card" style="background: linear-gradient(135deg, var(--primary-plum-dark) 0%, var(--primary-plum) 60%, var(--primary-lavender) 100%); color: #FFFFFF; padding: 26px 30px; border-radius: 16px; margin-bottom: 24px; box-shadow: var(--shadow-md);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <span class="badge" style="background: rgba(255, 255, 255, 0.2); color: #FFFFFF; margin-bottom: 6px; font-weight: 700;">
+            ROLE-AWARE DIRECT MESSAGING
+          </span>
+          <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; margin: 2px 0 4px 0; letter-spacing: -0.02em;">
+            Strakly Communications Center
+          </h1>
+          <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 0.9rem;">
+            Private direct messaging between athletes, assigned coaches, and front-desk reception staff.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="{{ url_for('community.index') }}" class="btn btn-secondary" style="background: #FFFFFF; color: var(--primary-plum); font-weight: 700; border: none;">
+            Public Feed
+          </a>
+        </div>
       </div>
     </div>
 
-    <div class="grid-3" style="min-height: 520px;">
-      <!-- Conversation Contacts -->
-      <div class="card card-elevated" style="grid-column: span 1; padding: 1.25rem;">
-        <h4 style="margin-bottom: 1rem; color: var(--primary-pink);">CONVERSATIONS</h4>
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-          <div style="padding: 0.8rem; background: var(--bg-elevated); border-left: 3px solid var(--primary-pink); border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 0.8rem;">
-            <img src="{{ url_for('static', filename='images/trainers/trainer-1.jpg') }}" alt="Coach Marcus" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-            <div>
-              <strong style="font-size: 0.95rem; display: block;">Coach James Scott</strong>
-              <span style="font-size: 0.8rem; color: var(--primary-pink);">Tomorrow's deadlift session: 11 AM</span>
+    <div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px; min-height: 580px; align-items: stretch;">
+      <!-- Conversation Contacts Roster -->
+      <div class="card" style="padding: 20px; display: flex; flex-direction: column;">
+        <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 800; color: var(--text-ink); margin: 0 0 14px 0; text-transform: uppercase; letter-spacing: 0.05em;">
+          Active Conversations
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto;">
+          <!-- Contact 1: Coach -->
+          <div class="card" style="padding: 12px 14px; background: var(--bg-pearl); border-left: 4px solid var(--primary-plum); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-line);">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--primary-plum); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">
+              M
+            </div>
+            <div style="overflow: hidden; flex: 1;">
+              <strong style="font-size: 0.95rem; color: var(--text-ink); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Coach Marcus</strong>
+              <span style="font-size: 0.78rem; color: var(--primary-plum); font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Focus on chest tall tomorrow</span>
             </div>
           </div>
 
-          <div style="padding: 0.8rem; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 0.8rem;">
-            <img src="{{ url_for('static', filename='images/placeholders/avatar-default.svg') }}" alt="Front Desk" style="width: 40px; height: 40px; border-radius: 50%;">
-            <div>
-              <strong style="font-size: 0.95rem; display: block;">Front Desk Admin</strong>
-              <span style="font-size: 0.8rem; color: var(--text-muted);">Receipt RCP-2026-9481A issued</span>
+          <!-- Contact 2: Front Desk -->
+          <div class="card" style="padding: 12px 14px; background: #FFFFFF; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-line);">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--primary-lavender); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">
+              FD
+            </div>
+            <div style="overflow: hidden; flex: 1;">
+              <strong style="font-size: 0.95rem; color: var(--text-ink); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Reception Desk</strong>
+              <span style="font-size: 0.78rem; color: var(--text-muted); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Payment confirmed for membership</span>
             </div>
           </div>
+        </div>
+
+        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-line); font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+          <i data-lucide="shield" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--primary-plum);"></i>
+          End-to-end authorized messaging
         </div>
       </div>
 
-      <!-- Active Chat Window -->
-      <div class="card card-elevated" style="grid-column: span 2; display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem;">
-        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-          <img src="{{ url_for('static', filename='images/trainers/trainer-1.jpg') }}" alt="Coach Marcus" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary-pink);">
-          <div>
-            <strong style="font-size: 1.1rem; display: block;">Coach James Scott</strong>
-            <span class="badge badge-pink" style="font-size: 0.7rem;">HEAD STRENGTH COACH • ONLINE</span>
+      <!-- Active Chat Conversation Stream -->
+      <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <!-- Chat Header -->
+        <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-plum); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem;">
+              M
+            </div>
+            <div>
+              <strong style="font-family: var(--font-heading); font-size: 1.15rem; color: var(--text-ink); display: block;">Coach Marcus</strong>
+              <span class="badge badge-plum" style="font-size: 10px;">Head Strength Coach &bull; Active Now</span>
+            </div>
           </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Assigned Athlete Thread</span>
         </div>
 
-        <!-- Chat Stream -->
-        <div style="flex-grow: 1; padding: 1.5rem 0; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
-          <div style="align-self: flex-start; max-width: 70%; background: var(--bg-elevated); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <p style="margin: 0; font-size: 0.95rem;">Hey Oliver, your pulling mechanics on the 180kg deadlift looked exceptionally tight today. Excellent hip hinge.</p>
-            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; display: block;">10:45 AM</span>
+        <!-- Chat History Stream -->
+        <div id="chatMessageStream" style="flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 380px;">
+          <!-- Message 1 (Incoming) -->
+          <div style="align-self: flex-start; max-width: 72%; background: var(--bg-pearl); padding: 12px 18px; border-radius: 12px 12px 12px 2px; border: 1px solid var(--border-line);">
+            <p style="margin: 0; font-size: 0.92rem; color: var(--text-ink); line-height: 1.5;">
+              Hey Elena, reviewed your pulling mechanics on the Romanian deadlifts yesterday. Your hip hinge was textbook and eccentric speed was perfectly controlled.
+            </p>
+            <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block; text-align: right;">10:45 AM</span>
           </div>
 
-          <div style="align-self: flex-end; max-width: 70%; background: var(--bg-card); padding: 0.8rem 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--primary-pink);">
-            <p style="margin: 0; font-size: 0.95rem; color: #fff;">Thanks Coach! Focus was 100% on keeping the chest tall. Ready for tomorrow's accessory volume.</p>
-            <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem; display: block;">10:50 AM</span>
+          <!-- Message 2 (Outgoing) -->
+          <div style="align-self: flex-end; max-width: 72%; background: var(--primary-plum); color: #FFFFFF; padding: 12px 18px; border-radius: 12px 12px 2px 12px; box-shadow: var(--shadow-sm);">
+            <p style="margin: 0; font-size: 0.92rem; color: #FFFFFF; line-height: 1.5;">
+              Thanks Coach! Focused 100% on keeping the chest proud and lats engaged. Ready for tomorrow morning's upper-body session at 9 AM!
+            </p>
+            <span style="font-size: 0.72rem; color: rgba(255,255,255,0.75); margin-top: 4px; display: block; text-align: right;">10:50 AM</span>
+          </div>
+
+          <!-- Message 3 (Incoming) -->
+          <div style="align-self: flex-start; max-width: 72%; background: var(--bg-pearl); padding: 12px 18px; border-radius: 12px 12px 12px 2px; border: 1px solid var(--border-line);">
+            <p style="margin: 0; font-size: 0.92rem; color: var(--text-ink); line-height: 1.5;">
+              Excellent. We'll ramp up to working sets on the incline dumbbell press. Prioritize your recovery nutrition tonight!
+            </p>
+            <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; display: block; text-align: right;">10:52 AM</span>
           </div>
         </div>
 
         <!-- Message Input -->
-        <form style="display: flex; gap: 0.8rem; border-top: 1px solid var(--border-color); padding-top: 1rem;" onsubmit="event.preventDefault(); alert('Message sent!');">
-          <input type="text" class="form-control" placeholder="Type your message to coach..." required>
-          <button type="submit" class="btn btn-primary">SEND</button>
+        <form id="chatSendForm" style="display: flex; gap: 10px; border-top: 1px solid var(--border-line); padding-top: 16px;" onsubmit="handleSendChat(event)">
+          <input type="text" id="chatInputMessage" class="form-control" placeholder="Type message to Coach Marcus..." required autocomplete="off">
+          <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <i data-lucide="send" style="width: 15px; height: 15px;"></i>
+            <span>Send</span>
+          </button>
         </form>
       </div>
     </div>
+
   </div>
 </section>
+
+<script>
+function handleSendChat(e) {
+  e.preventDefault();
+  const input = document.getElementById('chatInputMessage');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const stream = document.getElementById('chatMessageStream');
+  const bubble = document.createElement('div');
+  bubble.style.alignSelf = 'flex-end';
+  bubble.style.maxWidth = '72%';
+  bubble.style.background = 'var(--primary-plum)';
+  bubble.style.color = '#FFFFFF';
+  bubble.style.padding = '12px 18px';
+  bubble.style.borderRadius = '12px 12px 2px 12px';
+  bubble.style.boxShadow = 'var(--shadow-sm)';
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  bubble.innerHTML = `
+    <p style="margin: 0; font-size: 0.92rem; color: #FFFFFF; line-height: 1.5;">${escapeHtml(msg)}</p>
+    <span style="font-size: 0.72rem; color: rgba(255,255,255,0.75); margin-top: 4px; display: block; text-align: right;">${timeStr}</span>
+  `;
+
+  stream.appendChild(bubble);
+  input.value = '';
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+</script>
 {% endblock %}

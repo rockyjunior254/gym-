@@ -1,70 +1,73 @@
 {% extends 'member/layout.html' %}
 
-{% block page_title %}Strakly Store{% endblock %}
-{% block page_subtitle %}Official gym apparel, competition lifting belts, shakers, and athletic gear{% endblock %}
+{% block page_title %}Strakly Pro Shop{% endblock %}
+{% block page_subtitle %}Official gym apparel, competition lifting belts, stainless shakers, and athletic gear{% endblock %}
 
 {% block member_content %}
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
   <!-- Strict Cash Notice Banner -->
-  <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #1A130E 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 20px 24px;">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(195, 231, 22, 0.2); color: var(--primary-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <i data-lucide="banknote" style="width: 22px; height: 22px;"></i>
+  <div class="card" style="background: linear-gradient(135deg, var(--primary-plum-dark) 0%, var(--primary-plum) 100%); color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; border-radius: 16px;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255, 255, 255, 0.15); color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="banknote" style="width: 24px; height: 24px;"></i>
       </div>
       <div>
-        <div style="font-size: 0.95rem; font-weight: 800; color: #FFFFFF;">STRICT CASH ON COLLECTION</div>
-        <div style="font-size: 0.78rem; color: #9CA3AF; margin-top: 2px;">
-          Reserve your size online. All orders are paid in physical cash at the Strakly Gym reception desk upon pickup.
+        <div style="font-size: 1rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.01em;">PHYSICAL CASH ON RECEPTION PICKUP</div>
+        <div style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.85); margin-top: 2px;">
+          Reserve your size online. All items are verified and paid in physical cash at the Strakly Gym reception desk upon pickup.
         </div>
       </div>
     </div>
-    <span class="fp-brand-badge" style="background: var(--primary-pink); color: var(--fp-ink); padding: 4px 10px;">FRONT DESK PICKUP</span>
+    <span class="badge" style="background: rgba(255, 255, 255, 0.2); color: #FFFFFF; font-weight: 700; padding: 6px 14px;">
+      FRONT DESK PICKUP
+    </span>
   </div>
 
   <!-- Store Products Grid -->
-  <div class="fp-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div class="card" style="padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 12px;">
       <div>
-        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Official Gym Merchandise</h3>
-        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">High performance training wear and equipment</p>
+        <h3 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin: 0; color: var(--text-ink);">Official Gym Merchandise &amp; Gear</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;">High performance training wear, recovery supplements, and lifting equipment</p>
       </div>
-      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">{{ products|length }} ITEMS</span>
+      <span class="badge badge-plum">{{ products|length }} Items In Stock</span>
     </div>
 
     {% if products %}
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px;">
         {% for prod in products %}
-          <div style="border-radius: 14px; border: 1px solid var(--fp-border); overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="card" style="border-radius: 14px; border: 1px solid var(--border-line); overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease, box-shadow 0.2s ease;">
             <div>
-              <div style="height: 180px; overflow: hidden; background: #FAFAFA; position: relative;">
+              <div style="height: 190px; overflow: hidden; background: var(--bg-pearl); position: relative;">
                 {% if prod.image_url %}
-                  <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                  <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; color: var(--primary-lavender);">
+                    <i data-lucide="package" style="width: 48px; height: 48px; opacity: 0.5;"></i>
+                  </div>
                 {% else %}
-                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--fp-muted);">
-                    <i data-lucide="package" style="width: 48px; height: 48px; opacity: 0.3;"></i>
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--primary-lavender);">
+                    <i data-lucide="package" style="width: 48px; height: 48px; opacity: 0.5;"></i>
                   </div>
                 {% endif %}
-                <span class="fp-brand-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(13, 7, 4, 0.85); color: #FFFFFF;">
-                  {{ prod.category|upper }}
+                <span class="badge badge-plum" style="position: absolute; top: 12px; left: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                  {{ (prod.category or 'GEAR')|upper }}
                 </span>
               </div>
 
-              <div style="padding: 18px 18px 10px 18px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--fp-ink); margin: 0;">{{ prod.name }}</h4>
+              <div style="padding: 18px 20px 10px 20px;">
+                <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 6px 0;">{{ prod.name }}</h4>
+                <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary-plum); margin-bottom: 8px;">
+                  KES {{ "{:,.0f}".format(prod.price|float) if prod.price else '0' }}
                 </div>
-                <div style="font-size: 1.35rem; font-weight: 800; color: var(--fp-ink); margin-bottom: 8px;">
-                  KES {{ prod.price }}
-                </div>
-                <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 12px 0; line-height: 1.4;">
-                  {{ prod.description or 'Premium grade athletic merchandise from Strakly Fitness.' }}
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 12px 0; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  {{ prod.description or 'Premium grade athletic merchandise designed for rigorous training.' }}
                 </p>
               </div>
             </div>
 
-            <div style="padding: 0 18px 18px 18px;">
-              <button type="button" class="fp-btn-lime" style="width: 100%; justify-content: center;"
+            <div style="padding: 0 20px 20px 20px;">
+              <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;"
                       data-id="{{ prod.id }}" data-name="{{ prod.name }}" data-price="{{ prod.price }}"
                       onclick="selectProductForOrder(this)">
                 Reserve Item (Cash Pickup)
@@ -75,47 +78,40 @@
       </div>
     {% else %}
       <div style="text-align: center; padding: 48px 16px;">
-        <i data-lucide="shopping-bag" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
-        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">Merchandise Restocking</h3>
-        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">New apparel and gym gear drops are arriving this week.</p>
+        <i data-lucide="shopping-bag" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.6;"></i>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">Merchandise Restocking</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">New apparel and gym gear drops are arriving this week.</p>
       </div>
     {% endif %}
   </div>
 
   <!-- Member Order History -->
-  <div class="fp-card">
-    <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0 0 16px 0; color: var(--fp-ink);">My Store Reservations</h3>
-    
-    {% if orders %}
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+  {% if orders %}
+    <div class="card" style="padding: 24px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin: 0 0 16px 0; color: var(--text-ink);">My Store Reservations</h3>
+      <div class="table-responsive">
+        <table class="table-modern">
           <thead>
-            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
-              <th style="padding: 10px 12px;">Order #</th>
-              <th style="padding: 10px 12px;">Date</th>
-              <th style="padding: 10px 12px;">Product</th>
-              <th style="padding: 10px 12px;">Quantity</th>
-              <th style="padding: 10px 12px;">Amount Due</th>
-              <th style="padding: 10px 12px;">Payment Method</th>
-              <th style="padding: 10px 12px;">Status</th>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total Amount</th>
+              <th>Payment Status</th>
             </tr>
           </thead>
           <tbody>
-            {% for o in orders %}
-              <tr style="border-bottom: 1px solid var(--fp-border);">
-                <td style="padding: 12px; font-weight: 800;">{{ o.order_number }}</td>
-                <td style="padding: 12px;">{{ o.created_at[:10] }}</td>
-                <td style="padding: 12px; font-weight: 700;">{{ o.product.name if o.product else 'Store Product' }}</td>
-                <td style="padding: 12px;">{{ o.quantity }} (Size: {{ o.selected_size or 'Standard' }})</td>
-                <td style="padding: 12px; font-weight: 800; color: var(--fp-ink);">KES {{ o.total_amount }}</td>
-                <td style="padding: 12px; color: var(--fp-muted);">Cash on Collection</td>
-                <td style="padding: 12px;">
-                  {% if o.status == 'ready_for_pickup' %}
-                    <span style="color: #10B981; font-weight: 700;">Ready at Desk</span>
-                  {% elif o.status == 'completed' %}
-                    <span style="color: var(--fp-muted); font-weight: 600;">Collected & Paid</span>
+            {% for ord in orders %}
+              <tr>
+                <td style="font-weight: 700;">#{{ ord.id[:8] }}</td>
+                <td>{{ ord.created_at[:10] }}</td>
+                <td>{{ ord.product_name or 'Gym Gear' }}</td>
+                <td style="font-weight: 700; color: var(--primary-plum);">KES {{ ord.total_amount }}</td>
+                <td>
+                  {% if ord.status == 'completed' %}
+                    <span class="badge badge-success">Paid &amp; Collected</span>
                   {% else %}
-                    <span style="color: #F59E0B; font-weight: 700;">Pending Desk Pickup</span>
+                    <span class="badge badge-warning">Awaiting Cash at Desk</span>
                   {% endif %}
                 </td>
               </tr>
@@ -123,76 +119,69 @@
           </tbody>
         </table>
       </div>
-    {% else %}
-      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
-        No merchandise reservations logged yet.
-      </div>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 
 </div>
 
-<!-- Reserve Order Modal -->
-<div class="fp-modal-backdrop" id="orderProductModal">
-  <div class="fp-modal">
-    <div class="fp-modal-header">
-      <h3 id="orderModalTitle">Reserve Merchandise</h3>
-      <button type="button" onclick="closeModal('orderProductModal')" style="background: none; border: none; cursor: pointer;">
-        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-      </button>
+<!-- Reserve Item Modal -->
+<div id="orderProductModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="orderModalTitle">Reserve Merchandise</h3>
+        <p class="modal-subtitle">Pick up and pay physical cash at the front reception counter</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('orderProductModal')">&times;</button>
     </div>
     <form action="{{ url_for('member.place_order') }}" method="POST">
       <input type="hidden" name="product_id" id="orderProductId">
-      <div class="fp-modal-body">
-        <div class="fp-form-group">
-          <label class="fp-form-label">Price per Unit</label>
-          <div id="orderProductPrice" style="font-size: 1.3rem; font-weight: 800; color: var(--fp-ink);">KES 0</div>
+      <div class="modal-body">
+        <div style="background: var(--bg-pearl); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; border: 1px solid var(--border-line);">
+          <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Selected Item</div>
+          <div id="orderProductName" style="font-size: 1.1rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;"></div>
+          <div id="orderProductPrice" style="font-size: 1.2rem; font-weight: 800; color: var(--primary-plum);"></div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="fp-form-group">
-            <label class="fp-form-label">Select Size / Variant</label>
-            <select name="selected_size" class="fp-form-control">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="order_quantity">Quantity</label>
+            <input type="number" id="order_quantity" name="quantity" class="form-control" value="1" min="1" max="10" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="order_size">Size / Specification</label>
+            <select id="order_size" name="size" class="form-control">
+              <option value="Standard">Standard / One Size</option>
               <option value="S">Small (S)</option>
               <option value="M" selected>Medium (M)</option>
               <option value="L">Large (L)</option>
               <option value="XL">Extra Large (XL)</option>
-              <option value="Standard">Standard / One Size</option>
             </select>
           </div>
-          <div class="fp-form-group">
-            <label class="fp-form-label">Quantity</label>
-            <input type="number" name="quantity" class="fp-form-control" value="1" min="1" max="5" required>
-          </div>
         </div>
 
-        <div class="fp-form-group">
-          <label class="fp-form-label">Pickup Notes</label>
-          <textarea name="pickup_notes" class="fp-form-control" rows="2" placeholder="Will collect after my evening workout..."></textarea>
-        </div>
-
-        <div style="background: #F8F8F9; padding: 12px; border-radius: 10px; font-size: 0.75rem; color: var(--fp-muted); border: 1px solid var(--fp-border);">
-          <strong>Payment Note:</strong> Strakly operates strictly on physical cash. Please hand cash to the front-desk attendant when collecting your items.
+        <div class="form-group">
+          <label class="form-label" for="order_notes">Pickup Note for Front Desk</label>
+          <textarea id="order_notes" name="notes" class="form-control" rows="2" placeholder="e.g. Will pick up after evening training session..."></textarea>
         </div>
       </div>
-
-      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" class="fp-btn-outline" onclick="closeModal('orderProductModal')">Cancel</button>
-        <button type="submit" class="fp-btn-lime">Confirm Cash Reservation</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('orderProductModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Confirm Cash Reservation</button>
       </div>
     </form>
   </div>
 </div>
 
 <script>
-  function selectProductForOrder(btn) {
-    const prodId = btn.getAttribute('data-id');
-    const prodName = btn.getAttribute('data-name');
-    const prodPrice = btn.getAttribute('data-price');
-    document.getElementById('orderProductId').value = prodId;
-    document.getElementById('orderModalTitle').textContent = 'Reserve ' + prodName;
-    document.getElementById('orderProductPrice').textContent = 'KES ' + prodPrice;
-    openModal('orderProductModal');
-  }
+function selectProductForOrder(btn) {
+  const pId = btn.getAttribute('data-id');
+  const pName = btn.getAttribute('data-name');
+  const pPrice = btn.getAttribute('data-price');
+  document.getElementById('orderProductId').value = pId;
+  document.getElementById('orderProductName').textContent = pName;
+  document.getElementById('orderProductPrice').textContent = 'KES ' + Number(pPrice).toLocaleString();
+  openModal('orderProductModal');
+}
 </script>
 {% endblock %}

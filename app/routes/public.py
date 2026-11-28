@@ -2,10 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.services.repository import GymRepository
 from app.services.supabase_client import db_service
 from app.services.audit_service import log_audit
+from app.services.cache import cache
 
 public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
+@cache.cached(timeout=300)
 def index():
     services = GymRepository.get_published_services()
     plans = GymRepository.get_active_plans()
@@ -25,22 +27,26 @@ def index():
                            testimonials=testimonials)
 
 @public_bp.route('/about')
+@cache.cached(timeout=600)
 def about():
     equipment = GymRepository.get_all_equipment()
     return render_template('public/about.html', equipment=equipment)
 
 @public_bp.route('/programmes')
+@cache.cached(timeout=600)
 def programmes():
     services = GymRepository.get_published_services()
     programmes = GymRepository.get_published_trainer_programmes()
     return render_template('public/programmes.html', services=services, programmes=programmes)
 
 @public_bp.route('/classes')
+@cache.cached(timeout=300)
 def classes():
     upcoming_classes = GymRepository.get_upcoming_classes()
     return render_template('public/classes.html', classes=upcoming_classes)
 
 @public_bp.route('/trainers')
+@cache.cached(timeout=600)
 def trainers():
     all_trainers = GymRepository.get_published_trainers()
     return render_template('public/trainers.html', trainers=all_trainers)

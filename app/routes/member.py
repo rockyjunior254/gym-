@@ -663,3 +663,32 @@ def settings():
 
     current_settings = GymRepository.get_member_settings(member_id)
     return render_template('member/settings.html', settings=current_settings)
+
+@member_bp.route('/change-password', methods=['POST'])
+def change_password():
+    member = session.get('user', {})
+    member_id = member.get('id')
+    email = member.get('email')
+
+    current_password = request.form.get('current_password', '')
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not current_password or not new_password or not confirm_password:
+        flash('All password fields are required.', 'danger')
+        return redirect(url_for('member.settings'))
+
+    if new_password != confirm_password:
+        flash('New password and confirmation do not match.', 'danger')
+        return redirect(url_for('member.settings'))
+
+    try:
+        GymRepository.change_user_password(member_id, email, current_password, new_password)
+        log_audit(member_id, 'member', 'PASSWORD_CHANGE_SUCCESS', 'auth.users', member_id)
+        flash('Your password has been changed securely.', 'success')
+    except ValueError as val_err:
+        flash(str(val_err), 'danger')
+    except Exception as e:
+        flash(f"Unable to update password: {str(e)}", 'danger')
+
+    return redirect(url_for('member.settings'))

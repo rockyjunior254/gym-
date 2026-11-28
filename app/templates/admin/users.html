@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html' %}
 
-{% block title %}User Accounts & Access Control | {{ gym_settings.gym_name }}{% endblock %}
+{% block title %}User Accounts &amp; Access Control | {{ gym_settings.gym_name }}{% endblock %}
 
 {% block admin_content %}
 <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -8,13 +8,13 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Identity &bull; Access Control
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
-        User Accounts &amp; Permissions
+        Registered Accounts Directory
       </h1>
-      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+      <p style="margin: 4px 0 0; color: var(--text-secondary); font-size: 0.9rem;">
         Manage platform access, role authorizations (Admin, Trainer, Member), account statuses, and member security.
       </p>
     </div>
@@ -26,141 +26,197 @@
     </div>
   </div>
 
-  <div class="card" style="padding: 20px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-    <div>
-      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ink-dark);">Registered Accounts Directory</h3>
-      <p style="margin: 0.2rem 0 0; font-size: 0.82rem; color: var(--ink-muted);">Staff and member identities configured in Supabase Auth</p>
+  <div class="card" style="padding: 24px;">
+    <!-- Directory Header & Filters -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
+        <!-- Search -->
+        <div style="position: relative; min-width: 260px; flex: 1; max-width: 360px;">
+          <input type="text" id="userSearchInput" class="form-control" placeholder="Search by name or email..." onkeyup="filterUserTable()" style="padding-left: 38px; height: 40px; font-size: 13px;">
+          <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);"></i>
+        </div>
+
+        <!-- Role Filter -->
+        <select id="userRoleFilter" class="form-control" onchange="filterUserTable()" style="width: auto; height: 40px; font-size: 13px;">
+          <option value="">All Roles</option>
+          <option value="member">Members</option>
+          <option value="trainer">Trainers</option>
+          <option value="admin">Administrators</option>
+        </select>
+
+        <!-- Status Filter -->
+        <select id="userStatusFilter" class="form-control" onchange="filterUserTable()" style="width: auto; height: 40px; font-size: 13px;">
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
+
+      <span class="badge badge-plum" id="userCountBadge">{{ users|length }} Registered Accounts</span>
     </div>
-    <span class="badge badge-pink">{{ users|length }} Accounts</span>
+
+    {% if users %}
+      <div class="table-responsive">
+        <table class="table-custom" id="usersTable">
+          <thead>
+            <tr>
+              <th>User Identity</th>
+              <th>Email Address</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined Date</th>
+              <th>Last Active</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+              <tr data-name="{{ u.full_name|lower }}" data-email="{{ u.email|lower }}" data-role="{{ u.role }}" data-status="{{ 'active' if u.is_active else 'suspended' }}">
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-secondary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 800; color: var(--primary-plum); flex-shrink: 0; overflow: hidden;">
+                      {% if u.avatar_url and not 'avatar-default' in u.avatar_url %}
+                        <img src="{{ u.avatar_url }}" alt="{{ u.full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                      {% else %}
+                        {{ u.full_name[:2].upper() if u.full_name else 'US' }}
+                      {% endif %}
+                    </div>
+                    <div>
+                      <strong style="color: var(--text-ink); font-size: 0.92rem; display: block;">{{ u.full_name }}</strong>
+                      <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">{{ u.id[:8] }}...</span>
+                        {% if u.id == session.user.id %}
+                          <span class="badge badge-lavender" style="font-size: 0.65rem; padding: 2px 6px;">YOU</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style="color: var(--text-secondary); font-size: 0.88rem;">{{ u.email }}</td>
+                <td>
+                  {% if u.role == 'admin' %}
+                    <span class="badge badge-plum">Administrator</span>
+                  {% elif u.role == 'trainer' %}
+                    <span class="badge badge-lavender">Trainer</span>
+                  {% else %}
+                    <span class="badge badge-neutral">Member</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if u.is_active %}
+                    <span class="badge badge-success">Active</span>
+                  {% else %}
+                    <span class="badge badge-danger">Suspended</span>
+                  {% endif %}
+                </td>
+                <td style="color: var(--text-secondary); font-size: 0.82rem;">{{ u.created_at[:10] if u.created_at else 'N/A' }}</td>
+                <td style="color: var(--text-secondary); font-size: 0.82rem;">{{ u.updated_at[:10] if u.updated_at else 'Recent' }}</td>
+                <td style="text-align: right;">
+                  <div class="table-action-menu">
+                    <button type="button" class="table-action-btn" onclick="toggleTableActionMenu(this)" title="Account Actions">
+                      <i data-lucide="more-horizontal" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <div class="table-dropdown-menu">
+                      {% if u.role == 'member' %}
+                        <a href="{{ url_for('admin.member_detail', member_id=u.id) }}" class="table-dropdown-item">
+                          <i data-lucide="user" style="width: 14px; height: 14px;"></i>
+                          <span>View Profile</span>
+                        </a>
+                      {% elif u.role == 'trainer' %}
+                        <a href="{{ url_for('public.trainer_detail', trainer_id=u.id) }}" class="table-dropdown-item">
+                          <i data-lucide="user-check" style="width: 14px; height: 14px;"></i>
+                          <span>View Profile</span>
+                        </a>
+                      {% endif %}
+
+                      <button type="button" class="table-dropdown-item"
+                              data-id="{{ u.id }}"
+                              data-name="{{ u.full_name }}"
+                              data-phone="{{ u.phone or '' }}"
+                              data-role="{{ u.role }}"
+                              onclick="openEditUserModal(this)">
+                        <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+                        <span>Edit Account</span>
+                      </button>
+
+                      <button type="button" class="table-dropdown-item"
+                              data-id="{{ u.id }}"
+                              data-name="{{ u.full_name }}"
+                              data-email="{{ u.email }}"
+                              onclick="openResetPasswordModal(this)">
+                        <i data-lucide="key" style="width: 14px; height: 14px;"></i>
+                        <span>Reset Password</span>
+                      </button>
+
+                      {% if u.id != session.user.id %}
+                        <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}" style="margin: 0;">
+                          <input type="hidden" name="is_active" value="{{ 'false' if u.is_active else 'true' }}">
+                          {% if u.is_active %}
+                            <button type="submit" class="table-dropdown-item" onclick="return confirm('Suspend user access for {{ u.full_name }}?');">
+                              <i data-lucide="pause-circle" style="width: 14px; height: 14px; color: var(--color-warning);"></i>
+                              <span>Suspend Account</span>
+                            </button>
+                          {% else %}
+                            <button type="submit" class="table-dropdown-item">
+                              <i data-lucide="play-circle" style="width: 14px; height: 14px; color: var(--color-success);"></i>
+                              <span>Reactivate Account</span>
+                            </button>
+                          {% endif %}
+                        </form>
+
+                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=u.id) }}" onsubmit="return confirm('Archive user {{ u.full_name }}? Historical financial and training records will be preserved.');" style="margin: 0;">
+                          <button type="submit" class="table-dropdown-item danger">
+                            <i data-lucide="archive" style="width: 14px; height: 14px;"></i>
+                            <span>Archive User</span>
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i data-lucide="users" style="width: 48px; height: 48px;"></i>
+        </div>
+        <h3>No User Accounts Found</h3>
+        <p>Users register through the public registration interface or administrator invites.</p>
+      </div>
+    {% endif %}
   </div>
 
-  {% if users %}
-    <div class="table-responsive">
-      <table class="table-modern">
-        <thead>
-          <tr>
-            <th>User Identity</th>
-            <th>Email Address</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Joined</th>
-            <th>Role Assignment</th>
-            <th style="text-align: right;">Access Control</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in users %}
-            <tr>
-              <td>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                  <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--pearl-bg); border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: center; font-size: 0.88rem; font-weight: 700; color: var(--forest-primary);">
-                    {{ u.full_name[:2].upper() if u.full_name else 'US' }}
-                  </div>
-                  <div>
-                    <strong style="color: var(--ink-dark);">{{ u.full_name }}</strong>
-                    {% if u.id == session.user.id %}
-                      <span class="badge badge-pink" style="font-size: 0.68rem; margin-left: 0.35rem;">YOU</span>
-                    {% endif %}
-                  </div>
-                </div>
-              </td>
-              <td style="color: var(--ink-secondary); font-size: 0.85rem;">{{ u.email }}</td>
-              <td>
-                {% if u.role == 'admin' %}
-                  <span class="badge badge-pink">Administrator</span>
-                {% elif u.role == 'trainer' %}
-                  <span class="badge badge-neutral">Trainer</span>
-                {% else %}
-                  <span class="badge badge-neutral">Member</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if u.is_active %}
-                  <span class="badge badge-pink">Active</span>
-                {% else %}
-                  <span class="badge badge-rose">Suspended</span>
-                {% endif %}
-              </td>
-              <td style="color: var(--ink-muted); font-size: 0.82rem;">{{ u.created_at[:10] if u.created_at else 'N/A' }}</td>
-              <td>
-                <form method="POST" action="{{ url_for('admin.update_user_role', user_id=u.id) }}" style="display: flex; gap: 0.35rem; align-items: center;">
-                  <select name="role" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; width: auto;" {% if u.id == session.user.id %}disabled{% endif %}>
-                    <option value="member" {% if u.role == 'member' %}selected{% endif %}>Member</option>
-                    <option value="trainer" {% if u.role == 'trainer' %}selected{% endif %}>Trainer</option>
-                    <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
-                  </select>
-                  {% if u.id != session.user.id %}
-                    <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.3rem 0.6rem;">Set</button>
-                  {% endif %}
-                </form>
-              </td>
-              <td style="text-align: right;">
-                <div style="display: flex; gap: 0.35rem; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
-                  <button type="button" class="btn btn-secondary btn-sm"
-                          data-id="{{ u.id }}"
-                          data-name="{{ u.full_name }}"
-                          data-phone="{{ u.phone or '' }}"
-                          data-role="{{ u.role }}"
-                          onclick="openEditUserModal(this)">Edit</button>
-                  {% if u.id != session.user.id %}
-                    <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}" style="display: inline;">
-                      <input type="hidden" name="is_active" value="{{ 'false' if u.is_active else 'true' }}">
-                      {% if u.is_active %}
-                        <button type="submit" class="btn btn-outline-rose btn-sm" onclick="return confirm('Suspend user account?');">Suspend</button>
-                      {% else %}
-                        <button type="submit" class="btn btn-primary btn-sm">Reactivate</button>
-                      {% endif %}
-                    </form>
-                    <form method="POST" action="{{ url_for('admin.delete_user', user_id=u.id) }}" onsubmit="return confirm('Archive/Deactivate this user account?');" style="display: inline;">
-                      <button type="submit" class="btn btn-outline-rose btn-sm">Delete</button>
-                    </form>
-                  {% else %}
-                    <span style="font-size: 0.78rem; color: var(--ink-muted);">(Current Admin)</span>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="empty-state">
-      <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-      </div>
-      <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No User Accounts Found</h4>
-      <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">Users register through the public registration interface or administrator invites.</p>
-    </div>
-  {% endif %}
 </div>
 
 <!-- Modal: Add User -->
 <div id="addUserModal" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-line); padding-bottom: 14px;">
       <div>
-        <h3 class="modal-title">Create User Account</h3>
-        <p class="modal-subtitle">Provision account identity and assign role permissions</p>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text-ink);">Create User Account</h3>
+        <p style="margin: 4px 0 0; font-size: 0.82rem; color: var(--text-secondary);">Provision new account credentials and assign role permissions</p>
       </div>
-      <button type="button" class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+      <button type="button" onclick="closeModal('addUserModal')" style="background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">&times;</button>
     </div>
     <form method="POST" action="{{ url_for('admin.users') }}">
-      <div class="modal-body">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
         <div class="form-group">
-          <label class="form-label" for="u_full_name">Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <label class="form-label" for="u_full_name">Full Legal Name *</label>
           <input type="text" id="u_full_name" name="full_name" class="form-control" placeholder="e.g. Oliver Bennett" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="u_email">Email Address <span style="color: var(--accent-rose);">*</span></label>
+          <label class="form-label" for="u_email">Email Address *</label>
           <input type="email" id="u_email" name="email" class="form-control" placeholder="user@strakly.com" required>
         </div>
 
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label" for="u_role">Account Role <span style="color: var(--accent-rose);">*</span></label>
+            <label class="form-label" for="u_role">Account Role *</label>
             <select id="u_role" name="role" class="form-control" required>
               <option value="member" selected>Member (Athlete)</option>
               <option value="trainer">Trainer (Coach)</option>
@@ -174,7 +230,7 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; border-top: 1px solid var(--border-line); padding-top: 16px;">
         <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
         <button type="submit" class="btn btn-primary">Create Account</button>
       </div>
@@ -185,23 +241,23 @@
 <!-- Modal: Edit User -->
 <div id="editUserModal" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-line); padding-bottom: 14px;">
       <div>
-        <h3 class="modal-title">Edit User Account</h3>
-        <p class="modal-subtitle">Update user profile information and permissions</p>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text-ink);">Edit User Account</h3>
+        <p style="margin: 4px 0 0; font-size: 0.82rem; color: var(--text-secondary);">Update user profile details and role assignment</p>
       </div>
-      <button type="button" class="modal-close" onclick="closeModal('editUserModal')">&times;</button>
+      <button type="button" onclick="closeModal('editUserModal')" style="background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">&times;</button>
     </div>
     <form id="editUserForm" method="POST" action="">
-      <div class="modal-body">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
         <div class="form-group">
-          <label class="form-label" for="edit_u_name">Full Name <span style="color: var(--accent-rose);">*</span></label>
+          <label class="form-label" for="edit_u_name">Full Name *</label>
           <input type="text" id="edit_u_name" name="full_name" class="form-control" required>
         </div>
 
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label" for="edit_u_role">Account Role <span style="color: var(--accent-rose);">*</span></label>
+            <label class="form-label" for="edit_u_role">Account Role *</label>
             <select id="edit_u_role" name="role" class="form-control" required>
               <option value="member">Member (Athlete)</option>
               <option value="trainer">Trainer (Coach)</option>
@@ -215,15 +271,116 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; border-top: 1px solid var(--border-line); padding-top: 16px;">
         <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Update User</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Reset Password -->
+<div id="resetPasswordModal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-line); padding-bottom: 14px;">
+      <div>
+        <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--text-ink);">Reset User Password</h3>
+        <p style="margin: 4px 0 0; font-size: 0.82rem; color: var(--text-secondary);">Authorized credential update for <strong id="reset_user_label" style="color: var(--primary-plum);"></strong></p>
+      </div>
+      <button type="button" onclick="closeModal('resetPasswordModal')" style="background: transparent; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+    </div>
+    <form id="resetPasswordForm" method="POST" action="">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Reset Method</label>
+          <div style="display: flex; gap: 12px; flex-direction: column;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+              <input type="radio" name="reset_action" value="temporary" checked onchange="toggleResetFields(this.value)" style="accent-color: var(--primary-plum);">
+              <span>Set Secure Temporary Password</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+              <input type="radio" name="reset_action" value="email" onchange="toggleResetFields(this.value)" style="accent-color: var(--primary-plum);">
+              <span>Send Supabase Password Reset Email</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="tempPasswordFieldGroup" class="form-group">
+          <label class="form-label" for="reset_new_password">Temporary Password (Minimum 8 chars) *</label>
+          <input type="text" id="reset_new_password" name="new_password" class="form-control" placeholder="e.g. StraklyPass2026!">
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block;">Provide this credential securely to the user. Plaintext passwords are not logged or stored.</span>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; border-top: 1px solid var(--border-line); padding-top: 16px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Execute Reset</button>
       </div>
     </form>
   </div>
 </div>
 
 <script>
+function filterUserTable() {
+  const query = (document.getElementById('userSearchInput').value || '').toLowerCase().trim();
+  const role = (document.getElementById('userRoleFilter').value || '').toLowerCase();
+  const status = (document.getElementById('userStatusFilter').value || '').toLowerCase();
+
+  const rows = document.querySelectorAll('#usersTable tbody tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    const name = row.getAttribute('data-name') || '';
+    const email = row.getAttribute('data-email') || '';
+    const rRole = row.getAttribute('data-role') || '';
+    const rStatus = row.getAttribute('data-status') || '';
+
+    const matchesQuery = !query || name.includes(query) || email.includes(query);
+    const matchesRole = !role || rRole === role;
+    const matchesStatus = !status || rStatus === status;
+
+    if (matchesQuery && matchesRole && matchesStatus) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  const badge = document.getElementById('userCountBadge');
+  if (badge) {
+    badge.textContent = `${visibleCount} Accounts Displayed`;
+  }
+}
+
+function openEditUserModal(btn) {
+  const form = document.getElementById('editUserForm');
+  form.action = '/admin/users/edit/' + btn.dataset.id;
+  document.getElementById('edit_u_name').value = btn.dataset.name || '';
+  document.getElementById('edit_u_phone').value = btn.dataset.phone || '';
+  document.getElementById('edit_u_role').value = btn.dataset.role || 'member';
+  openModal('editUserModal');
+}
+
+function openResetPasswordModal(btn) {
+  const form = document.getElementById('resetPasswordForm');
+  form.action = '/admin/users/reset-password/' + btn.dataset.id;
+  document.getElementById('reset_user_label').textContent = `${btn.dataset.name} (${btn.dataset.email})`;
+  document.getElementById('reset_new_password').value = '';
+  openModal('resetPasswordModal');
+}
+
+function toggleResetFields(action) {
+  const grp = document.getElementById('tempPasswordFieldGroup');
+  const input = document.getElementById('reset_new_password');
+  if (action === 'email') {
+    grp.style.display = 'none';
+    input.required = false;
+  } else {
+    grp.style.display = 'block';
+    input.required = true;
+  }
+}
+
 function openEditUserModal(btn) {
   const form = document.getElementById('editUserForm');
   form.action = '/admin/users/edit/' + btn.dataset.id;

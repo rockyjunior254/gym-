@@ -1,65 +1,245 @@
 {% extends 'member/layout.html' %}
 
-{% block page_title %}Account Preferences & Settings{% endblock %}
-{% block page_subtitle %}Manage notifications, coach data sharing, and platform privacy preferences{% endblock %}
+{% block page_title %}Account Preferences &amp; Security{% endblock %}
+{% block page_subtitle %}Manage notifications, athlete data sharing, and update your account password{% endblock %}
 
 {% block member_content %}
-<div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+<div style="max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px;">
 
-  <div class="fp-card">
-    <div style="border-bottom: 1px solid var(--fp-border); padding-bottom: 16px; margin-bottom: 20px;">
-      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Athlete Preferences</h3>
-      <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Control how you receive alerts and what data your coach can access</p>
+  <!-- Account Preferences Card -->
+  <div class="card">
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-ink);">Athlete Preferences</h3>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 3px 0 0 0;">Control how you receive facility alerts and what data your coach can access</p>
+      </div>
+      <span class="badge badge-lavender">Preferences</span>
     </div>
 
     <form action="{{ url_for('member.settings') }}" method="POST">
       <div style="display: flex; flex-direction: column; gap: 18px;">
         
         <!-- Setting 1: Email Notifications -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
           <div>
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Email Notifications</div>
-            <div style="font-size: 0.78rem; color: var(--fp-muted);">Receive membership renewal reminders and receipt confirmations via email.</div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-ink);">Email Notifications</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Receive membership renewal reminders and official cash payment receipt confirmations via email.</div>
           </div>
-          <input type="checkbox" name="notify_email" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('notify_email') %}checked{% endif %}>
+          <input type="checkbox" name="notify_email" style="width: 20px; height: 20px; accent-color: var(--primary-plum); cursor: pointer;" {% if settings and settings.get('notify_email') %}checked{% endif %}>
         </div>
 
         <!-- Setting 2: Class Reminders -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
           <div>
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Class & PT Booking Reminders</div>
-            <div style="font-size: 0.78rem; color: var(--fp-muted);">Receive notifications before your booked fitness classes and 1-on-1 PT sessions.</div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-ink);">Class &amp; PT Booking Reminders</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Receive alerts 2 hours prior to your booked fitness classes and 1-on-1 coaching sessions.</div>
           </div>
-          <input type="checkbox" name="notify_class_reminders" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('notify_class_reminders') %}checked{% endif %}>
+          <input type="checkbox" name="notify_class_reminders" style="width: 20px; height: 20px; accent-color: var(--primary-plum); cursor: pointer;" {% if settings and settings.get('notify_class_reminders') %}checked{% endif %}>
         </div>
 
         <!-- Setting 3: Share Progress with Coach -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
           <div>
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Share Progress Studio with Coach</div>
-            <div style="font-size: 0.78rem; color: var(--fp-muted);">Allows your assigned certified trainer to view your body measurements, PRs, and workout logs.</div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-ink);">Share Training Analytics with Assigned Coach</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Allows your assigned certified trainer to view your workout logs, personal records, and check-ins.</div>
           </div>
-          <input type="checkbox" name="share_progress_with_coach" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('share_progress_with_coach') %}checked{% endif %}>
+          <input type="checkbox" name="share_progress_with_coach" style="width: 20px; height: 20px; accent-color: var(--primary-plum); cursor: pointer;" {% if settings and settings.get('share_progress_with_coach') %}checked{% endif %}>
         </div>
 
         <!-- Setting 4: Public Leaderboards -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--fp-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 1px solid var(--border-subtle);">
           <div>
-            <div style="font-size: 0.9rem; font-weight: 700; color: var(--fp-ink);">Challenge Leaderboard Visibility</div>
-            <div style="font-size: 0.78rem; color: var(--fp-muted);">Show your name and milestone scores on club-wide challenge leaderboards.</div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--text-ink);">Challenge Leaderboard Visibility</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">Show your name and milestone scores on facility-wide fitness challenge leaderboards.</div>
           </div>
-          <input type="checkbox" name="public_leaderboard" style="width: 18px; height: 18px; accent-color: var(--fp-ink);" {% if settings and settings.get('public_leaderboard') %}checked{% endif %}>
+          <input type="checkbox" name="public_leaderboard" style="width: 20px; height: 20px; accent-color: var(--primary-plum); cursor: pointer;" {% if settings and settings.get('public_leaderboard') %}checked{% endif %}>
         </div>
 
       </div>
 
       <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
-        <button type="submit" class="fp-btn-dark">
-          Save Settings
+        <button type="submit" class="btn btn-secondary">
+          Save Preferences
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Security & Password Management Card -->
+  <div class="card" id="security">
+    <div style="border-bottom: 1px solid var(--border-line); padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-ink);">Account Security &bull; Change Password</h3>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 3px 0 0 0;">Update your account password to ensure your account remains protected</p>
+      </div>
+      <span class="badge badge-plum">Security</span>
+    </div>
+
+    <form action="{{ url_for('member.change_password') }}" method="POST" id="memberPasswordForm" onsubmit="return validateMemberPassword()">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+
+        <!-- Current Password -->
+        <div class="form-group">
+          <label class="form-label" for="mem_curr_pass">Current Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="mem_curr_pass" name="current_password" class="form-control" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right: 42px;">
+            <button type="button" onclick="togglePasswordVisibility('mem_curr_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- New Password -->
+        <div class="form-group">
+          <label class="form-label" for="mem_new_pass">New Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="mem_new_pass" name="new_password" class="form-control" placeholder="Minimum 8 characters" required autocomplete="new-password" oninput="checkPasswordStrength(this.value, 'mem_strength_bar', 'mem_strength_txt', 'mem_req_len', 'mem_req_num', 'mem_req_char')" style="padding-right: 42px;">
+            <button type="button" onclick="togglePasswordVisibility('mem_new_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+
+          <!-- Strength Bar Indicator -->
+          <div style="margin-top: 8px;">
+            <div style="height: 5px; width: 100%; background: var(--border-line); border-radius: 4px; overflow: hidden;">
+              <div id="mem_strength_bar" style="height: 100%; width: 0%; background: var(--color-danger); transition: all 0.3s ease;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+              <span style="font-size: 0.75rem; color: var(--text-secondary);">Password Strength: <strong id="mem_strength_txt" style="color: var(--text-muted);">None</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label class="form-label" for="mem_conf_pass">Confirm New Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="mem_conf_pass" name="confirm_password" class="form-control" placeholder="Re-type new password" required autocomplete="new-password" style="padding-right: 42px;">
+            <button type="button" onclick="togglePasswordVisibility('mem_conf_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+          <span id="mem_match_msg" style="font-size: 0.75rem; margin-top: 4px; display: block;"></span>
+        </div>
+
+        <!-- Password Requirements Checklist -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-line); border-radius: var(--radius-sm); padding: 14px 18px;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-ink); margin-bottom: 8px;">Password Requirements:</div>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--text-secondary);">
+            <li id="mem_req_len" style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="circle" style="width: 12px; height: 12px; color: var(--text-muted);"></i>
+              At least 8 characters in length
+            </li>
+            <li id="mem_req_num" style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="circle" style="width: 12px; height: 12px; color: var(--text-muted);"></i>
+              Contains at least one number (0-9)
+            </li>
+            <li id="mem_req_char" style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="circle" style="width: 12px; height: 12px; color: var(--text-muted);"></i>
+              Contains both uppercase and lowercase letters
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+          <span>Update Password</span>
         </button>
       </div>
     </form>
   </div>
 
 </div>
+
+<script>
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  const icon = btn.querySelector('i') || btn.querySelector('svg');
+  if (icon) {
+    icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function checkPasswordStrength(val, barId, txtId, reqLenId, reqNumId, reqCharId) {
+  const bar = document.getElementById(barId);
+  const txt = document.getElementById(txtId);
+  const elLen = document.getElementById(reqLenId);
+  const elNum = document.getElementById(reqNumId);
+  const elChar = document.getElementById(reqCharId);
+
+  const hasLen = val.length >= 8;
+  const hasNum = /\d/.test(val);
+  const hasUpperLower = /[a-z]/.test(val) && /[A-Z]/.test(val);
+
+  updateReqItem(elLen, hasLen);
+  updateReqItem(elNum, hasNum);
+  updateReqItem(elChar, hasUpperLower);
+
+  let score = 0;
+  if (hasLen) score += 35;
+  if (hasNum) score += 35;
+  if (hasUpperLower) score += 30;
+
+  if (val.length === 0) {
+    bar.style.width = '0%';
+    txt.textContent = 'None';
+    txt.style.color = 'var(--text-muted)';
+  } else if (score < 50) {
+    bar.style.width = '35%';
+    bar.style.background = 'var(--color-danger)';
+    txt.textContent = 'Weak';
+    txt.style.color = 'var(--color-danger)';
+  } else if (score < 100) {
+    bar.style.width = '70%';
+    bar.style.background = 'var(--color-warning)';
+    txt.textContent = 'Medium';
+    txt.style.color = 'var(--color-warning)';
+  } else {
+    bar.style.width = '100%';
+    bar.style.background = 'var(--color-success)';
+    txt.textContent = 'Strong';
+    txt.style.color = 'var(--color-success)';
+  }
+}
+
+function updateReqItem(el, passed) {
+  if (!el) return;
+  const icon = el.querySelector('i') || el.querySelector('svg');
+  if (passed) {
+    el.style.color = 'var(--color-success)';
+    if (icon) {
+      icon.setAttribute('data-lucide', 'check-circle-2');
+      icon.style.color = 'var(--color-success)';
+    }
+  } else {
+    el.style.color = 'var(--text-secondary)';
+    if (icon) {
+      icon.setAttribute('data-lucide', 'circle');
+      icon.style.color = 'var(--text-muted)';
+    }
+  }
+  if (window.lucide) lucide.createIcons();
+}
+
+function validateMemberPassword() {
+  const p1 = document.getElementById('mem_new_pass').value;
+  const p2 = document.getElementById('mem_conf_pass').value;
+  if (p1 !== p2) {
+    alert('New password and confirmation do not match.');
+    return false;
+  }
+  if (p1.length < 8) {
+    alert('Password must be at least 8 characters long.');
+    return false;
+  }
+  return true;
+}
+</script>
 {% endblock %}

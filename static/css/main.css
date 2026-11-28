@@ -1,6 +1,6 @@
 /* ==========================================================================
    STRAKLY ATHLETICS & FITNESS PLATFORM — DESIGN SYSTEM
-   MASTER PRESENTATION SYSTEM: PINK, ROSE, MAGENTA, LAVENDER & WARM NEUTRALS
+   MASTER PRESENTATION SYSTEM: LAVENDER, PLUM, SOFT PURPLE, WHITE & WARM NEUTRALS
    ========================================================================== */
 
 @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700,800&display=swap');
@@ -8,107 +8,138 @@
 
 :root {
   /* ==========================================================================
-     1. BRAND COLOR SYSTEM: PINK, ROSE, MAGENTA, LAVENDER, PLUM & WARM NEUTRALS
+     1. BRAND COLOR SYSTEM: OFFICIAL LAVENDER, PLUM & SOFT PURPLE PALETTE
      ========================================================================== */
-  /* Primary Pink / Rose Family */
-  --primary-pink: #E7549C;
-  --primary-pink-hover: #D63D88;
-  --primary-pink-active: #C22D77;
-  --primary-pink-light: #FCE7F1;
-  --primary-pink-soft: #FFF0F6;
-  --primary-pink-tint: rgba(231, 84, 156, 0.12);
-  --primary-pink-glow: rgba(231, 84, 156, 0.28);
+  /* Primary Plum */
+  --primary-plum: #684A78;
+  --primary-plum-dark: #56365F;
+  --primary-plum-hover: #56365F;
+  --primary-plum-active: #472B4F;
+  --primary-plum-soft: #F4EFFB;
+  --primary-plum-tint: rgba(104, 74, 120, 0.12);
+  --primary-plum-glow: rgba(104, 74, 120, 0.25);
 
-  /* Primary Compatibility Aliases */
-  --primary-forest: #E7549C;
-  --primary-forest-hover: #D63D88;
-  --primary-forest-tint: rgba(231, 84, 156, 0.12);
-  --primary-lime: #E7549C;
-  --secondary-lime: #D63D88;
-  --lime-glow: rgba(231, 84, 156, 0.28);
-  --lime-muted: rgba(231, 84, 156, 0.12);
-  --border-lime: #E8B6D0;
+  /* Primary Lavender */
+  --primary-lavender: #9677CE;
+  --primary-lavender-light: #A78BDA;
+  --primary-lavender-hover: #8564BD;
+  --primary-lavender-active: #7653B4;
+  --primary-lavender-soft: #EDE5FA;
+  --primary-lavender-tint: rgba(150, 119, 206, 0.14);
+  --primary-lavender-glow: rgba(150, 119, 206, 0.28);
 
-  /* Secondary & Accents */
-  --secondary-lavender: #A78BDA;
-  --secondary-lavender-hover: #9676CF;
-  --secondary-purple: #B99CEB;
-  --secondary-plum: #68465F;
-  --accent-rose: #E7549C;
-  --accent-rose-hover: #D63D88;
-  --accent-rose-tint: rgba(231, 84, 156, 0.12);
-  --accent-plum: #68465F;
-  --accent-lavender: #A78BDA;
+  /* Light Purple */
+  --light-purple: #D9CCF0;
+  --light-purple-soft: #C2AFE8;
 
-  /* Backgrounds & Surfaces */
-  --bg-pearl: #FFF9FC;
-  --bg-main: #FFF9FC;
-  --bg-secondary: #FFF1F6;
+  /* Soft Lavender & Accents */
+  --soft-lavender: #EDE5FA;
+  --soft-lavender-bg: #F4EFFB;
+
+  /* Core Brand Identity (Plum as primary strong, Lavender as primary vibrant) */
+  --brand-primary: #684A78;
+  --brand-primary-hover: #56365F;
+  --brand-accent: #9677CE;
+  --brand-accent-hover: #8564BD;
+
+  /* Compatibility Aliases to seamlessly transition legacy template references */
+  --primary-pink: #684A78;
+  --primary-pink-hover: #56365F;
+  --primary-pink-active: #472B4F;
+  --primary-pink-light: #EDE5FA;
+  --primary-pink-soft: #F4EFFB;
+  --primary-pink-tint: rgba(104, 74, 120, 0.12);
+  --primary-pink-glow: rgba(150, 119, 206, 0.28);
+  --primary-forest: #684A78;
+  --primary-forest-hover: #56365F;
+  --primary-forest-tint: rgba(104, 74, 120, 0.12);
+  --primary-lime: #9677CE;
+  --secondary-lime: #A78BDA;
+  --lime-glow: rgba(150, 119, 206, 0.28);
+  --lime-muted: rgba(150, 119, 206, 0.14);
+  --border-lime: #D9CCF0;
+  --accent-rose: #684A78;
+  --accent-rose-hover: #56365F;
+  --accent-rose-tint: rgba(104, 74, 120, 0.12);
+  --accent-plum: #684A78;
+  --accent-lavender: #9677CE;
+  --secondary-lavender: #9677CE;
+  --secondary-lavender-hover: #8564BD;
+  --secondary-purple: #A78BDA;
+  --secondary-plum: #56365F;
+
+  /* Backgrounds & Surfaces (Exact specification) */
+  --bg-main: #FAF8FD;
+  --bg-secondary: #F4F0F9;
   --bg-card: #FFFFFF;
-  --bg-blush: #FFF0F6;
   --bg-surface: #FFFFFF;
-  --bg-surface-alt: #FFF5F9;
+  --bg-surface-alt: #F4F0F9;
+  --bg-pearl: #FAF8FD;
+  --bg-blush: #F4EFFB;
+  --bg-hover: #EDE5FA;
 
-  /* Typography / Inks */
-  --text-ink: #3D2938;
-  --text-secondary: #826B7A;
-  --text-muted: #A08D99;
+  /* Typography / Inks (Exact specification) */
+  --text-ink: #342B3D;
+  --text-main: #342B3D;
+  --text-secondary: #776B82;
+  --text-muted: #9B91A5;
   --text-white: #FFFFFF;
 
-  /* Borders & Dividers */
-  --border-line: #F0DDE7;
-  --border-color: #F0DDE7;
-  --border-subtle: #F9ECF3;
-  --border-active: #E8B6D0;
-  --border-hover: #E29CBD;
+  /* Borders & Dividers (Exact specification) */
+  --border-line: #E8E0EF;
+  --border-color: #E8E0EF;
+  --border-subtle: #F2ECF7;
+  --border-active: #C2AFE8;
+  --border-hover: #A78BDA;
 
-  /* Semantic Supporting Status */
-  --color-success: #21866A;
-  --color-success-tint: rgba(33, 134, 106, 0.12);
+  /* Semantic Supporting Status (Exact specification) */
+  --color-success: #268568;
+  --color-success-tint: rgba(38, 133, 104, 0.12);
   --color-success-bg: #E8F7F2;
-  --color-warning: #C58A38;
-  --color-warning-text: #96631E;
-  --color-warning-tint: rgba(197, 138, 56, 0.14);
-  --color-warning-bg: #FEF6EB;
-  --color-danger: #D94E68;
-  --color-danger-tint: rgba(217, 78, 104, 0.12);
+  --color-warning: #C28B3D;
+  --color-warning-text: #8E5C1B;
+  --color-warning-tint: rgba(194, 139, 61, 0.14);
+  --color-warning-bg: #FEF7ED;
+  --color-danger: #D95368;
+  --color-danger-tint: rgba(217, 83, 104, 0.12);
   --color-danger-bg: #FEECEF;
-  --color-info: #9570C8;
-  --color-info-tint: rgba(149, 112, 200, 0.12);
-  --color-info-bg: #F4EEFB;
-  --chart-accent: #A78BDA;
+  --color-info: #7586C9;
+  --color-info-tint: rgba(117, 134, 201, 0.14);
+  --color-info-bg: #EFF2FA;
+  --chart-accent: #9677CE;
 
-  /* FitPulse / Legacy Variable Overrides to Pink Design System */
-  --fp-bg: #FFF9FC;
+  /* FitPulse / Legacy Variable Overrides to Lavender & Plum */
+  --fp-bg: #FAF8FD;
   --fp-surface: #FFFFFF;
-  --fp-surface-alt: #FFF1F6;
-  --fp-ink: #3D2938;
-  --fp-muted: #826B7A;
-  --fp-lime: #E7549C;
-  --fp-lime-dark: #68465F;
-  --fp-lime-hover: #D63D88;
-  --fp-coral: #D94E68;
-  --fp-sand: #FCE7F1;
-  --fp-border: #F0DDE7;
-  --fp-border-subtle: #F9ECF3;
-  --fp-shadow: 0 2px 6px rgba(104, 70, 95, 0.05), 0 10px 28px -6px rgba(104, 70, 95, 0.08);
+  --fp-surface-alt: #F4F0F9;
+  --fp-ink: #342B3D;
+  --fp-muted: #776B82;
+  --fp-lime: #9677CE;
+  --fp-lime-dark: #684A78;
+  --fp-lime-hover: #8564BD;
+  --fp-coral: #D95368;
+  --fp-sand: #EDE5FA;
+  --fp-border: #E8E0EF;
+  --fp-border-subtle: #F2ECF7;
+  --fp-shadow: 0 2px 6px rgba(86, 54, 95, 0.05), 0 10px 28px -6px rgba(86, 54, 95, 0.08);
   --fp-radius: 16px;
 
   /* Gradients */
-  --gradient-signature: linear-gradient(135deg, #FFF9FC 0%, #FFF0F6 50%, #F5EBFB 100%);
-  --gradient-pink: linear-gradient(135deg, #E7549C 0%, #C22D77 100%);
-  --gradient-plum: linear-gradient(135deg, #68465F 0%, #3D2938 100%);
-  --gradient-lavender: linear-gradient(135deg, #B99CEB 0%, #A78BDA 100%);
-  --gradient-hero-dark: linear-gradient(135deg, #2B1624 0%, #1A0D16 100%);
-  --gradient-forest: var(--gradient-pink);
+  --gradient-signature: linear-gradient(135deg, #FAF8FD 0%, #F4F0F9 50%, #EDE5FA 100%);
+  --gradient-plum: linear-gradient(135deg, #684A78 0%, #56365F 100%);
+  --gradient-lavender: linear-gradient(135deg, #A78BDA 0%, #9677CE 100%);
+  --gradient-soft: linear-gradient(135deg, #EDE5FA 0%, #F4EFFB 100%);
+  --gradient-pink: var(--gradient-plum);
+  --gradient-forest: var(--gradient-plum);
+  --gradient-hero-dark: linear-gradient(135deg, #342B3D 0%, #201726 100%);
 
-  /* Chart Default Palette (Rose Garden) */
-  --chart-1: #E7549C;
-  --chart-2: #B58AE8;
-  --chart-3: #F2A65A;
-  --chart-4: #E76F77;
-  --chart-5: #7C9E8B;
-  --chart-6: #68465F;
+  /* Chart Default Palette (Official Lavender & Plum) */
+  --chart-1: #9677CE;
+  --chart-2: #684A78;
+  --chart-3: #B8A2E5;
+  --chart-4: #56365F;
+  --chart-5: #7586C9;
+  --chart-6: #268568;
 
   /* Typography Families */
   --font-heading: 'General Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -1095,9 +1126,9 @@ body.public-body .btn-primary, body.public-body .btn-neon {
 }
 
 body.public-body .btn-primary:hover, body.public-body .btn-neon:hover {
-  background: #D63D88 !important;
+  background: var(--primary-plum-hover) !important;
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(231, 84, 156, 0.45);
+  box-shadow: 0 10px 28px rgba(104, 74, 120, 0.4);
 }
 
 body.public-body .btn-secondary, body.public-body .btn-glass {
@@ -1440,9 +1471,9 @@ body.public-body textarea:focus {
 }
 
 .btn-neon:hover {
-  background: #D63D88 !important;
+  background: var(--primary-plum-hover) !important;
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(231, 84, 156, 0.45);
+  box-shadow: 0 8px 28px rgba(104, 74, 120, 0.4);
 }
 
 .btn-glass {

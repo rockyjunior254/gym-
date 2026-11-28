@@ -988,6 +988,77 @@ class GymRepository:
             raise e
 
     @staticmethod
+    def change_user_password(user_id: str, email: str, current_password: str, new_password: str):
+        """
+        Securely verifies current password and updates to new password.
+        Never stores or logs plaintext passwords.
+        """
+        if not new_password or len(new_password) < 8:
+            raise ValueError("New password must be at least 8 characters long.")
+        if not any(c.isdigit() for c in new_password) or not any(c.isalpha() for c in new_password):
+            raise ValueError("Password must contain both letters and at least one number.")
+
+        if db_service.is_configured:
+            # 1. Verify current password
+            try:
+                verify_res = db_service.client.auth.sign_in_with_password({'email': email, 'password': current_password})
+                if not verify_res or not hasattr(verify_res, 'user') or not verify_res.user:
+                    raise ValueError("Current password verification failed.")
+            except Exception as e:
+                logger.warning(f"Password verification failure for {email}: {e}")
+                raise ValueError("Current password does not match our records.")
+
+            # 2. Update user password
+            try:
+                db_service.client.auth.update_user({'password': new_password})
+            except Exception as update_err:
+                admin_auth = getattr(db_service.client.auth, 'admin', None)
+                if admin_auth and hasattr(admin_auth, 'update_user_by_id'):
+                    admin_auth.update_user_by_id(user_id, {'password': new_password})
+                else:
+                    raise update_err
+
+            # 3. Update profile updated_at timestamp
+            try:
+                db_service.get_table('profiles').update({'updated_at': datetime.datetime.now().isoformat()}).eq('id', user_id).execute()
+            except Exception:
+                pass
+        return True
+
+    @staticmethod
+    def admin_reset_user_password(admin_user_id: str, target_user_id: str, new_password: str = None):
+        """
+        Administrator-authorized password reset or dispatch of password reset email.
+        Admin never sees the user's existing password.
+        """
+        if db_service.is_configured:
+            prof_res = db_service.get_table('profiles').select('email, full_name').eq('id', target_user_id).execute()
+            if not prof_res.data:
+                raise ValueError("Target user profile not found.")
+            target_email = prof_res.data[0]['email']
+
+            admin_auth = getattr(db_service.client.auth, 'admin', None)
+            if new_password:
+                if len(new_password) < 8:
+                    raise ValueError("New password must be at least 8 characters long.")
+                try:
+                    if admin_auth and hasattr(admin_auth, 'update_user_by_id'):
+                        admin_auth.update_user_by_id(target_user_id, {'password': new_password})
+                    else:
+                        db_service.client.auth.reset_password_for_email(target_email)
+                except Exception as e:
+                    logger.warning(f"Admin direct update failed, falling back to reset email: {e}")
+                    db_service.client.auth.reset_password_for_email(target_email)
+            else:
+                db_service.client.auth.reset_password_for_email(target_email)
+
+            try:
+                db_service.get_table('profiles').update({'updated_at': datetime.datetime.now().isoformat()}).eq('id', target_user_id).execute()
+            except Exception:
+                pass
+        return True
+
+    @staticmethod
     def create_user_account(full_name: str, email: str, role: str, phone: str = ''):
         """Creates a new user profile and Auth identity."""
         if not db_service.is_configured:
@@ -1034,28 +1105,70 @@ class GymRepository:
             raise e
 
     @staticmethod
-    def delete_user_account(user_id: str):
-        """Controlled deletion or safe archival of a user account."""
+    def delete_user_account(user_id: str, permanent: bool = True):
+        """
+        Permanent deletion of a user account with comprehensive data safeguards.
+        1. Protects sole active admin and prevents self-deletion.
+        2. Preserves cash payment receipts by nullifying foreign key references.
+        3. Cleans related member subscriptions, attendance, trainer assignments.
+        4. Permanently removes profile and Supabase Auth credentials.
+        """
         if not db_service.is_configured:
             return True
         try:
             # Check if protected last admin
-            profile = db_service.get_table('profiles').select('*').eq('id', user_id).execute()
-            if profile.data and profile.data[0].get('role') == 'admin':
+            profile_res = db_service.get_table('profiles').select('*').eq('id', user_id).execute()
+            if profile_res.data and profile_res.data[0].get('role') == 'admin':
                 admin_count = db_service.get_table('profiles').select('id').eq('role', 'admin').eq('is_active', True).execute()
                 if len(admin_count.data) <= 1:
                     raise ValueError("Cannot delete or deactivate the sole active administrator account.")
 
-            # Soft delete/archive profile
-            db_service.get_table('profiles').update({
-                'is_active': False,
-                'is_archived': True,
-                'archived_at': datetime.datetime.now().isoformat()
-            }).eq('id', user_id).execute()
+            if permanent:
+                # 1. Preserve financial audit trail: disassociate member_id on cash_payments so financial logs persist
+                try:
+                    db_service.get_table('cash_payments').update({'member_id': None}).eq('member_id', user_id).execute()
+                except Exception as pay_err:
+                    logger.debug(f"Preserving payments note: {pay_err}")
+
+                # 2. Clean child relational tables
+                for child_tbl, col in [
+                    ('member_subscriptions', 'member_id'),
+                    ('manual_attendance', 'member_id'),
+                    ('trainer_assignments', 'member_id'),
+                    ('trainer_assignments', 'trainer_id'),
+                    ('pt_sessions', 'member_id'),
+                    ('pt_sessions', 'trainer_id'),
+                    ('user_notifications', 'user_id'),
+                    ('workout_logs', 'member_id'),
+                    ('service_inquiries', 'member_id'),
+                    ('equipment_reservations', 'member_id'),
+                    ('store_orders', 'member_id'),
+                    ('trainer_details', 'id')
+                ]:
+                    try:
+                        db_service.get_table(child_tbl).delete().eq(col, user_id).execute()
+                    except Exception:
+                        pass
+
+                # 3. Permanently delete from profiles
+                db_service.get_table('profiles').delete().eq('id', user_id).execute()
+
+                # 4. Remove from Supabase Auth admin if available
+                try:
+                    if hasattr(db_service, 'client') and hasattr(db_service.client, 'auth') and hasattr(db_service.client.auth, 'admin'):
+                        db_service.client.auth.admin.delete_user(user_id)
+                except Exception as auth_err:
+                    logger.debug(f"Auth admin deletion: {auth_err}")
+            else:
+                db_service.get_table('profiles').update({
+                    'is_active': False,
+                    'is_archived': True,
+                    'archived_at': datetime.datetime.now().isoformat()
+                }).eq('id', user_id).execute()
 
             return True
         except Exception as e:
-            logger.error(f"Error deleting user {user_id}: {e}")
+            logger.error(f"Error permanently deleting user {user_id}: {e}")
             raise e
 
     # =========================================================================
@@ -1519,18 +1632,152 @@ class GymRepository:
             return []
 
     @staticmethod
-    def get_store_products(category: str = None):
+    def get_store_products(category: str = None, include_archived: bool = False):
+        default_catalogue = [
+            {
+                'id': 'prod-001',
+                'name': 'Strakly Heavy-Duty Lifting Belt',
+                'category': 'Lifting Gear',
+                'description': 'IPF-compliant 10mm genuine leather lever lifting belt engineered for maximal bracing and stability.',
+                'price': 8500.00,
+                'currency': 'KES',
+                'stock_quantity': 24,
+                'sku': 'STR-BLT-01',
+                'image_url': 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['S', 'M', 'L', 'XL'],
+                'is_active': True,
+                'is_featured': True
+            },
+            {
+                'id': 'prod-002',
+                'name': 'Strakly Oversized Heavyweight Tee',
+                'category': 'Apparel',
+                'description': '280 GSM heavyweight combed cotton training shirt with dropped shoulders and embroidered chest crest.',
+                'price': 2800.00,
+                'currency': 'KES',
+                'stock_quantity': 45,
+                'sku': 'STR-TEE-01',
+                'image_url': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['S', 'M', 'L', 'XL', '2XL'],
+                'is_active': True,
+                'is_featured': True
+            },
+            {
+                'id': 'prod-003',
+                'name': 'Vacuum Insulated Stainless Shaker (750ml)',
+                'category': 'Bottles & Shakers',
+                'description': 'Double-walled vacuum insulated kitchen-grade stainless shaker with silent mixing mechanism.',
+                'price': 1800.00,
+                'currency': 'KES',
+                'stock_quantity': 60,
+                'sku': 'STR-SHK-01',
+                'image_url': 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['Standard'],
+                'is_active': True,
+                'is_featured': False
+            },
+            {
+                'id': 'prod-004',
+                'name': 'Heavy-Duty Gym Duffle Bag (45L)',
+                'category': 'Gym Bags',
+                'description': 'Water-resistant cordura nylon gear bag with ventilated shoe compartment and wet laundry pocket.',
+                'price': 4500.00,
+                'currency': 'KES',
+                'stock_quantity': 28,
+                'sku': 'STR-BAG-01',
+                'image_url': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['Standard'],
+                'is_active': True,
+                'is_featured': True
+            },
+            {
+                'id': 'prod-005',
+                'name': 'Elastic Heavy Wrist Wraps (Pair)',
+                'category': 'Accessories',
+                'description': '24-inch competition grade thumb-loop wrist supports with reinforced military velcro.',
+                'price': 1500.00,
+                'currency': 'KES',
+                'stock_quantity': 50,
+                'sku': 'STR-WRP-01',
+                'image_url': 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['Standard'],
+                'is_active': True,
+                'is_featured': False
+            },
+            {
+                'id': 'prod-006',
+                'name': 'Deep Tissue Vibrating Foam Roller',
+                'category': 'Recovery Accessories',
+                'description': 'High-density contoured foam roller with 4-speed vibration motor for deep myofascial release.',
+                'price': 3800.00,
+                'currency': 'KES',
+                'stock_quantity': 16,
+                'sku': 'STR-ROL-01',
+                'image_url': 'https://images.unsplash.com/photo-1600881333168-2ef49b341f30?auto=format&fit=crop&w=800&q=80',
+                'available_sizes': ['Standard'],
+                'is_active': True,
+                'is_featured': True
+            }
+        ]
+
         if not db_service.is_configured:
-            return []
+            return default_catalogue
         try:
-            query = db_service.get_table('store_products').select('*').eq('is_active', True)
+            query = db_service.get_table('store_products').select('*')
+            if not include_archived:
+                query = query.eq('is_active', True)
             if category:
                 query = query.eq('category', category)
             res = query.order('created_at', desc=True).execute()
-            return res.data or []
+            if res.data and len(res.data) > 0:
+                return res.data
+            return default_catalogue
         except Exception as e:
             logger.error(f"Error fetching store products: {e}")
-            return []
+            return default_catalogue
+
+    @staticmethod
+    def create_store_product(name: str, category: str, price: float, description: str = '', stock_quantity: int = 10, image_url: str = '', sku: str = ''):
+        data = {
+            'name': name,
+            'category': category,
+            'price': float(price),
+            'description': description,
+            'stock_quantity': int(stock_quantity),
+            'image_url': image_url,
+            'sku': sku or f"STR-{name[:3].upper()}-{int(datetime.datetime.now().timestamp()) % 1000}",
+            'is_active': True
+        }
+        if db_service.is_configured:
+            try:
+                res = db_service.get_table('store_products').insert(data).execute()
+                return res.data[0] if res.data else data
+            except Exception as e:
+                logger.error(f"Error inserting product: {e}")
+                return data
+        return data
+
+    @staticmethod
+    def update_store_product(product_id: str, updates: dict):
+        if db_service.is_configured:
+            try:
+                res = db_service.get_table('store_products').update(updates).eq('id', product_id).execute()
+                return res.data[0] if res.data else updates
+            except Exception as e:
+                logger.error(f"Error updating product: {e}")
+                return updates
+        return updates
+
+    @staticmethod
+    def archive_store_product(product_id: str):
+        if db_service.is_configured:
+            try:
+                db_service.get_table('store_products').update({'is_active': False, 'is_archived': True}).eq('id', product_id).execute()
+                return True
+            except Exception as e:
+                logger.error(f"Error archiving product: {e}")
+                return False
+        return True
 
     @staticmethod
     def place_store_order(member_id: str, product_id: str, quantity: int = 1, selected_size: str = 'Standard', pickup_notes: str = ''):

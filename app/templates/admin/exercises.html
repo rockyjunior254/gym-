@@ -8,19 +8,19 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
         Training Architecture
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
         Movement &amp; Exercise Library
       </h1>
       <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
-        Master movement directory: target muscle groups, exercise instructions, equipment cues, and mechanics.
+        Master movement directory: target muscle groups, exercise instructions, equipment cues, and media illustrations.
       </p>
     </div>
     <div>
       <button class="btn btn-primary" onclick="openModal('addExerciseModal')" style="display: inline-flex; align-items: center; gap: 8px;">
-        <i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i>
+        <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
         <span>Add Movement</span>
       </button>
     </div>
@@ -31,18 +31,18 @@
     <div class="card" style="padding: 20px;">
       <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-line); padding-bottom: 10px;">
         <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Add Movement</h3>
-        <span class="badge badge-pink" style="font-size: 10.5px;">Library</span>
+        <span class="badge badge-plum" style="font-size: 11px;">Library</span>
       </div>
 
       <form method="POST" action="{{ url_for('admin.exercises') }}">
         <div class="form-group">
-          <label class="form-label" for="name">Movement Name <span style="color: var(--accent-rose);">*</span></label>
+          <label class="form-label" for="name">Movement Name <span style="color: var(--primary-plum);">*</span></label>
           <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Barbell Romanian Deadlift" required>
         </div>
 
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label" for="target_muscle_group">Target Muscle Group</label>
+            <label class="form-label" for="target_muscle_group">Target Muscle</label>
             <select id="target_muscle_group" name="target_muscle_group" class="form-control">
               <option value="Legs">Legs / Posterior</option>
               <option value="Chest">Chest</option>
@@ -54,7 +54,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="difficulty_level">Difficulty Level</label>
+            <label class="form-label" for="difficulty_level">Difficulty</label>
             <select id="difficulty_level" name="difficulty_level" class="form-control">
               <option value="beginner">Beginner</option>
               <option value="intermediate" selected>Intermediate</option>
@@ -66,6 +66,11 @@
         <div class="form-group">
           <label class="form-label" for="equipment_required">Required Equipment</label>
           <input type="text" id="equipment_required" name="equipment_required" class="form-control" placeholder="e.g. Olympic Barbell, Chalk">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="image_url">Demonstration Image URL</label>
+          <input type="url" id="image_url" name="image_url" class="form-control" placeholder="https://... or /static/images/exercises/...">
         </div>
 
         <div class="form-group">
@@ -87,56 +92,77 @@
           <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Movement Directory</h3>
           <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Standardized exercises referenced across athlete training plans</p>
         </div>
-        <span class="badge badge-pink" style="font-size: 11px;">{{ exercises|length }} Movements</span>
+        <span class="badge badge-plum" style="font-size: 11px;">{{ exercises|length }} Movements</span>
       </div>
 
       {% if exercises %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
           {% for ex in exercises %}
-            <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span class="badge badge-pink" style="font-size: 10.5px;">{{ ex.target_muscle_group }}</span>
-                  <span class="badge badge-neutral" style="font-size: 10.5px;">{{ (ex.difficulty or 'BEGINNER')|upper }}</span>
+            <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+              <!-- Thumbnail -->
+              <div style="height: 120px; position: relative; background: linear-gradient(135deg, rgba(104, 74, 120, 0.15), rgba(150, 119, 206, 0.2)); overflow: hidden;">
+                {% if ex.image_url %}
+                  <img src="{{ ex.image_url }}" alt="{{ ex.name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center;">
+                    <i data-lucide="dumbbell" style="width: 32px; height: 32px; color: var(--primary-lavender); opacity: 0.6;"></i>
+                  </div>
+                {% else %}
+                  <div style="display: flex; width: 100%; height: 100%; align-items: center; justify-content: center;">
+                    <i data-lucide="dumbbell" style="width: 32px; height: 32px; color: var(--primary-lavender); opacity: 0.6;"></i>
+                  </div>
+                {% endif %}
+                <div style="position: absolute; top: 8px; left: 8px;">
+                  <span class="badge badge-plum" style="font-size: 10px; font-weight: 700;">{{ ex.target_muscle_group }}</span>
                 </div>
-                <h4 style="margin: 0 0 6px; font-size: 1rem; font-weight: 700; color: var(--text-ink);">{{ ex.name }}</h4>
-                <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 12px; line-height: 1.45;">
-                  {{ ex.instructions or 'No form mechanics notes specified.' }}
-                </p>
+                <div style="position: absolute; top: 8px; right: 8px;">
+                  <span class="badge badge-neutral" style="font-size: 10px; background: rgba(255,255,255,0.9); color: var(--text-ink); font-weight: 700;">{{ (ex.difficulty or 'BEGINNER')|upper }}</span>
+                </div>
               </div>
 
-            <div style="border-top: 1px solid var(--border-line); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--ink-muted);">
-              <span>{{ ex.equipment_required or 'Standard Gym Gear' }}</span>
-              <div style="display: flex; gap: 0.35rem;">
-                <button type="button" class="btn btn-sm btn-secondary"
-                        data-id="{{ ex.id }}"
-                        data-name="{{ ex.name }}"
-                        data-muscle="{{ ex.target_muscle_group or 'Full Body' }}"
-                        data-diff="{{ ex.difficulty or 'intermediate' }}"
-                        data-inst="{{ ex.instructions or '' }}"
-                        data-equip="{{ ex.equipment_required or '' }}"
-                        onclick="openEditExerciseModal(this)">Edit</button>
-                <form method="POST" action="{{ url_for('admin.archive_exercise', exercise_id=ex.id) }}" onsubmit="return confirm('Archive exercise movement?');" style="display:inline;">
-                  <button type="submit" class="btn btn-sm btn-outline-rose">Archive</button>
-                </form>
+              <div style="padding: 14px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+                <div>
+                  <h4 style="margin: 0 0 6px; font-size: 1rem; font-weight: 700; color: var(--text-ink);">{{ ex.name }}</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 10px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ ex.instructions or 'No form mechanics notes specified.' }}
+                  </p>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-line); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted);">
+                  <span style="max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ex.equipment_required or 'Standard Gym Gear' }}</span>
+                  <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn btn-sm btn-secondary"
+                            data-id="{{ ex.id }}"
+                            data-name="{{ ex.name }}"
+                            data-muscle="{{ ex.target_muscle_group or 'Full Body' }}"
+                            data-diff="{{ ex.difficulty or 'intermediate' }}"
+                            data-inst="{{ ex.instructions or '' }}"
+                            data-equip="{{ ex.equipment_required or '' }}"
+                            data-img="{{ ex.image_url or '' }}"
+                            onclick="openEditExerciseModal(this)">Edit</button>
+                    <form method="POST" action="{{ url_for('admin.archive_exercise', exercise_id=ex.id) }}" onsubmit="return confirm('Archive exercise movement?');" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-outline-rose" style="padding: 4px 8px;">Archive</button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="empty-state">
-        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          {% endfor %}
         </div>
-        <h4 style="margin: 0 0 0.5rem; color: var(--ink-dark);">No Exercises Found</h4>
-        <p style="margin: 0; font-size: 0.85rem; color: var(--ink-muted);">Build your facility movement library to enable trainers to build structured workout templates.</p>
-      </div>
-    {% endif %}
+      {% else %}
+        <div class="empty-state" style="text-align: center; padding: 40px 16px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary-lavender);">
+            <i data-lucide="book-open" style="width: 24px; height: 24px;"></i>
+          </div>
+          <h4 style="margin: 0 0 0.5rem; color: var(--text-ink);">No Exercises Found</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Build your facility movement library to enable trainers to build structured workout templates.</p>
+        </div>
+      {% endif %}
+    </div>
   </div>
+
 </div>
 
-<!-- Modal: Add Exercise (Header button target) -->
+<!-- Modal: Add Exercise -->
 <div id="addExerciseModal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-header">
@@ -149,17 +175,16 @@
     <form method="POST" action="{{ url_for('admin.exercises') }}">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label" for="modal_ex_name">Movement Name <span style="color: var(--accent-rose);">*</span></label>
-          <input type="text" id="modal_ex_name" name="name" class="form-control" placeholder="e.g. Barbell Romanian Deadlift" required>
+          <label class="form-label" for="modal_name">Movement Name <span style="color: var(--primary-plum);">*</span></label>
+          <input type="text" id="modal_name" name="name" class="form-control" placeholder="e.g. Incline Dumbbell Press" required>
         </div>
-
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label" for="modal_target_muscle_group">Target Muscle Group</label>
-            <select id="modal_target_muscle_group" name="target_muscle_group" class="form-control">
-              <option value="Legs">Legs / Posterior</option>
+            <label class="form-label" for="modal_muscle">Target Muscle Group</label>
+            <select id="modal_muscle" name="target_muscle_group" class="form-control">
               <option value="Chest">Chest</option>
               <option value="Back">Back</option>
+              <option value="Legs">Legs / Posterior</option>
               <option value="Shoulders">Shoulders</option>
               <option value="Arms">Arms</option>
               <option value="Core">Core</option>
@@ -167,28 +192,30 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="modal_difficulty_level">Difficulty Level</label>
-            <select id="modal_difficulty_level" name="difficulty_level" class="form-control">
+            <label class="form-label" for="modal_diff">Difficulty Level</label>
+            <select id="modal_diff" name="difficulty_level" class="form-control">
               <option value="beginner">Beginner</option>
               <option value="intermediate" selected>Intermediate</option>
               <option value="advanced">Advanced</option>
             </select>
           </div>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="modal_equipment_required">Required Equipment</label>
-          <input type="text" id="modal_equipment_required" name="equipment_required" class="form-control" placeholder="e.g. Barbell, Chalk">
+          <label class="form-label" for="modal_equip">Required Equipment</label>
+          <input type="text" id="modal_equip" name="equipment_required" class="form-control" placeholder="e.g. Adjustable Bench, Dumbbells">
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="modal_instructions">Form Mechanics & Cues</label>
-          <textarea id="modal_instructions" name="instructions" class="form-control" rows="3" placeholder="Setup cue, bracing, tempo..."></textarea>
+          <label class="form-label" for="modal_img">Demonstration Image URL</label>
+          <input type="url" id="modal_img" name="image_url" class="form-control" placeholder="https://... or /static/images/exercises/...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal_inst">Instructions / Form Mechanics</label>
+          <textarea id="modal_inst" name="instructions" class="form-control" rows="3" placeholder="Setup cue, bracing, eccentric tempo..."></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" onclick="closeModal('addExerciseModal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Exercise</button>
+        <button type="submit" class="btn btn-primary">Save Movement</button>
       </div>
     </form>
   </div>
@@ -199,49 +226,50 @@
   <div class="modal-box">
     <div class="modal-header">
       <div>
-        <h3 class="modal-title">Edit Exercise Movement</h3>
-        <p class="modal-subtitle">Update movement cues, equipment, or target muscle group</p>
+        <h3 class="modal-title">Edit Movement</h3>
+        <p class="modal-subtitle">Update form cues, difficulty, or equipment</p>
       </div>
       <button type="button" class="modal-close" onclick="closeModal('editExerciseModal')">&times;</button>
     </div>
     <form id="editExerciseForm" method="POST" action="">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label" for="edit_ex_name">Movement Name <span style="color: var(--accent-rose);">*</span></label>
-          <input type="text" id="edit_ex_name" name="name" class="form-control" required>
+          <label class="form-label" for="edit_name">Movement Name <span style="color: var(--primary-plum);">*</span></label>
+          <input type="text" id="edit_name" name="name" class="form-control" required>
         </div>
-
         <div class="grid-2">
           <div class="form-group">
-            <label class="form-label" for="edit_ex_muscle">Target Muscle Group</label>
-            <select id="edit_ex_muscle" name="target_muscle_group" class="form-control">
-              <option value="Legs">Legs / Posterior Chain</option>
+            <label class="form-label" for="edit_muscle">Target Muscle Group</label>
+            <select id="edit_muscle" name="target_muscle_group" class="form-control">
               <option value="Chest">Chest</option>
               <option value="Back">Back</option>
+              <option value="Legs">Legs / Posterior</option>
               <option value="Shoulders">Shoulders</option>
               <option value="Arms">Arms</option>
               <option value="Core">Core</option>
-              <option value="Full Body">Full Body / Conditioning</option>
+              <option value="Full Body">Full Body</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="edit_ex_diff">Difficulty Level</label>
-            <select id="edit_ex_diff" name="difficulty" class="form-control">
+            <label class="form-label" for="edit_diff">Difficulty Level</label>
+            <select id="edit_diff" name="difficulty_level" class="form-control">
               <option value="beginner">Beginner</option>
               <option value="intermediate">Intermediate</option>
               <option value="advanced">Advanced</option>
             </select>
           </div>
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="edit_ex_equip">Required Equipment</label>
-          <input type="text" id="edit_ex_equip" name="equipment_required" class="form-control">
+          <label class="form-label" for="edit_equip">Required Equipment</label>
+          <input type="text" id="edit_equip" name="equipment_required" class="form-control">
         </div>
-
         <div class="form-group">
-          <label class="form-label" for="edit_ex_inst">Instructions / Form Mechanics</label>
-          <textarea id="edit_ex_inst" name="instructions" class="form-control" rows="3"></textarea>
+          <label class="form-label" for="edit_img">Demonstration Image URL</label>
+          <input type="url" id="edit_img" name="image_url" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_inst">Instructions / Form Mechanics</label>
+          <textarea id="edit_inst" name="instructions" class="form-control" rows="3"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -253,14 +281,27 @@
 </div>
 
 <script>
-function openEditExerciseModal(btn) {
+function openEditExerciseModal(button) {
+  const id = button.getAttribute('data-id');
+  const name = button.getAttribute('data-name');
+  const muscle = button.getAttribute('data-muscle');
+  const diff = button.getAttribute('data-diff');
+  const equip = button.getAttribute('data-equip');
+  const inst = button.getAttribute('data-inst');
+  const img = button.getAttribute('data-img');
+
+  document.getElementById('edit_name').value = name;
+  document.getElementById('edit_muscle').value = muscle;
+  document.getElementById('edit_diff').value = (diff || 'intermediate').toLowerCase();
+  document.getElementById('edit_equip').value = equip;
+  document.getElementById('edit_inst').value = inst;
+  if (document.getElementById('edit_img')) {
+    document.getElementById('edit_img').value = img || '';
+  }
+
   const form = document.getElementById('editExerciseForm');
-  form.action = '/admin/exercises/edit/' + btn.dataset.id;
-  document.getElementById('edit_ex_name').value = btn.dataset.name || '';
-  document.getElementById('edit_ex_muscle').value = btn.dataset.muscle || 'Full Body';
-  document.getElementById('edit_ex_diff').value = (btn.dataset.diff || 'intermediate').toLowerCase();
-  document.getElementById('edit_ex_equip').value = btn.dataset.equip || '';
-  document.getElementById('edit_ex_inst').value = btn.dataset.inst || '';
+  form.action = "{{ url_for('admin.exercises') }}/edit/" + id;
+
   openModal('editExerciseModal');
 }
 </script>

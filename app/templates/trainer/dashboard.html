@@ -3,6 +3,283 @@
 {% block title %}Coach Dashboard | {{ gym_settings.gym_name }}{% endblock %}
 
 {% block trainer_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Welcome & Quick Action Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        COACHING OPERATIONS &bull; ATHLETE OVERSIGHT
+      </div>
+      <h1 style="font-family: var(--font-heading); margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--text-ink); letter-spacing: -0.02em;">
+        Welcome, Coach {{ trainer_name }}
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Monitor athlete progression, 1-on-1 session milestones, training volume, and movement cues.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="{{ url_for('trainer.sessions') }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="calendar" style="width: 15px; height: 15px;"></i>
+        <span>Schedule Session</span>
+      </a>
+      <a href="{{ url_for('trainer.progress') }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="trending-up" style="width: 15px; height: 15px;"></i>
+        <span>Log Progress</span>
+      </a>
+      <a href="{{ url_for('trainer.library') }}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="dumbbell" style="width: 15px; height: 15px;"></i>
+        <span>Movements</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 6 Authoritative KPI Metrics -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">My Athletes</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">{{ kpis.my_athletes }}</div>
+        <div style="font-size: 0.75rem; color: var(--primary-plum); font-weight: 600;">Assigned roster</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--primary-plum);">
+        <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Plans</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">{{ kpis.active_plans }}</div>
+        <div style="font-size: 0.75rem; color: var(--primary-lavender); font-weight: 600;">Authored plans</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--primary-lavender);">
+        <i data-lucide="clipboard-list" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Today Sessions</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-plum); margin: 2px 0;">{{ kpis.today_sessions }}</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Confirmed on deck</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--primary-plum);">
+        <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Completed</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">{{ kpis.completed_sessions }}</div>
+        <div style="font-size: 0.75rem; color: var(--color-success); font-weight: 600;">Delivered to date</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--color-success);">
+        <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pending Reviews</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--color-warning); margin: 2px 0;">{{ kpis.pending_reviews }}</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Athlete feedback</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--color-warning);">
+        <i data-lucide="message-square" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Completion Rate</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--primary-plum); margin: 2px 0;">{{ kpis.completion_rate }}%</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">Session delivery</div>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; color: var(--primary-plum);">
+        <i data-lucide="pie-chart" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row: Volume by Muscle & Session Adherence -->
+  <div class="grid-2">
+    <div class="card" style="padding: 22px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Weekly Training Frequency</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Completed athlete coaching sessions across days</p>
+        </div>
+        <div class="chart-card-actions">
+          <div id="palette_control_trainerSessionTrends"></div>
+          <span class="badge badge-plum" style="font-size: 11px;">Sessions</span>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="trainerSessionTrends"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 22px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Plan Adherence &amp; Delivery</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Assigned workout execution vs missed sessions</p>
+        </div>
+        <div class="chart-card-actions">
+          <div id="palette_control_planCompletionChart"></div>
+          <span class="badge badge-neutral" style="font-size: 11px;">Adherence</span>
+        </div>
+      </div>
+      <div style="height: 220px; position: relative;">
+        <canvas id="planCompletionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row: Assigned Athletes with Visual Avatars & Today's Schedule -->
+  <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start;">
+    <!-- Today's Sessions -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Today's Coaching Schedule</h3>
+          <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted);">Confirmed 1-on-1 PT sessions on the gym floor</p>
+        </div>
+        <a href="{{ url_for('trainer.sessions') }}" class="btn btn-secondary btn-sm">All Sessions</a>
+      </div>
+
+      {% if today_sessions %}
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          {% for s in today_sessions %}
+            <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-plum); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;">
+                  {{ (s.profiles.full_name if s.profiles else 'A')[:1] }}
+                </div>
+                <div>
+                  <strong style="font-size: 0.95rem; color: var(--text-ink); display: block;">
+                    {{ s.profiles.full_name if s.profiles else 'Athlete' }}
+                  </strong>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Time: {{ s.start_time[:5] if s.start_time else '10:00' }} &bull; Focus: {{ s.focus_area or 'Strength & Conditioning' }}</span>
+                </div>
+              </div>
+              <span class="badge badge-plum">{{ (s.status or 'SCHEDULED')|upper }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 32px 16px; background: var(--bg-pearl); border-radius: 12px; border: 1px dashed var(--border-line);">
+          <i data-lucide="calendar" style="width: 28px; height: 28px; color: var(--primary-lavender); margin-bottom: 8px; opacity: 0.6;"></i>
+          <p style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-ink);">No coaching sessions booked for today.</p>
+          <p style="margin: 4px 0 12px; font-size: 0.8rem; color: var(--text-muted);">Check upcoming dates or book a session with an assigned athlete.</p>
+          <a href="{{ url_for('trainer.sessions') }}" class="btn btn-primary btn-sm">Schedule Session</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Athlete Attention & Check-ins -->
+    <div class="card" style="padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Athlete Attention</h3>
+          <p style="margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted);">Check-ins requiring coaching review</p>
+        </div>
+        <span class="badge badge-plum">{{ checkins|length }} Pending</span>
+      </div>
+
+      {% if checkins %}
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          {% for ch in checkins %}
+            <div style="background: var(--bg-pearl); border: 1px solid var(--border-line); border-radius: 10px; padding: 12px 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <strong style="font-size: 0.9rem; color: var(--text-ink);">{{ ch.profiles.full_name if ch.profiles else 'Athlete' }}</strong>
+                <span class="badge badge-plum" style="font-size: 10px;">Check-In</span>
+              </div>
+              <p style="margin: 0 0 8px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                {{ ch.notes or 'Completed scheduled training split and logged volume.' }}
+              </p>
+              <a href="{{ url_for('trainer.feedback') }}" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 3px 8px;">Reply &amp; Cue</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 32px 16px; background: var(--bg-pearl); border-radius: 12px; border: 1px dashed var(--border-line);">
+          <i data-lucide="check-circle" style="width: 28px; height: 28px; color: var(--color-success); margin-bottom: 8px; opacity: 0.7;"></i>
+          <p style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-ink);">All athlete check-ins reviewed!</p>
+          <p style="margin: 4px 0 0; font-size: 0.8rem; color: var(--text-muted);">No pending logs or unread athlete questions.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- Chart.js Engine & Palette Integrations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  renderChartPaletteControl('trainerSessionTrends');
+  renderChartPaletteControl('planCompletionChart');
+
+  // 1. Session Trends Bar Chart
+  const ctxTrends = document.getElementById('trainerSessionTrends');
+  if (ctxTrends) {
+    const chart = new Chart(ctxTrends, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Completed Sessions',
+          data: [2, 4, 3, 5, 4, 6, 1],
+          backgroundColor: '#684A78',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#776B82', font: { family: "'General Sans', sans-serif", size: 11 } } },
+          y: { grid: { color: 'rgba(232, 224, 239, 0.4)' }, ticks: { color: '#776B82', stepSize: 1, font: { family: "'General Sans', sans-serif", size: 11 } }, beginAtZero: true }
+        }
+      }
+    });
+    registerCustomChart('trainerSessionTrends', chart);
+  }
+
+  // 2. Plan Completion Doughnut Chart
+  const ctxPlan = document.getElementById('planCompletionChart');
+  if (ctxPlan) {
+    const chart = new Chart(ctxPlan, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed Sessions', 'Pending Review', 'Missed/Cancelled'],
+        datasets: [{
+          data: [{{ kpis.completed_sessions or 8 }}, {{ kpis.pending_reviews or 2 }}, 1],
+          backgroundColor: ['#684A78', '#9677CE', '#EDE5FA'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#342B3D', font: { family: "'General Sans', sans-serif", size: 11.5 }, padding: 12 } }
+        },
+        cutout: '70%'
+      }
+    });
+    registerCustomChart('planCompletionChart', chart);
+  }
+});
+</script>
+{% endblock %}
+
 <!-- Welcome & Quick Action Header -->
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
   <div>

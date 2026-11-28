@@ -18,51 +18,185 @@
 </div>
 
 <div style="display: grid; grid-template-columns: minmax(0, 640px) 300px; gap: 24px; align-items: start;">
-  <div class="fp-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--fp-border-subtle); padding-bottom: 12px;">
-      <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">Account Identity</h3>
-      <span class="badge-pink">Trainer Role</span>
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Account Identity -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-line); padding-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink);">Coach Identity &amp; Contact</h3>
+        <span class="badge badge-lavender">Trainer Role</span>
+      </div>
+
+      <form method="POST" action="{{ url_for('trainer.settings') }}">
+        <div class="form-group">
+          <label class="form-label" for="set_name">Full Name *</label>
+          <input type="text" id="set_name" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="set_email">Email Address</label>
+          <input type="email" id="set_email" class="form-control" value="{{ user.email }}" disabled style="background: var(--bg-secondary);">
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block;">Managed by Supabase Auth</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="set_phone">Telephone Number</label>
+          <input type="tel" id="set_phone" name="phone" class="form-control" value="{{ user.phone or '+254 700 000 000' }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 12px;">
+          Save Account Details
+        </button>
+      </form>
     </div>
 
-    <form method="POST" action="{{ url_for('trainer.settings') }}">
-      <div class="form-group">
-        <label class="form-label" for="set_name">Full Name *</label>
-        <input type="text" id="set_name" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+    <!-- Security & Password Management Card -->
+    <div class="card" id="security">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid var(--border-line); padding-bottom: 12px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink);">Security &bull; Change Password</h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 3px 0 0 0;">Update your coaching credentials without needing administrator assistance</p>
+        </div>
+        <span class="badge badge-plum">Security</span>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="set_email">Email Address</label>
-        <input type="email" id="set_email" class="form-control" value="{{ user.email }}" disabled style="background: #F8FAFC;">
-        <span style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 4px; display: block;">Managed by Supabase Auth</span>
-      </div>
+      <form method="POST" action="{{ url_for('trainer.change_password') }}" onsubmit="return validateTrainerPassword()">
+        <div class="form-group">
+          <label class="form-label" for="tr_curr_pass">Current Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="tr_curr_pass" name="current_password" class="form-control" placeholder="••••••••••••" required style="padding-right: 42px;">
+            <button type="button" onclick="togglePass('tr_curr_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label" for="set_phone">Telephone Number</label>
-        <input type="tel" id="set_phone" name="phone" class="form-control" value="{{ user.phone or '+254 700 000 000' }}">
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="tr_new_pass">New Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="tr_new_pass" name="new_password" class="form-control" placeholder="Minimum 8 characters" required oninput="checkStrength(this.value)" style="padding-right: 42px;">
+            <button type="button" onclick="togglePass('tr_new_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+          <div style="margin-top: 8px;">
+            <div style="height: 5px; width: 100%; background: var(--border-line); border-radius: 4px; overflow: hidden;">
+              <div id="tr_strength_bar" style="height: 100%; width: 0%; background: var(--color-danger); transition: all 0.3s ease;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+              <span style="font-size: 0.75rem; color: var(--text-secondary);">Strength: <strong id="tr_strength_txt" style="color: var(--text-muted);">None</strong></span>
+            </div>
+          </div>
+        </div>
 
-      <button type="submit" class="fp-btn-primary" style="margin-top: 12px;">
-        Save Account Details
-      </button>
-    </form>
+        <div class="form-group">
+          <label class="form-label" for="tr_conf_pass">Confirm New Password *</label>
+          <div style="position: relative;">
+            <input type="password" id="tr_conf_pass" name="confirm_password" class="form-control" placeholder="Confirm new password" required style="padding-right: 42px;">
+            <button type="button" onclick="togglePass('tr_conf_pass', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-line); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 16px;">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-ink); margin-bottom: 6px;">Requirements:</div>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; font-size: 0.76rem; color: var(--text-secondary);">
+            <li id="tr_req_len">● At least 8 characters</li>
+            <li id="tr_req_num">● Contains at least one digit (0-9)</li>
+            <li id="tr_req_case">● Contains uppercase and lowercase letters</li>
+          </ul>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+          <span>Update Coach Password</span>
+        </button>
+      </form>
+    </div>
   </div>
 
   <div>
-    <div class="fp-card" style="margin-bottom: 20px;">
-      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--fp-ink);">Security & Role</h4>
-      <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 10px;">
+    <div class="card" style="margin-bottom: 20px;">
+      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--text-ink);">Security &amp; Role</h4>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 10px;">
         You are authenticated with the <strong>Trainer</strong> role. Your access permissions allow scheduling sessions, managing assigned athletes, and authoring workout plans.
       </p>
-      <span class="badge-neutral">Strict Front-Desk Cash Facility</span>
+      <span class="badge badge-lavender">Certified Coaching Staff</span>
     </div>
 
-    <div class="fp-card">
-      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--fp-ink);">Public Homepage Link</h4>
-      <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.5; margin: 0 0 12px;">
+    <div class="card">
+      <h4 style="margin: 0 0 8px; font-size: 0.95rem; font-weight: 700; color: var(--text-ink);">Public Homepage Link</h4>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 12px;">
         To manage what gym members and visitors see on the public website, use the dedicated Coach Profile workspace.
       </p>
-      <a href="{{ url_for('trainer.profile') }}" class="fp-btn-outline" style="font-size: 0.78rem;">Open Coach Profile</a>
+      <a href="{{ url_for('trainer.profile') }}" class="btn btn-outline" style="font-size: 0.78rem;">Open Coach Profile</a>
     </div>
   </div>
 </div>
+
+<script>
+function togglePass(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  const icon = btn.querySelector('i') || btn.querySelector('svg');
+  if (icon) {
+    icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+    if (window.lucide) lucide.createIcons();
+  }
+}
+
+function checkStrength(val) {
+  const bar = document.getElementById('tr_strength_bar');
+  const txt = document.getElementById('tr_strength_txt');
+  const rLen = document.getElementById('tr_req_len');
+  const rNum = document.getElementById('tr_req_num');
+  const rCase = document.getElementById('tr_req_case');
+
+  const hasLen = val.length >= 8;
+  const hasNum = /\d/.test(val);
+  const hasCase = /[a-z]/.test(val) && /[A-Z]/.test(val);
+
+  rLen.style.color = hasLen ? 'var(--color-success)' : 'var(--text-secondary)';
+  rNum.style.color = hasNum ? 'var(--color-success)' : 'var(--text-secondary)';
+  rCase.style.color = hasCase ? 'var(--color-success)' : 'var(--text-secondary)';
+
+  let score = (hasLen ? 35 : 0) + (hasNum ? 35 : 0) + (hasCase ? 30 : 0);
+  if (val.length === 0) {
+    bar.style.width = '0%';
+    txt.textContent = 'None';
+    txt.style.color = 'var(--text-muted)';
+  } else if (score < 50) {
+    bar.style.width = '35%';
+    bar.style.background = 'var(--color-danger)';
+    txt.textContent = 'Weak';
+    txt.style.color = 'var(--color-danger)';
+  } else if (score < 100) {
+    bar.style.width = '70%';
+    bar.style.background = 'var(--color-warning)';
+    txt.textContent = 'Medium';
+    txt.style.color = 'var(--color-warning)';
+  } else {
+    bar.style.width = '100%';
+    bar.style.background = 'var(--color-success)';
+    txt.textContent = 'Strong';
+    txt.style.color = 'var(--color-success)';
+  }
+}
+
+function validateTrainerPassword() {
+  const p1 = document.getElementById('tr_new_pass').value;
+  const p2 = document.getElementById('tr_conf_pass').value;
+  if (p1 !== p2) {
+    alert('New password and confirmation do not match.');
+    return false;
+  }
+  if (p1.length < 8) {
+    alert('Password must be at least 8 characters long.');
+    return false;
+  }
+  return true;
+}
+</script>
 {% endblock %}

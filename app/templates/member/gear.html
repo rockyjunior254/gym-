@@ -1,26 +1,54 @@
 {% extends 'member/layout.html' %}
 
-{% block page_title %}Gym Equipment & Floor Gear{% endblock %}
-{% block page_subtitle %}Explore training equipment and checkout specialty gear (lifting belts, resistance bands, mobility rollers){% endblock %}
+{% block page_title %}Gym Equipment &amp; Lockers{% endblock %}
+{% block page_subtitle %}Explore training equipment, inspect your assigned locker, and checkout specialty mobility gear{% endblock %}
 
 {% block member_content %}
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
+  <!-- Distinct "My Locker" Card -->
+  <div class="card" style="background: linear-gradient(135deg, var(--primary-plum-dark) 0%, var(--primary-plum) 100%); color: #FFFFFF; padding: 26px 30px; border-radius: 16px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
+          <i data-lucide="key" style="width: 26px; height: 26px;"></i>
+        </div>
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.08em;">
+            FACILITY STORAGE
+          </span>
+          <h2 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; margin: 4px 0 2px 0;">
+            My Locker Assignment
+          </h2>
+          <p style="font-size: 0.85rem; color: rgba(255,255,255,0.85); margin: 0;">
+            Locker #42 &bull; East Wing Changing Pavilion &bull; Digital PIN Secured
+          </p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="badge" style="background: rgba(255,255,255,0.2); color: #FFFFFF; font-weight: 700; padding: 6px 12px;">
+          ACTIVE ALLOCATION
+        </span>
+      </div>
+    </div>
+  </div>
+
   <!-- Active Gear Reservations -->
   {% if reservations %}
-    <div class="fp-card" style="border-left: 4px solid var(--color-danger);">
-      <h3 style="font-size: 1.05rem; font-weight: 800; margin: 0 0 14px 0; color: var(--fp-ink);">My Active Equipment Reservations</h3>
+    <div class="card" style="border-left: 4px solid var(--primary-plum); padding: 20px;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; margin: 0 0 14px 0; color: var(--text-ink);">My Active Equipment Reservations</h3>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         {% for r in reservations %}
-          <div style="padding: 12px 16px; background: #FAFAFA; border-radius: 12px; border: 1px solid var(--fp-border); display: flex; align-items: center; justify-content: space-between;">
+          <div style="padding: 14px 18px; background: var(--bg-pearl); border-radius: 12px; border: 1px solid var(--border-line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
             <div>
-              <span style="font-size: 0.95rem; font-weight: 800; color: var(--fp-ink);">{{ r.equipment.name }}</span>
-              <span class="fp-brand-badge" style="margin-left: 8px;">{{ r.status|upper }}</span>
-              <div style="font-size: 0.75rem; color: var(--fp-muted); margin-top: 2px;">
+              <span style="font-size: 1rem; font-weight: 800; color: var(--text-ink);">{{ r.equipment.name }}</span>
+              <span class="badge badge-plum" style="margin-left: 8px;">{{ r.status|upper }}</span>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
                 Reserved for {{ r.reservation_date }} at {{ r.start_time }} ({{ r.duration_minutes }} mins)
               </div>
             </div>
-            <span style="font-size: 0.75rem; color: var(--fp-muted);">Return to desk after use</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Return to reception desk after session</span>
           </div>
         {% endfor %}
       </div>
@@ -28,34 +56,34 @@
   {% endif %}
 
   <!-- Equipment Floor Directory -->
-  <div class="fp-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div class="card" style="padding: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
       <div>
-        <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Available Gym Floor Assets</h3>
-        <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Heavy machinery, barbells, and borrowable mobility gear</p>
+        <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin: 0; color: var(--text-ink);">Available Gym Floor Assets</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;">Barbells, platforms, specialized machines, and borrowable mobility gear</p>
       </div>
-      <span class="fp-brand-badge" style="background: var(--fp-ink); color: #FFFFFF;">EQUIPMENT DIRECTORY</span>
+      <span class="badge badge-plum">EQUIPMENT DIRECTORY</span>
     </div>
 
     {% if equipment %}
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;">
         {% for eq in equipment %}
-          <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="card" style="padding: 22px; border-radius: 14px; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-line);">
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="fp-brand-badge" style="background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="badge badge-lavender">
                   {{ eq.category or 'Equipment' }}
                 </span>
-                <span style="font-size: 0.72rem; color: #10B981; font-weight: 700;">Operational</span>
+                <span class="badge badge-success">Operational</span>
               </div>
 
-              <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ eq.name }}</h4>
-              <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 12px 0;">
+              <h4 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; color: var(--text-ink); margin: 0 0 6px 0;">{{ eq.name }}</h4>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 16px 0; line-height: 1.45;">
                 Brand: {{ eq.brand or 'Strakly Pro' }} &bull; Location: {{ eq.location_in_facility or 'Gym Floor' }}
               </p>
             </div>
 
-            <button type="button" class="fp-btn-dark" style="width: 100%; justify-content: center;"
+            <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;"
                     data-id="{{ eq.id }}" data-name="{{ eq.name }}"
                     onclick="selectGearForReservation(this)">
               Borrow / Reserve Gear
@@ -65,9 +93,9 @@
       </div>
     {% else %}
       <div style="text-align: center; padding: 48px 16px;">
-        <i data-lucide="shield-check" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
-        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">Equipment Directory Updating</h3>
-        <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0;">Facility assets are undergoing scheduled inventory verification.</p>
+        <i data-lucide="shield-check" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.6;"></i>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">Equipment Directory Updating</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Facility assets are undergoing scheduled inventory verification.</p>
       </div>
     {% endif %}
   </div>
@@ -75,31 +103,32 @@
 </div>
 
 <!-- Reserve Gear Modal -->
-<div class="fp-modal-backdrop" id="reserveGearModal">
-  <div class="fp-modal">
-    <div class="fp-modal-header">
-      <h3 id="reserveModalTitle">Reserve Equipment</h3>
-      <button type="button" onclick="closeModal('reserveGearModal')" style="background: none; border: none; cursor: pointer;">
-        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-      </button>
+<div id="reserveGearModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="reserveModalTitle">Reserve Equipment</h3>
+        <p class="modal-subtitle">Reserve specialty equipment for your workout slot</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('reserveGearModal')">&times;</button>
     </div>
     <form action="{{ url_for('member.reserve_gear') }}" method="POST">
       <input type="hidden" name="equipment_id" id="reserveEquipmentId">
-      <div class="fp-modal-body">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="fp-form-group">
-            <label class="fp-form-label">Reservation Date</label>
-            <input type="date" name="reservation_date" class="fp-form-control" required>
+      <div class="modal-body">
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Reservation Date</label>
+            <input type="date" name="reservation_date" class="form-control" required>
           </div>
-          <div class="fp-form-group">
-            <label class="fp-form-label">Start Time</label>
-            <input type="time" name="start_time" class="fp-form-control" value="10:00" required>
+          <div class="form-group">
+            <label class="form-label">Start Time</label>
+            <input type="time" name="start_time" class="form-control" value="10:00" required>
           </div>
         </div>
 
-        <div class="fp-form-group">
-          <label class="fp-form-label">Duration (Minutes)</label>
-          <select name="duration_minutes" class="fp-form-control">
+        <div class="form-group">
+          <label class="form-label">Duration (Minutes)</label>
+          <select name="duration_minutes" class="form-control">
             <option value="30">30 Minutes</option>
             <option value="60" selected>60 Minutes (1 Hour)</option>
             <option value="90">90 Minutes</option>
@@ -107,15 +136,15 @@
           </select>
         </div>
 
-        <div class="fp-form-group">
-          <label class="fp-form-label">Notes for Front Desk</label>
-          <textarea name="notes" class="fp-form-control" rows="2" placeholder="Will collect at 10 AM..."></textarea>
+        <div class="form-group">
+          <label class="form-label">Notes for Front Desk</label>
+          <textarea name="notes" class="form-control" rows="2" placeholder="Will collect at 10 AM..."></textarea>
         </div>
       </div>
 
-      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" class="fp-btn-outline" onclick="closeModal('reserveGearModal')">Cancel</button>
-        <button type="submit" class="fp-btn-lime">Confirm Reservation</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('reserveGearModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Confirm Reservation</button>
       </div>
     </form>
   </div>
@@ -123,10 +152,10 @@
 
 <script>
   function selectGearForReservation(btn) {
-    const eqId = btn.getAttribute('data-id');
-    const eqName = btn.getAttribute('data-name');
-    document.getElementById('reserveEquipmentId').value = eqId;
-    document.getElementById('reserveModalTitle').textContent = 'Reserve ' + eqName;
+    const id = btn.getAttribute('data-id');
+    const name = btn.getAttribute('data-name');
+    document.getElementById('reserveEquipmentId').value = id;
+    document.getElementById('reserveModalTitle').textContent = 'Reserve ' + name;
     openModal('reserveGearModal');
   }
 </script>

@@ -3,122 +3,186 @@
 {% block title %}Movement & Exercise Library | {{ gym_settings.gym_name }}{% endblock %}
 
 {% block trainer_content %}
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-  <div>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--secondary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
-      EXERCISE CATALOGUE
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Header Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        EXERCISE CATALOGUE
+      </div>
+      <h1 style="font-family: var(--font-heading); margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--text-ink); letter-spacing: -0.02em;">
+        Movement Library
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Reference verified movement mechanics, target muscle groups, and cues when assembling client training routines.
+      </p>
     </div>
-    <h1 style="margin: 0; font-size: 1.85rem; font-weight: 800; color: var(--fp-ink); letter-spacing: -0.02em;">
-      MOVEMENT LIBRARY
-    </h1>
-    <p style="margin: 4px 0 0; color: var(--fp-muted); font-size: 0.9rem;">
-      Reference verified exercise mechanics, target muscle groups, and cues when assembling training routines.
-    </p>
+
+    <span class="badge badge-plum" style="font-size: 0.85rem; padding: 8px 14px;">
+      {{ exercises|length }} Movements Available
+    </span>
   </div>
 
-  <span class="badge-pink" style="font-size: 0.82rem; padding: 6px 12px;">
-    {{ exercises|length }} Movements Available
-  </span>
-</div>
+  <!-- Filters Bar -->
+  <div class="card" style="padding: 16px 20px;">
+    <form method="GET" action="{{ url_for('trainer.library') }}" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 180px;">
+        <select name="muscle" class="form-control" style="font-size: 0.85rem;" onchange="this.form.submit()">
+          <option value="">All Muscle Groups</option>
+          <option value="Legs" {% if selected_muscle == 'Legs' %}selected{% endif %}>Legs / Posterior</option>
+          <option value="Chest" {% if selected_muscle == 'Chest' %}selected{% endif %}>Chest</option>
+          <option value="Back" {% if selected_muscle == 'Back' %}selected{% endif %}>Back</option>
+          <option value="Shoulders" {% if selected_muscle == 'Shoulders' %}selected{% endif %}>Shoulders</option>
+          <option value="Arms" {% if selected_muscle == 'Arms' %}selected{% endif %}>Arms</option>
+          <option value="Core" {% if selected_muscle == 'Core' %}selected{% endif %}>Core</option>
+          <option value="Full Body" {% if selected_muscle == 'Full Body' %}selected{% endif %}>Full Body</option>
+        </select>
+      </div>
 
-<!-- Filters Bar -->
-<div class="fp-card" style="padding: 14px 18px; margin-bottom: 24px;">
-  <form method="GET" action="{{ url_for('trainer.library') }}" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-    <div style="flex: 1; min-width: 180px;">
-      <select name="muscle" class="form-control" style="font-size: 0.85rem; border-radius: 8px;">
-        <option value="">All Muscle Groups</option>
-        <option value="Legs" {% if selected_muscle == 'Legs' %}selected{% endif %}>Legs / Posterior</option>
-        <option value="Chest" {% if selected_muscle == 'Chest' %}selected{% endif %}>Chest</option>
-        <option value="Back" {% if selected_muscle == 'Back' %}selected{% endif %}>Back</option>
-        <option value="Shoulders" {% if selected_muscle == 'Shoulders' %}selected{% endif %}>Shoulders</option>
-        <option value="Arms" {% if selected_muscle == 'Arms' %}selected{% endif %}>Arms</option>
-        <option value="Core" {% if selected_muscle == 'Core' %}selected{% endif %}>Core</option>
-        <option value="Full Body" {% if selected_muscle == 'Full Body' %}selected{% endif %}>Full Body</option>
-      </select>
-    </div>
+      <div style="flex: 1; min-width: 160px;">
+        <select name="difficulty" class="form-control" style="font-size: 0.85rem;" onchange="this.form.submit()">
+          <option value="">All Difficulty Levels</option>
+          <option value="beginner" {% if selected_diff == 'beginner' %}selected{% endif %}>Beginner</option>
+          <option value="intermediate" {% if selected_diff == 'intermediate' %}selected{% endif %}>Intermediate</option>
+          <option value="advanced" {% if selected_diff == 'advanced' %}selected{% endif %}>Advanced</option>
+        </select>
+      </div>
 
-    <div style="flex: 1; min-width: 160px;">
-      <select name="difficulty" class="form-control" style="font-size: 0.85rem; border-radius: 8px;">
-        <option value="">All Difficulty Levels</option>
-        <option value="beginner" {% if selected_diff == 'beginner' %}selected{% endif %}>Beginner</option>
-        <option value="intermediate" {% if selected_diff == 'intermediate' %}selected{% endif %}>Intermediate</option>
-        <option value="advanced" {% if selected_diff == 'advanced' %}selected{% endif %}>Advanced</option>
-      </select>
-    </div>
+      {% if selected_muscle or selected_diff %}
+        <a href="{{ url_for('trainer.library') }}" class="btn btn-secondary btn-sm">Reset</a>
+      {% endif %}
+    </form>
+  </div>
 
-    <button type="submit" class="fp-btn-primary" style="font-size: 0.85rem;">Filter Library</button>
-  </form>
-</div>
+  <!-- Movement Cards Grid -->
+  {% if exercises %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+      {% for ex in exercises %}
+        <div class="card" style="display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; justify-content: space-between;">
+          <!-- Visual Media Header -->
+          <div style="height: 150px; position: relative; background: linear-gradient(135deg, rgba(104, 74, 120, 0.2), rgba(150, 119, 206, 0.25)); overflow: hidden;">
+            {% if ex.image_url %}
+              <img src="{{ ex.image_url }}" alt="{{ ex.name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #FAF8FD, #EDE5FA);">
+                <i data-lucide="dumbbell" style="width: 40px; height: 40px; color: var(--primary-lavender); opacity: 0.7;"></i>
+              </div>
+            {% else %}
+              <div style="display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #FAF8FD, #EDE5FA);">
+                <i data-lucide="dumbbell" style="width: 40px; height: 40px; color: var(--primary-lavender); opacity: 0.7;"></i>
+              </div>
+            {% endif %}
 
-<!-- Movement Cards Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-  {% for ex in exercises %}
-    <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-      <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="badge-pink" style="font-size: 0.72rem;">{{ ex.target_muscle_group }}</span>
-          <span class="badge-neutral" style="font-size: 0.72rem;">{{ (ex.difficulty or 'INTERMEDIATE')|upper }}</span>
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="badge badge-plum" style="font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                {{ ex.target_muscle_group or 'Full Body' }}
+              </span>
+            </div>
+            <div style="position: absolute; top: 12px; right: 12px;">
+              <span class="badge badge-neutral" style="background: rgba(255,255,255,0.92); color: var(--text-ink); font-weight: 700;">
+                {{ (ex.difficulty or 'INTERMEDIATE')|upper }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Body -->
+          <div style="padding: 18px 20px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+            <div>
+              <h3 style="margin: 0 0 6px; font-size: 1.1rem; font-weight: 800; color: var(--text-ink); font-family: var(--font-heading);">{{ ex.name }}</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ ex.instructions or 'Standard form cues and eccentric tempo.' }}
+              </p>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-line); padding-top: 12px; font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
+              <span><i data-lucide="shield" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; color: var(--primary-lavender);"></i> {{ ex.equipment_required or 'Standard Gym Gear' }}</span>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      data-name="{{ ex.name }}"
+                      data-muscle="{{ ex.target_muscle_group or 'Full Body' }}"
+                      data-diff="{{ (ex.difficulty or 'Intermediate')|capitalize }}"
+                      data-equip="{{ ex.equipment_required or 'Standard Gear' }}"
+                      data-inst="{{ ex.instructions or '' }}"
+                      data-img="{{ ex.image_url or '' }}"
+                      onclick="showTrainerExModal(this)">
+                Coaching Cues
+              </button>
+            </div>
+          </div>
         </div>
-
-        <h3 style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; color: var(--fp-ink);">{{ ex.name }}</h3>
-
-        <p style="font-size: 0.82rem; color: var(--fp-muted); line-height: 1.45; margin: 0 0 12px;">
-          {{ ex.instructions or 'Standard form cues and eccentric tempo.' }}
-        </p>
-      </div>
-
-      <div style="border-top: 1px solid var(--fp-border-subtle); padding-top: 10px; font-size: 0.78rem; color: var(--fp-muted); display: flex; justify-content: space-between; align-items: center;">
-        <span>Gear: {{ ex.equipment_required or 'Standard Gym Gear' }}</span>
-        <button type="button" class="fp-btn-outline" style="font-size: 0.75rem; padding: 3px 8px;"
-                onclick="showExerciseModal('{{ ex.name }}', '{{ ex.target_muscle_group }}', '{{ ex.difficulty or 'Intermediate' }}', '{{ ex.equipment_required or 'Standard Gear' }}', '{{ ex.instructions or '' }}')">
-          Details
-        </button>
-      </div>
+      {% endfor %}
     </div>
   {% else %}
-    <div style="grid-column: 1 / -1;">
-      <p style="text-align: center; color: var(--fp-muted); padding: 32px 0;">No exercises match the selected filters.</p>
+    <div class="card" style="text-align: center; padding: 48px 16px;">
+      <i data-lucide="book-open" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.5;"></i>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">No Movements Found</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0;">No exercises match the selected filters.</p>
+      <a href="{{ url_for('trainer.library') }}" class="btn btn-primary">Reset Filters</a>
     </div>
-  {% endfor %}
+  {% endif %}
+
 </div>
 
 <!-- Modal: Exercise Detail -->
-<div id="exerciseModal" class="modal-overlay">
-  <div class="modal-box">
+<div id="trainerExerciseModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 540px;">
     <div class="modal-header">
       <div>
-        <h3 class="modal-title" id="exModalTitle">Exercise Details</h3>
-        <p class="modal-subtitle" id="exModalMuscle"></p>
+        <h3 class="modal-title" id="tExModalTitle">Exercise Details</h3>
+        <p class="modal-subtitle" id="tExModalMuscle"></p>
       </div>
-      <button type="button" class="modal-close" onclick="closeModal('exerciseModal')">&times;</button>
+      <button type="button" class="modal-close" onclick="closeModal('trainerExerciseModal')">&times;</button>
     </div>
-    <div class="modal-body" style="font-size: 0.88rem;">
-      <div style="margin-bottom: 12px;">
-        <span class="badge-neutral" id="exModalDiff"></span>
+    <div class="modal-body">
+      <div id="tExImgWrap" style="height: 200px; border-radius: 10px; overflow: hidden; margin-bottom: 16px; background: var(--bg-pearl); display: none;">
+        <img id="tExImg" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
       </div>
-      <div style="margin-bottom: 12px;">
-        <strong style="color: var(--fp-ink); display: block; margin-bottom: 4px;">Required Equipment:</strong>
-        <span id="exModalEquip" style="color: var(--fp-muted);"></span>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+        <span class="badge badge-plum" id="tExMuscleBadge"></span>
+        <span class="badge badge-neutral" id="tExDiffBadge"></span>
+      </div>
+
+      <div style="margin-bottom: 14px; background: var(--bg-pearl); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-line);">
+        <strong style="color: var(--text-ink); display: block; font-size: 0.82rem; margin-bottom: 2px;">Required Equipment:</strong>
+        <span id="tExModalEquip" style="color: var(--text-secondary); font-size: 0.88rem;"></span>
       </div>
       <div>
-        <strong style="color: var(--fp-ink); display: block; margin-bottom: 4px;">Form Mechanics & Coaching Cues:</strong>
-        <p id="exModalInst" style="color: var(--fp-muted); line-height: 1.5; margin: 0;"></p>
+        <strong style="color: var(--text-ink); display: block; font-size: 0.85rem; margin-bottom: 6px;">Form Mechanics &amp; Coaching Cues:</strong>
+        <p id="tExModalInst" style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin: 0; white-space: pre-line;"></p>
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="fp-btn-outline" onclick="closeModal('exerciseModal')">Close</button>
+      <button type="button" class="btn btn-secondary" onclick="closeModal('trainerExerciseModal')">Close</button>
     </div>
   </div>
 </div>
 
 <script>
-function showExerciseModal(name, muscle, diff, equip, inst) {
-  document.getElementById('exModalTitle').textContent = name;
-  document.getElementById('exModalMuscle').textContent = 'Target: ' + muscle;
-  document.getElementById('exModalDiff').textContent = diff.toUpperCase();
-  document.getElementById('exModalEquip').textContent = equip;
-  document.getElementById('exModalInst').textContent = inst || 'Execute with controlled eccentric tempo and full range of motion.';
-  openModal('exerciseModal');
+function showTrainerExModal(btn) {
+  const name = btn.getAttribute('data-name');
+  const muscle = btn.getAttribute('data-muscle');
+  const diff = btn.getAttribute('data-diff');
+  const equip = btn.getAttribute('data-equip');
+  const inst = btn.getAttribute('data-inst');
+  const img = btn.getAttribute('data-img');
+
+  document.getElementById('tExModalTitle').textContent = name;
+  document.getElementById('tExModalMuscle').textContent = 'Target: ' + muscle;
+  document.getElementById('tExMuscleBadge').textContent = muscle;
+  document.getElementById('tExDiffBadge').textContent = diff.toUpperCase();
+  document.getElementById('tExModalEquip').textContent = equip;
+  document.getElementById('tExModalInst').textContent = inst || 'Execute with controlled eccentric tempo and full range of motion.';
+
+  const imgWrap = document.getElementById('tExImgWrap');
+  const imgEl = document.getElementById('tExImg');
+  if (img && img.trim() !== '') {
+    imgEl.src = img;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+
+  openModal('trainerExerciseModal');
 }
 </script>
 {% endblock %}

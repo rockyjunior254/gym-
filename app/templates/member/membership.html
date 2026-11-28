@@ -4,9 +4,9 @@
 {% block page_subtitle %}Manage your active tier, review gym benefits, and request plan renewals or freezes{% endblock %}
 
 {% block topbar_actions %}
-  <button type="button" class="fp-btn-lime" onclick="openModal('membershipRequestModal')">
+  <button type="button" class="btn btn-primary" onclick="openModal('membershipRequestModal')" style="display: inline-flex; align-items: center; gap: 8px;">
     <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
-    Request Plan Change
+    <span>Request Plan Change</span>
   </button>
 {% endblock %}
 
@@ -14,14 +14,16 @@
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
   <!-- Active Plan Highlight Card -->
-  <div class="fp-card" style="background: linear-gradient(135deg, #0D0704 0%, #201712 100%); color: #FFFFFF; padding: 32px; border-radius: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+  <div class="card" style="background: linear-gradient(135deg, var(--primary-plum-dark) 0%, var(--primary-plum) 60%, var(--primary-lavender) 100%); color: #FFFFFF; padding: 32px; border-radius: 20px; box-shadow: var(--shadow-md);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
       <div>
-        <span style="font-size: 0.72rem; font-weight: 800; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em;">CURRENT MEMBERSHIP PLAN</span>
-        <h2 style="font-size: 2rem; font-weight: 800; margin: 8px 0 4px 0; letter-spacing: -0.02em;">
+        <span class="badge" style="background: rgba(255, 255, 255, 0.2); color: #FFFFFF; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+          CURRENT MEMBERSHIP PLAN
+        </span>
+        <h2 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; margin: 10px 0 6px 0; letter-spacing: -0.02em;">
           {{ active_sub.plan_name if active_sub else 'No Active Subscription' }}
         </h2>
-        <p style="font-size: 0.85rem; color: #9CA3AF; margin: 0;">
+        <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.85); margin: 0;">
           {% if active_sub %}
             Valid from {{ active_sub.start_date }} to {{ active_sub.end_date }}
           {% else %}
@@ -30,53 +32,55 @@
         </p>
       </div>
 
-      <div style="text-align: right;">
-        <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary-pink); line-height: 1;">
+      <div style="text-align: right; background: rgba(255, 255, 255, 0.15); padding: 14px 20px; border-radius: 14px; backdrop-filter: blur(4px);">
+        <div style="font-size: 2.4rem; font-weight: 800; color: #FFFFFF; line-height: 1;">
           {{ days_remaining }}
         </div>
-        <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 700; text-transform: uppercase; margin-top: 4px;">Days Remaining</div>
+        <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.85); font-weight: 700; text-transform: uppercase; margin-top: 4px;">Days Remaining</div>
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 28px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.2);">
       <div>
-        <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 600;">PAYMENT ARCHITECTURE</div>
-        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Strict Physical Cash Only</div>
+        <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); font-weight: 600;">PAYMENT ARCHITECTURE</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Physical Cash On Counter</div>
       </div>
       <div>
-        <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 600;">ACCESS PERMISSIONS</div>
-        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Full Floor, Lockers & Recovery</div>
+        <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); font-weight: 600;">ACCESS PERMISSIONS</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Full Floor, Lockers &amp; Recovery</div>
       </div>
       <div>
-        <div style="font-size: 0.72rem; color: #9CA3AF; font-weight: 600;">CHECK-IN MODE</div>
-        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Manual Front-Desk Verification</div>
+        <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); font-weight: 600;">CHECK-IN MODE</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-top: 2px;">Front-Desk Verification</div>
       </div>
     </div>
   </div>
 
   <!-- Available Plans Overview -->
-  <div class="fp-card">
+  <div class="card" style="padding: 24px;">
     <div style="margin-bottom: 20px;">
-      <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: var(--fp-ink);">Explore Gym Tiers</h3>
-      <p style="font-size: 0.78rem; color: var(--fp-muted); margin: 2px 0 0 0;">Request an upgrade or renewal to activate at the front desk</p>
+      <h3 style="font-family: var(--font-heading); font-size: 1.2rem; font-weight: 800; margin: 0; color: var(--text-ink);">Explore Gym Tiers</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin: 2px 0 0 0;">Request an upgrade or renewal to activate at the front desk</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
       {% for p in plans %}
-        <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--fp-border); background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="card" style="padding: 22px; border-radius: 14px; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-line);">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.75rem; font-weight: 800; color: var(--fp-muted); text-transform: uppercase;">{{ p.duration_days }} Days</span>
-              <span class="fp-brand-badge" style="background: #F3F4F6; color: var(--fp-ink);">TIER</span>
+              <span style="font-size: 0.75rem; font-weight: 800; color: var(--primary-plum); text-transform: uppercase;">{{ p.duration_days }} Days Access</span>
+              <span class="badge badge-plum">TIER</span>
             </div>
-            <h4 style="font-size: 1.25rem; font-weight: 800; margin: 8px 0; color: var(--fp-ink);">{{ p.name }}</h4>
-            <div style="font-size: 1.5rem; font-weight: 800; color: var(--fp-ink); margin-bottom: 8px;">
-              KES {{ p.price }}
+            <h4 style="font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; margin: 10px 0 4px 0; color: var(--text-ink);">{{ p.name }}</h4>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--primary-plum); margin-bottom: 10px;">
+              KES {{ "{:,.0f}".format(p.price|float) if p.price else '0' }}
             </div>
-            <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 16px 0;">{{ p.description or 'All inclusive access to gym floor and facilities.' }}</p>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 18px 0; line-height: 1.5;">
+              {{ p.description or 'All inclusive access to gym floor, locker amenities, and specialist movement sessions.' }}
+            </p>
           </div>
 
-          <button type="button" class="fp-btn-dark" style="width: 100%; justify-content: center;"
+          <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;"
                   data-id="{{ p.id }}" data-name="{{ p.name }}"
                   onclick="selectPlanForRequest(this)">
             Select Plan
@@ -87,134 +91,98 @@
   </div>
 
   <!-- Membership Requests History -->
-  <div class="fp-card">
-    <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0 0 16px 0; color: var(--fp-ink);">My Plan Change Requests</h3>
+  <div class="card" style="padding: 24px;">
+    <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; margin: 0 0 16px 0; color: var(--text-ink);">My Plan Change Requests</h3>
     
     {% if requests %}
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+      <div class="table-responsive">
+        <table class="table-modern">
           <thead>
-            <tr style="text-align: left; border-bottom: 2px solid var(--fp-border); color: var(--fp-muted); font-size: 0.72rem; text-transform: uppercase;">
-              <th style="padding: 10px 12px;">Date</th>
-              <th style="padding: 10px 12px;">Type</th>
-              <th style="padding: 10px 12px;">Target Plan</th>
-              <th style="padding: 10px 12px;">Status</th>
-              <th style="padding: 10px 12px;">Admin Note</th>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Target Plan</th>
+              <th>Status</th>
+              <th>Admin Note</th>
             </tr>
           </thead>
           <tbody>
             {% for r in requests %}
-              <tr style="border-bottom: 1px solid var(--fp-border);">
-                <td style="padding: 12px;">{{ r.created_at[:10] }}</td>
-                <td style="padding: 12px; font-weight: 700; text-transform: capitalize;">{{ r.request_type }}</td>
-                <td style="padding: 12px;">{{ r.target_plan.name if r.target_plan else 'N/A' }}</td>
-                <td style="padding: 12px;">
+              <tr>
+                <td>{{ r.created_at[:10] }}</td>
+                <td style="font-weight: 700; text-transform: capitalize;">{{ r.request_type }}</td>
+                <td>{{ r.target_plan.name if r.target_plan else 'N/A' }}</td>
+                <td>
                   {% if r.status == 'approved' %}
-                    <span style="color: #10B981; font-weight: 700;">Approved</span>
+                    <span class="badge badge-success">Approved</span>
                   {% elif r.status == 'rejected' %}
-                    <span style="color: var(--color-danger); font-weight: 700;">Declined</span>
+                    <span class="badge badge-rose">Declined</span>
                   {% else %}
-                    <span style="color: #F59E0B; font-weight: 700;">Pending Desk Review</span>
+                    <span class="badge badge-warning">Pending Desk Review</span>
                   {% endif %}
                 </td>
-                <td style="padding: 12px; color: var(--fp-muted);">{{ r.admin_notes or '—' }}</td>
+                <td style="color: var(--text-muted);">{{ r.admin_notes or '—' }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     {% else %}
-      <div style="text-align: center; padding: 24px; color: var(--fp-muted); font-size: 0.82rem;">
-        No plan change or freeze requests submitted yet.
-      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">No pending or previous plan change requests.</p>
     {% endif %}
   </div>
 
 </div>
 
-<!-- Plan Change / Freeze Modal -->
-<div class="fp-modal-backdrop" id="membershipRequestModal">
-  <div class="fp-modal">
-    <div class="fp-modal-header">
-      <h3>Membership Plan Request</h3>
-      <button type="button" onclick="closeModal('membershipRequestModal')" style="background: none; border: none; cursor: pointer;">
-        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-      </button>
+<!-- Plan Request Modal -->
+<div id="membershipRequestModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Request Plan Change</h3>
+        <p class="modal-subtitle">Submit your renewal or upgrade request to the front desk</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('membershipRequestModal')">&times;</button>
     </div>
     <form action="{{ url_for('member.request_membership') }}" method="POST">
-      <div class="fp-modal-body">
-        <div class="fp-form-group">
-          <label class="fp-form-label">Request Type</label>
-          <select name="request_type" class="fp-form-control" id="requestTypeSelect" onchange="toggleFreezeFields()">
-            <option value="upgrade">Plan Upgrade</option>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="request_type">Request Type</label>
+          <select name="request_type" id="request_type" class="form-control">
             <option value="renewal">Plan Renewal</option>
-            <option value="downgrade">Plan Downgrade</option>
-            <option value="freeze">Membership Freeze (Medical/Travel)</option>
-            <option value="cancellation">Cancellation Request</option>
+            <option value="upgrade">Tier Upgrade</option>
+            <option value="freeze">Temporary Freeze</option>
           </select>
         </div>
-
-        <div class="fp-form-group" id="targetPlanGroup">
-          <label class="fp-form-label">Target Tier</label>
-          <select name="target_plan_id" class="fp-form-control" id="targetPlanSelect">
+        <div class="form-group">
+          <label class="form-label" for="target_plan_id">Target Membership Tier</label>
+          <select name="target_plan_id" id="target_plan_id" class="form-control">
             {% for p in plans %}
-              <option value="{{ p.id }}">{{ p.name }} (KES {{ p.price }})</option>
+              <option value="{{ p.id }}">{{ p.name }} &bull; KES {{ p.price }} ({{ p.duration_days }} days)</option>
             {% endfor %}
           </select>
         </div>
-
-        <div id="freezeDatesGroup" style="display: none; margin-bottom: 16px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div>
-              <label class="fp-form-label">Freeze Start</label>
-              <input type="date" name="freeze_start_date" class="fp-form-control">
-            </div>
-            <div>
-              <label class="fp-form-label">Freeze End</label>
-              <input type="date" name="freeze_end_date" class="fp-form-control">
-            </div>
-          </div>
-        </div>
-
-        <div class="fp-form-group">
-          <label class="fp-form-label">Reason / Notes for Front Desk</label>
-          <textarea name="reason" class="fp-form-control" rows="3" placeholder="Provide any details or timing preferences..."></textarea>
-        </div>
-
-        <div style="background: #F8F8F9; padding: 12px; border-radius: 10px; font-size: 0.75rem; color: var(--fp-muted); border: 1px solid var(--fp-border);">
-          <strong>Note:</strong> All membership subscriptions, upgrades, and renewals are confirmed upon physical cash payment at the gym front desk.
+        <div class="form-group">
+          <label class="form-label" for="member_notes">Additional Notes</label>
+          <textarea name="notes" id="member_notes" class="form-control" rows="3" placeholder="Preferred start date, freeze duration reason, etc..."></textarea>
         </div>
       </div>
-
-      <div style="padding: 16px 24px; border-top: 1px solid var(--fp-border); display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" class="fp-btn-outline" onclick="closeModal('membershipRequestModal')">Cancel</button>
-        <button type="submit" class="fp-btn-dark">Submit Request</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('membershipRequestModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit Request</button>
       </div>
     </form>
   </div>
 </div>
 
 <script>
-  function toggleFreezeFields() {
-    const type = document.getElementById('requestTypeSelect').value;
-    const freezeGroup = document.getElementById('freezeDatesGroup');
-    const targetGroup = document.getElementById('targetPlanGroup');
-    if (type === 'freeze') {
-      freezeGroup.style.display = 'block';
-      targetGroup.style.display = 'none';
-    } else {
-      freezeGroup.style.display = 'none';
-      targetGroup.style.display = 'block';
-    }
+function selectPlanForRequest(btn) {
+  const planId = btn.getAttribute('data-id');
+  const sel = document.getElementById('target_plan_id');
+  if (sel && planId) {
+    sel.value = planId;
   }
-
-  function selectPlanForRequest(btn) {
-    const planId = btn.getAttribute('data-id');
-    const select = document.getElementById('targetPlanSelect');
-    if (select) {
-      select.value = planId;
-    }
-    openModal('membershipRequestModal');
-  }
+  openModal('membershipRequestModal');
+}
 </script>
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html' %}
 
-{% block title %}Operational Reports & CSV Exports | {{ gym_settings.gym_name }}{% endblock %}
+{% block title %}Operational Reports &amp; Analytics | {{ gym_settings.gym_name }}{% endblock %}
 
 {% block admin_content %}
 <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -8,112 +8,300 @@
   <!-- Page Header & Action Banner -->
   <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
-      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-pink); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
-        Business Analytics &bull; Compliance
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        Business Analytics &amp; Compliance
       </div>
       <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
-        Operational Reports
+        Operational Reports &amp; Intelligence
       </h1>
       <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
-        Generate official gym reports, filter by custom date windows, inspect live aggregates, and export CSV files.
+        Generate official gym reports, audit operational metrics, visualize growth trends, and export verified CSV datasets.
       </p>
     </div>
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 10px; align-items: center;">
       <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()" style="display: inline-flex; align-items: center; gap: 6px;">
-        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+        <i data-lucide="printer" style="width: 15px; height: 15px;"></i>
         <span>Print View</span>
       </button>
       <a href="{{ url_for('admin.reports', type=report_type, start_date=start_date, end_date=end_date, export='csv') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-        <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+        <i data-lucide="download" style="width: 15px; height: 15px;"></i>
         <span>Export CSV</span>
       </a>
     </div>
   </div>
 
-  <!-- Filter Bar -->
-  <div class="card" style="padding: 18px;">
-  <form method="GET" action="{{ url_for('admin.reports') }}" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-    <div style="flex: 2; min-width: 240px;">
-      <label class="form-label" for="type">Select Operational Report Category</label>
-      <select id="type" name="type" class="form-control">
-        <option value="cash_collection" {% if report_type == 'cash_collection' %}selected{% endif %}>1. Physical Cash Collections & Receipts</option>
-        <option value="attendance" {% if report_type == 'attendance' %}selected{% endif %}>2. Front-Desk Manual Attendance</option>
-        <option value="memberships" {% if report_type == 'memberships' %}selected{% endif %}>3. Membership Subscriptions & Expiry</option>
-        <option value="trainers" {% if report_type == 'trainers' %}selected{% endif %}>4. Coaching Staff & Athlete Allocation</option>
-        <option value="equipment" {% if report_type == 'equipment' %}selected{% endif %}>5. Gym Assets & Maintenance History</option>
-      </select>
-    </div>
-
-    <div style="flex: 1; min-width: 150px;">
-      <label class="form-label" for="start_date">From Date</label>
-      <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date or '' }}">
-    </div>
-
-    <div style="flex: 1; min-width: 150px;">
-      <label class="form-label" for="end_date">To Date</label>
-      <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date or '' }}">
-    </div>
-
-    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-      <button type="submit" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        Generate Report
-      </button>
-    </div>
-  </form>
-</div>
-
-<!-- Structured Report Output Table -->
-<div class="card">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-line); padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-    <div>
-      <h3 style="text-transform: uppercase; margin: 0 0 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--ink-dark);">
-        {{ report_type|replace('_', ' ')|upper }} REPORT
-      </h3>
-      <p style="margin: 0; font-size: 0.82rem; color: var(--ink-muted);">
-        Enterprise Operational Reports • Generated directly from live PostgreSQL database records
-        {% if start_date or end_date %}
-          • Window: {{ start_date or 'Earliest' }} to {{ end_date or 'Present' }}
-        {% endif %}
-      </p>
-    </div>
-    {% if total_val %}
-      <div style="text-align: right; background: var(--pearl-bg); padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border-line);">
-        <span style="font-size: 0.72rem; color: var(--ink-muted); text-transform: uppercase; display: block; font-weight: 700;">SUMMARY / TOTAL</span>
-        <strong style="font-size: 1.25rem; color: var(--forest-primary);">{{ total_val }}</strong>
+  <!-- KPI Overview Cards -->
+  <div class="grid-4">
+    <div class="card" style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">TOTAL REVENUE</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">
+          KES {{ "{:,.0f}".format(kpis.total_cash_collected or 0) }}
+        </div>
+        <span style="font-size: 0.75rem; color: var(--primary-plum); font-weight: 600;">Cash Collections</span>
       </div>
-    {% endif %}
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); color: var(--primary-plum); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="banknote" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">TOTAL ATHLETES</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">
+          {{ kpis.total_members or 0 }}
+        </div>
+        <span style="font-size: 0.75rem; color: var(--primary-lavender); font-weight: 600;">Registered Members</span>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); color: var(--primary-lavender); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">ACTIVE PASSES</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">
+          {{ kpis.active_members or 0 }}
+        </div>
+        <span style="font-size: 0.75rem; color: var(--color-success); font-weight: 600;">Clear for Floor Access</span>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); color: var(--color-success); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">TODAY ATTENDANCE</div>
+        <div style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-ink); margin: 2px 0;">
+          {{ kpis.today_attendance or 0 }}
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">Desk Check-Ins</span>
+      </div>
+      <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-pearl); color: var(--primary-plum); display: flex; align-items: center; justify-content: center;">
+        <i data-lucide="clipboard-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="table-modern">
-      <thead>
-        <tr>
-          {% for h in headers %}
-            <th>{{ h }}</th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in data %}
+  <!-- Interactive Visual Analytics Charts (with Palette Customizer) -->
+  <div class="grid-2">
+    <!-- Chart 1: Revenue & Growth Trends -->
+    <div class="card" style="padding: 22px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Revenue &amp; Collections Flow</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Verified physical cash revenue collected at reception</p>
+        </div>
+        <div class="chart-card-actions">
+          <div id="palette_control_reportsRevenueChart"></div>
+          <span class="badge badge-plum" style="font-size: 11px;">Cash Flow</span>
+        </div>
+      </div>
+      <div style="height: 240px; position: relative;">
+        <canvas id="reportsRevenueChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Membership Distribution -->
+    <div class="card" style="padding: 22px;">
+      <div class="chart-card-header">
+        <div class="chart-card-titles">
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">Member Subscription Status</h3>
+          <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">Active, pending cash approval, and expired athlete records</p>
+        </div>
+        <div class="chart-card-actions">
+          <div id="palette_control_reportsStatusChart"></div>
+          <span class="badge badge-neutral" style="font-size: 11px;">Roster Breakdown</span>
+        </div>
+      </div>
+      <div style="height: 240px; position: relative;">
+        <canvas id="reportsStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="card" style="padding: 18px 22px;">
+    <form method="GET" action="{{ url_for('admin.reports') }}" style="display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;">
+      <div style="flex: 2; min-width: 240px;">
+        <label class="form-label" for="type">Select Operational Report Category</label>
+        <select id="type" name="type" class="form-control" onchange="this.form.submit()">
+          <option value="cash_collection" {% if report_type == 'cash_collection' %}selected{% endif %}>1. Physical Cash Collections &amp; Receipts</option>
+          <option value="attendance" {% if report_type == 'attendance' %}selected{% endif %}>2. Front-Desk Manual Attendance</option>
+          <option value="memberships" {% if report_type == 'memberships' %}selected{% endif %}>3. Membership Subscriptions &amp; Expiry</option>
+          <option value="trainers" {% if report_type == 'trainers' %}selected{% endif %}>4. Coaching Staff &amp; Athlete Allocation</option>
+          <option value="equipment" {% if report_type == 'equipment' %}selected{% endif %}>5. Gym Assets &amp; Maintenance Status</option>
+        </select>
+      </div>
+
+      <div style="flex: 1; min-width: 150px;">
+        <label class="form-label" for="start_date">From Date</label>
+        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+      </div>
+
+      <div style="flex: 1; min-width: 150px;">
+        <label class="form-label" for="end_date">To Date</label>
+        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ end_date or '' }}">
+      </div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="filter" style="width: 15px; height: 15px;"></i>
+          <span>Filter Report</span>
+        </button>
+        {% if start_date or end_date or report_type != 'cash_collection' %}
+          <a href="{{ url_for('admin.reports') }}" class="btn btn-secondary">Reset</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Structured Report Output Table -->
+  <div class="card" style="padding: 22px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-line); padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h3 style="text-transform: uppercase; margin: 0 0 0.25rem; font-size: 1.15rem; font-weight: 700; color: var(--text-ink); font-family: var(--font-heading);">
+          {{ report_type|replace('_', ' ')|upper }} REPORT
+        </h3>
+        <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted);">
+          Enterprise Operational Reports &bull; Generated from live database records
+          {% if start_date or end_date %}
+            &bull; Window: {{ start_date or 'Earliest' }} to {{ end_date or 'Present' }}
+          {% endif %}
+        </p>
+      </div>
+      {% if total_val %}
+        <div style="text-align: right; background: var(--bg-pearl); padding: 0.6rem 1rem; border-radius: 8px; border: 1px solid var(--border-line);">
+          <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; display: block; font-weight: 700;">SUMMARY / TOTAL</span>
+          <strong style="font-size: 1.25rem; color: var(--primary-plum);">{{ total_val }}</strong>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
           <tr>
-            {% for cell in row %}
-              <td style="font-size: 0.85rem; color: var(--ink-secondary);">{{ cell }}</td>
+            {% for h in headers %}
+              <th>{{ h }}</th>
             {% endfor %}
           </tr>
-        {% else %}
-          <tr>
-            <td colspan="{{ headers|length if headers else 4 }}" style="text-align: center; padding: 3rem 1rem; color: var(--ink-muted);">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--pearl-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--ink-muted);">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              </div>
-              <h4 style="margin: 0 0 0.35rem; color: var(--ink-dark);">No Records Found</h4>
-              <p style="font-size: 0.85rem; margin: 0;">Try selecting a broader date range or choosing another report category above.</p>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for row in data %}
+            <tr>
+              {% for cell in row %}
+                <td style="font-size: 0.85rem; color: var(--text-ink);">{{ cell }}</td>
+              {% endfor %}
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="{{ headers|length if headers else 4 }}" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-pearl); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary-lavender);">
+                  <i data-lucide="file-text" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h4 style="margin: 0 0 0.35rem; color: var(--text-ink);">No Records Found</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Try selecting a broader date range or choosing another report category above.</p>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
+
 </div>
+
+<!-- Chart.js Engine & Palette Integrations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  renderChartPaletteControl('reportsRevenueChart');
+  renderChartPaletteControl('reportsStatusChart');
+
+  const chartAnalytics = {{ chart_analytics|tojson|safe }};
+
+  // 1. Revenue Chart
+  const ctxRev = document.getElementById('reportsRevenueChart');
+  if (ctxRev) {
+    const revLabels = (chartAnalytics && chartAnalytics.cash_labels && chartAnalytics.cash_labels.length) 
+                      ? chartAnalytics.cash_labels 
+                      : ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const revValues = (chartAnalytics && chartAnalytics.cash_data && chartAnalytics.cash_data.length) 
+                      ? chartAnalytics.cash_data 
+                      : [1200, 2400, 1800, 5000];
+
+    const revChart = new Chart(ctxRev, {
+      type: 'line',
+      data: {
+        labels: revLabels,
+        datasets: [{
+          label: 'Revenue (KES)',
+          data: revValues,
+          borderColor: '#684A78',
+          backgroundColor: 'rgba(104, 74, 120, 0.12)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2.5,
+          pointBackgroundColor: '#684A78',
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(c) { return 'KES ' + Number(c.raw).toLocaleString(); }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(232, 224, 239, 0.4)' }, ticks: { color: '#776B82', font: { family: "'General Sans', sans-serif", size: 11.5 } } },
+          y: { grid: { color: 'rgba(232, 224, 239, 0.4)' }, ticks: { color: '#776B82', font: { family: "'General Sans', sans-serif", size: 11.5 } }, beginAtZero: true }
+        }
+      }
+    });
+    registerCustomChart('reportsRevenueChart', revChart);
+  }
+
+  // 2. Status Breakdown Doughnut Chart
+  const ctxStatus = document.getElementById('reportsStatusChart');
+  if (ctxStatus) {
+    const statusLabels = (chartAnalytics && chartAnalytics.status_labels && chartAnalytics.status_labels.length) 
+                         ? chartAnalytics.status_labels 
+                         : ['Active', 'Pending', 'Expired'];
+    const statusData = (chartAnalytics && chartAnalytics.status_data && chartAnalytics.status_data.length && chartAnalytics.status_data.some(x => x > 0))
+                       ? chartAnalytics.status_data 
+                       : [{{ kpis.active_members or 1 }}, {{ kpis.new_registrations or 0 }}, {{ kpis.expired_memberships or 1 }}];
+
+    const statusChart = new Chart(ctxStatus, {
+      type: 'doughnut',
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          data: statusData,
+          backgroundColor: ['#684A78', '#9677CE', '#C2AFE8', '#EDE5FA'],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#342B3D', font: { family: "'General Sans', sans-serif", size: 12 }, padding: 14 } }
+        },
+        cutout: '68%'
+      }
+    });
+    registerCustomChart('reportsStatusChart', statusChart);
+  }
+});
+</script>
 {% endblock %}

@@ -6,26 +6,30 @@
 {% block member_content %}
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
-  <!-- Search & Muscle Filter Bar -->
-  <div class="fp-card">
-    <form method="GET" action="{{ url_for('member.exercises') }}" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+  <!-- Search & Filter Controls -->
+  <div class="card" style="padding: 18px 24px;">
+    <form method="GET" action="{{ url_for('member.exercises') }}" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;">
       <div style="display: flex; gap: 10px; flex: 1; min-width: 280px;">
-        <input type="text" name="q" class="fp-form-control" placeholder="Search exercises (e.g. Squat, Bench Press, Pull-Up)..." value="{{ request.args.get('q', '') }}">
-        <button type="submit" class="fp-btn-dark">Search</button>
+        <div style="position: relative; width: 100%;">
+          <input type="text" name="q" class="form-control" placeholder="Search exercises (e.g. Squat, Bench Press, Pull-Up)..." value="{{ request.args.get('q', '') }}" style="padding-left: 38px;">
+          <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted);"></i>
+        </div>
+        <button type="submit" class="btn btn-primary" style="white-space: nowrap;">Search</button>
       </div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <select name="muscle" class="fp-form-control" style="width: auto;" onchange="this.form.submit()">
+        <select name="muscle" class="form-control" style="width: auto; min-width: 170px;" onchange="this.form.submit()">
           <option value="">All Muscle Groups</option>
-          <option value="chest" {% if request.args.get('muscle') == 'chest' %}selected{% endif %}>Chest</option>
-          <option value="back" {% if request.args.get('muscle') == 'back' %}selected{% endif %}>Back</option>
-          <option value="legs" {% if request.args.get('muscle') == 'legs' %}selected{% endif %}>Legs / Quads / Hamstrings</option>
-          <option value="shoulders" {% if request.args.get('muscle') == 'shoulders' %}selected{% endif %}>Shoulders / Delts</option>
-          <option value="arms" {% if request.args.get('muscle') == 'arms' %}selected{% endif %}>Arms / Biceps / Triceps</option>
-          <option value="core" {% if request.args.get('muscle') == 'core' %}selected{% endif %}>Core / Abs</option>
+          <option value="Legs" {% if request.args.get('muscle')|lower == 'legs' %}selected{% endif %}>Legs / Quads / Hamstrings</option>
+          <option value="Chest" {% if request.args.get('muscle')|lower == 'chest' %}selected{% endif %}>Chest</option>
+          <option value="Back" {% if request.args.get('muscle')|lower == 'back' %}selected{% endif %}>Back</option>
+          <option value="Shoulders" {% if request.args.get('muscle')|lower == 'shoulders' %}selected{% endif %}>Shoulders / Delts</option>
+          <option value="Arms" {% if request.args.get('muscle')|lower == 'arms' %}selected{% endif %}>Arms / Biceps / Triceps</option>
+          <option value="Core" {% if request.args.get('muscle')|lower == 'core' %}selected{% endif %}>Core / Abs</option>
+          <option value="Full Body" {% if request.args.get('muscle')|lower in ['full body', 'fullbody'] %}selected{% endif %}>Full Body</option>
         </select>
 
-        <select name="difficulty" class="fp-form-control" style="width: auto;" onchange="this.form.submit()">
+        <select name="difficulty" class="form-control" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
           <option value="">All Difficulties</option>
           <option value="beginner" {% if request.args.get('difficulty') == 'beginner' %}selected{% endif %}>Beginner</option>
           <option value="intermediate" {% if request.args.get('difficulty') == 'intermediate' %}selected{% endif %}>Intermediate</option>
@@ -33,53 +37,145 @@
         </select>
 
         {% if request.args.get('q') or request.args.get('muscle') or request.args.get('difficulty') %}
-          <a href="{{ url_for('member.exercises') }}" class="fp-btn-outline">Reset</a>
+          <a href="{{ url_for('member.exercises') }}" class="btn btn-secondary">Reset</a>
         {% endif %}
       </div>
     </form>
   </div>
 
-  <!-- Exercise Cards Grid -->
+  <!-- Exercise Grid -->
   {% if exercises %}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
       {% for ex in exercises %}
-        <div class="fp-card" style="display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.15s ease;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-              <span class="fp-brand-badge" style="background: rgba(195, 231, 22, 0.25); color: var(--fp-ink);">
-                {{ ex.target_muscle_group or 'General' }}
-              </span>
-              <span style="font-size: 0.72rem; font-weight: 700; color: var(--fp-muted); text-transform: uppercase;">
-                {{ ex.difficulty_level or 'All Levels' }}
+        <div class="card" style="display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+          <!-- Visual Media Header -->
+          <div style="height: 160px; position: relative; background: linear-gradient(135deg, rgba(104, 74, 120, 0.2), rgba(150, 119, 206, 0.25)); overflow: hidden;">
+            {% if ex.image_url %}
+              <img src="{{ ex.image_url }}" alt="{{ ex.name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #FAF8FD, #EDE5FA);">
+                <i data-lucide="dumbbell" style="width: 44px; height: 44px; color: var(--primary-lavender); opacity: 0.7;"></i>
+              </div>
+            {% else %}
+              <div style="display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; background: linear-gradient(135deg, #FAF8FD, #EDE5FA);">
+                <i data-lucide="dumbbell" style="width: 44px; height: 44px; color: var(--primary-lavender); opacity: 0.7;"></i>
+              </div>
+            {% endif %}
+            
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="badge badge-plum" style="box-shadow: 0 2px 6px rgba(0,0,0,0.15); font-weight: 700;">
+                {{ ex.target_muscle_group or 'Full Body' }}
               </span>
             </div>
-
-            <h4 style="font-size: 1.15rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 6px 0;">{{ ex.name }}</h4>
-            <p style="font-size: 0.8rem; color: var(--fp-muted); margin: 0 0 14px 0; line-height: 1.4;">
-              {{ ex.description or 'Compound gym movement focusing on functional athletic strength.' }}
-            </p>
+            <div style="position: absolute; top: 12px; right: 12px;">
+              <span class="badge badge-neutral" style="background: rgba(255,255,255,0.92); color: var(--text-ink); font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                {{ (ex.difficulty or 'INTERMEDIATE')|upper }}
+              </span>
+            </div>
           </div>
 
-          <div style="border-top: 1px solid var(--fp-border); padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
-            <span style="color: var(--fp-muted); font-weight: 600;">
-              <i data-lucide="shield" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-              {{ ex.equipment_required or 'Standard Equipment' }}
-            </span>
-            <a href="{{ url_for('member.workouts') }}" style="color: var(--fp-ink); font-weight: 700; text-decoration: underline;">
-              Add to Log
-            </a>
+          <!-- Card Body -->
+          <div style="padding: 18px 20px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 6px 0; font-family: var(--font-heading);">{{ ex.name }}</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 14px 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ ex.instructions or 'Master this functional movement pattern to build compound strength and power.' }}
+              </p>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-line); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+              <span style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px;">
+                <i data-lucide="wrench" style="width: 14px; height: 14px; color: var(--primary-lavender);"></i>
+                {{ ex.equipment_required or 'Standard Gym Gear' }}
+              </span>
+              <button type="button" class="btn btn-secondary btn-sm"
+                      data-name="{{ ex.name }}"
+                      data-muscle="{{ ex.target_muscle_group or 'Full Body' }}"
+                      data-diff="{{ (ex.difficulty or 'Intermediate')|capitalize }}"
+                      data-equip="{{ ex.equipment_required or 'Standard Gym Gear' }}"
+                      data-inst="{{ ex.instructions or 'Execute with controlled tempo, full range of motion, and tight core engagement.' }}"
+                      data-img="{{ ex.image_url or '' }}"
+                      onclick="openMovementModal(this)">
+                View Form Guide
+              </button>
+            </div>
           </div>
         </div>
       {% endfor %}
     </div>
   {% else %}
-    <div class="fp-card" style="text-align: center; padding: 48px 16px;">
-      <i data-lucide="book-open" style="width: 40px; height: 40px; color: var(--fp-muted); margin-bottom: 12px; opacity: 0.4;"></i>
-      <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--fp-ink); margin: 0 0 4px 0;">No Movements Found</h3>
-      <p style="font-size: 0.82rem; color: var(--fp-muted); margin: 0 0 16px 0;">Try adjusting your search terms or clearing the muscle filters.</p>
-      <a href="{{ url_for('member.exercises') }}" class="fp-btn-dark">Reset All Filters</a>
+    <div class="card" style="text-align: center; padding: 48px 16px;">
+      <i data-lucide="book-open" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.6;"></i>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">No Movements Found</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0;">Try adjusting your search terms or clearing the muscle filters.</p>
+      <a href="{{ url_for('member.exercises') }}" class="btn btn-primary">Reset All Filters</a>
     </div>
   {% endif %}
 
 </div>
+
+<!-- Exercise Details Modal -->
+<div id="movementGuideModal" class="modal-overlay">
+  <div class="modal-box" style="max-width: 540px;">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="mGuideTitle">Movement Guide</h3>
+        <p class="modal-subtitle" id="mGuideMuscle"></p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('movementGuideModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="mGuideImgWrap" style="height: 200px; border-radius: 10px; overflow: hidden; margin-bottom: 16px; background: var(--bg-pearl); display: none;">
+        <img id="mGuideImg" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <span class="badge badge-plum" id="mGuideMuscleBadge"></span>
+        <span class="badge badge-neutral" id="mGuideDiffBadge"></span>
+      </div>
+
+      <div style="margin-bottom: 16px; background: var(--bg-pearl); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-line);">
+        <strong style="color: var(--text-ink); display: block; font-size: 0.82rem; margin-bottom: 2px;">Required Equipment:</strong>
+        <span id="mGuideEquip" style="color: var(--text-secondary); font-size: 0.88rem;"></span>
+      </div>
+
+      <div>
+        <strong style="color: var(--text-ink); display: block; font-size: 0.85rem; margin-bottom: 6px;">Form Mechanics & Coaching Notes:</strong>
+        <p id="mGuideInst" style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin: 0; white-space: pre-line;"></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeModal('movementGuideModal')">Close</button>
+      <a href="{{ url_for('member.workouts') }}" class="btn btn-primary">Add to Workout</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function openMovementModal(btn) {
+  const name = btn.getAttribute('data-name');
+  const muscle = btn.getAttribute('data-muscle');
+  const diff = btn.getAttribute('data-diff');
+  const equip = btn.getAttribute('data-equip');
+  const inst = btn.getAttribute('data-inst');
+  const img = btn.getAttribute('data-img');
+
+  document.getElementById('mGuideTitle').textContent = name;
+  document.getElementById('mGuideMuscle').textContent = 'Target Group: ' + muscle;
+  document.getElementById('mGuideMuscleBadge').textContent = muscle;
+  document.getElementById('mGuideDiffBadge').textContent = diff.toUpperCase();
+  document.getElementById('mGuideEquip').textContent = equip;
+  document.getElementById('mGuideInst').textContent = inst;
+
+  const imgWrap = document.getElementById('mGuideImgWrap');
+  const imgEl = document.getElementById('mGuideImg');
+  if (img && img.trim() !== '') {
+    imgEl.src = img;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+
+  openModal('movementGuideModal');
+}
+</script>
 {% endblock %}

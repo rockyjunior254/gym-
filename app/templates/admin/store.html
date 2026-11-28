@@ -1,0 +1,269 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Pro Shop &amp; Merchandise Management | {{ gym_settings.gym_name }}{% endblock %}
+
+{% block admin_content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Header Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-plum); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">
+        COMMERCE &bull; INVENTORY CONTROL
+      </div>
+      <h1 style="font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; color: var(--text-ink); margin: 0; letter-spacing: -0.02em;">
+        Pro Shop &amp; Merchandise
+      </h1>
+      <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Manage official apparel, lifting belts, shakers, and athletic gear. All pickups are paid in physical cash at the front desk.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button type="button" class="btn btn-primary" onclick="openModal('addProductModal')" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+        <span>Add New Product</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter & Stats Bar -->
+  <div class="card" style="padding: 16px 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <form method="GET" action="{{ url_for('admin.store') }}" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <select name="category" class="form-control" style="width: auto; font-size: 0.85rem;" onchange="this.form.submit()">
+          <option value="">All Categories</option>
+          <option value="Apparel" {% if selected_category == 'Apparel' %}selected{% endif %}>Apparel</option>
+          <option value="Lifting Gear" {% if selected_category == 'Lifting Gear' %}selected{% endif %}>Lifting Gear</option>
+          <option value="Bottles & Shakers" {% if selected_category == 'Bottles & Shakers' %}selected{% endif %}>Bottles &amp; Shakers</option>
+          <option value="Gym Bags" {% if selected_category == 'Gym Bags' %}selected{% endif %}>Gym Bags</option>
+          <option value="Accessories" {% if selected_category == 'Accessories' %}selected{% endif %}>Accessories</option>
+          <option value="Recovery Accessories" {% if selected_category == 'Recovery Accessories' %}selected{% endif %}>Recovery Accessories</option>
+        </select>
+        {% if selected_category %}
+          <a href="{{ url_for('admin.store') }}" class="btn btn-secondary btn-sm">Reset</a>
+        {% endif %}
+      </form>
+
+      <span class="badge badge-plum" style="font-size: 11.5px; padding: 6px 12px;">
+        {{ products|length }} Products Listed
+      </span>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  {% if products %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;">
+      {% for prod in products %}
+        <div class="card" style="border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-line);">
+          <div>
+            <!-- Media Box -->
+            <div style="height: 160px; position: relative; background: var(--bg-pearl); overflow: hidden;">
+              {% if prod.image_url %}
+                <img src="{{ prod.image_url }}" alt="{{ prod.name }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; color: var(--primary-lavender);">
+                  <i data-lucide="package" style="width: 44px; height: 44px; opacity: 0.5;"></i>
+                </div>
+              {% else %}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--primary-lavender);">
+                  <i data-lucide="package" style="width: 44px; height: 44px; opacity: 0.5;"></i>
+                </div>
+              {% endif %}
+
+              <div style="position: absolute; top: 10px; left: 10px;">
+                <span class="badge badge-plum" style="font-size: 10.5px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                  {{ prod.category or 'Merchandise' }}
+                </span>
+              </div>
+              <div style="position: absolute; top: 10px; right: 10px;">
+                <span class="badge badge-neutral" style="font-size: 10.5px; background: rgba(255,255,255,0.92); color: var(--text-ink); font-weight: 700;">
+                  Stock: {{ prod.stock_quantity or 0 }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div style="padding: 16px 18px 10px 18px;">
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">SKU: {{ prod.sku or 'N/A' }}</div>
+              <h4 style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; color: var(--text-ink); margin: 4px 0 6px 0;">{{ prod.name }}</h4>
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--primary-plum); margin-bottom: 8px;">
+                KES {{ "{:,.0f}".format(prod.price|float) if prod.price else '0' }}
+              </div>
+              <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ prod.description or 'Official merchandise item.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="border-top: 1px solid var(--border-line); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+            <button type="button" class="btn btn-secondary btn-sm"
+                    data-id="{{ prod.id }}"
+                    data-name="{{ prod.name }}"
+                    data-cat="{{ prod.category }}"
+                    data-price="{{ prod.price }}"
+                    data-stock="{{ prod.stock_quantity or 0 }}"
+                    data-desc="{{ prod.description or '' }}"
+                    data-img="{{ prod.image_url or '' }}"
+                    data-sku="{{ prod.sku or '' }}"
+                    onclick="openEditProductModal(this)">
+              Edit
+            </button>
+
+            <form method="POST" action="{{ url_for('admin.store') }}" onsubmit="return confirm('Archive this merchandise item?');" style="display: inline;">
+              <input type="hidden" name="action" value="archive">
+              <input type="hidden" name="product_id" value="{{ prod.id }}">
+              <button type="submit" class="btn btn-outline-rose btn-sm" style="padding: 4px 10px;">Archive</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 48px 16px;">
+      <i data-lucide="package" style="width: 44px; height: 44px; color: var(--primary-lavender); margin-bottom: 12px; opacity: 0.6;"></i>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-ink); margin: 0 0 4px 0;">No Products Found</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 16px 0;">Add official merchandise items to populate the Pro Shop.</p>
+      <button type="button" class="btn btn-primary" onclick="openModal('addProductModal')">Add First Product</button>
+    </div>
+  {% endif %}
+
+</div>
+
+<!-- Modal: Add Product -->
+<div id="addProductModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Add Pro Shop Item</h3>
+        <p class="modal-subtitle">Save a new merchandise product to the catalogue</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.store') }}">
+      <input type="hidden" name="action" value="create">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="add_name">Product Name <span style="color: var(--primary-plum);">*</span></label>
+          <input type="text" id="add_name" name="name" class="form-control" placeholder="e.g. Competition Lifting Belt" required>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="add_cat">Category</label>
+            <select id="add_cat" name="category" class="form-control">
+              <option value="Apparel">Apparel</option>
+              <option value="Lifting Gear">Lifting Gear</option>
+              <option value="Bottles & Shakers">Bottles &amp; Shakers</option>
+              <option value="Gym Bags">Gym Bags</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Recovery Accessories">Recovery Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add_price">Price (KES) <span style="color: var(--primary-plum);">*</span></label>
+            <input type="number" id="add_price" name="price" class="form-control" step="10" placeholder="2500" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="add_stock">Stock Quantity</label>
+            <input type="number" id="add_stock" name="stock_quantity" class="form-control" value="20" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="add_sku">SKU Code</label>
+            <input type="text" id="add_sku" name="sku" class="form-control" placeholder="STR-BLT-01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="add_img">Image URL</label>
+          <input type="url" id="add_img" name="image_url" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="add_desc">Product Description</label>
+          <textarea id="add_desc" name="description" class="form-control" rows="3" placeholder="Specifications, sizing details, materials..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Edit Product -->
+<div id="editProductModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Edit Merchandise Item</h3>
+        <p class="modal-subtitle">Update product pricing, stock count, or imagery</p>
+      </div>
+      <button type="button" class="modal-close" onclick="closeModal('editProductModal')">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.store') }}">
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="product_id" id="edit_prod_id">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="edit_name">Product Name <span style="color: var(--primary-plum);">*</span></label>
+          <input type="text" id="edit_name" name="name" class="form-control" required>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_cat">Category</label>
+            <select id="edit_cat" name="category" class="form-control">
+              <option value="Apparel">Apparel</option>
+              <option value="Lifting Gear">Lifting Gear</option>
+              <option value="Bottles & Shakers">Bottles &amp; Shakers</option>
+              <option value="Gym Bags">Gym Bags</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Recovery Accessories">Recovery Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_price">Price (KES) <span style="color: var(--primary-plum);">*</span></label>
+            <input type="number" id="edit_price" name="price" class="form-control" step="10" required>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="edit_stock">Stock Quantity</label>
+            <input type="number" id="edit_stock" name="stock_quantity" class="form-control" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit_sku">SKU Code</label>
+            <input type="text" id="edit_sku" name="sku" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_img">Image URL</label>
+          <input type="url" id="edit_img" name="image_url" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit_desc">Product Description</label>
+          <textarea id="edit_desc" name="description" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editProductModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditProductModal(btn) {
+  document.getElementById('edit_prod_id').value = btn.getAttribute('data-id');
+  document.getElementById('edit_name').value = btn.getAttribute('data-name');
+  document.getElementById('edit_cat').value = btn.getAttribute('data-cat');
+  document.getElementById('edit_price').value = btn.getAttribute('data-price');
+  document.getElementById('edit_stock').value = btn.getAttribute('data-stock');
+  document.getElementById('edit_desc').value = btn.getAttribute('data-desc');
+  document.getElementById('edit_img').value = btn.getAttribute('data-img');
+  document.getElementById('edit_sku').value = btn.getAttribute('data-sku');
+  openModal('editProductModal');
+}
+</script>
+{% endblock %}

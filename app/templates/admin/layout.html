@@ -103,6 +103,18 @@
             <span class="nav-label">Assets & Gear</span>
           </a>
         </li>
+        <li>
+          <a href="{{ url_for('admin.store') }}" class="sidebar-link {% if request.endpoint == 'admin.store' %}active{% endif %}" data-tooltip="Pro Shop & Merchandise">
+            <span class="sidebar-icon"><i data-lucide="shopping-bag"></i></span>
+            <span class="nav-label">Pro Shop</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('admin.media') }}" class="sidebar-link {% if request.endpoint == 'admin.media' %}active{% endif %}" data-tooltip="Media Library">
+            <span class="sidebar-icon"><i data-lucide="image"></i></span>
+            <span class="nav-label">Media Library</span>
+          </a>
+        </li>
       </ul>
 
       <!-- COMMUNICATION -->
