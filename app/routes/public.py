@@ -1,10 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+import os
 from app.services.repository import GymRepository
 from app.services.supabase_client import db_service
 from app.services.audit_service import log_audit
 from app.services.cache import cache
+from app.services.turnstile import verify_turnstile_token
 
 public_bp = Blueprint('public', __name__)
+
+def _get_turnstile_site_key() -> str:
+    return os.getenv('TURNSTILE_SITE_KEY', '').strip()
 
 @public_bp.route('/')
 @cache.cached(timeout=300)
@@ -89,15 +94,29 @@ def contact():
 
 @public_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    turnstile_site_key = _get_turnstile_site_key()
+
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
+        turnstile_token = request.form.get('cf-turnstile-response', '')
 
+        # 1. MANDATORY: Verify Cloudflare Turnstile bot protection before executing authentication
+        remote_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For', request.remote_addr)
+        if remote_ip and ',' in remote_ip:
+            remote_ip = remote_ip.split(',')[0].strip()
+
+        turnstile_result = verify_turnstile_token(turnstile_token, remote_ip=remote_ip)
+        if not turnstile_result:
+            flash(turnstile_result.error_message or 'Human verification failed. Please try again.', 'danger')
+            return render_template('public/login.html', turnstile_site_key=turnstile_site_key, email=email), 400
+
+        # 2. Basic form validation
         if not email or not password:
             flash('Please enter both email and password.', 'warning')
-            return render_template('public/login.html')
+            return render_template('public/login.html', turnstile_site_key=turnstile_site_key, email=email)
 
-        # Authentication against Supabase or demo administrative flow
+        # 3. Authentication against Supabase or demo administrative flow
         if db_service.is_configured:
             try:
                 res = db_service.client.auth.sign_in_with_password({'email': email, 'password': password})
@@ -150,7 +169,7 @@ def login():
             else:
                 return redirect(url_for('member.dashboard'))
 
-    return render_template('public/login.html')
+    return render_template('public/login.html', turnstile_site_key=turnstile_site_key)
 
 @public_bp.route('/register', methods=['GET', 'POST'])
 def register():
